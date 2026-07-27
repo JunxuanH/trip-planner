@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Italy 2026 — Travel Plan</title>
+<meta name="description" content="Thirteen nights: Rome, Florence, the Val d'Orcia, the Amalfi Coast and Naples. Day-by-day plan with maps and booking links.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇮🇹</text></svg>">
+<style>__CSS__</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Itinerary · revised <span id="revised"></span></div>
+    <h1 id="mast-title"></h1>
+    <div class="sub" id="mast-sub"></div>
+    <div class="facts" id="facts"></div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Jump to a day">
+  <div class="rail-inner">
+    <div class="rail-scroll" id="rail-scroll"></div>
+    <div class="jump">
+      <a href="#s-hotels">Hotels</a>
+      <a href="#s-logistics">Logistics</a>
+      <a href="#s-bookings">Bookings</a>
+      <a href="#s-budget">Budget</a>
+    </div>
+    <button class="theme-btn" id="theme" type="button" aria-label="Toggle theme">☾</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- what changed -->
+  <section class="section wrap">
+    <div class="change reveal">
+      <div class="change-top">
+        <div class="eyebrow">The revision</div>
+        <h2 id="change-head"></h2>
+        <p class="lede" id="change-sum"></p>
+        <div class="routes" id="routes"></div>
+      </div>
+      <div class="change-cols">
+        <div class="change-col gain">
+          <h4>What it buys you</h4>
+          <ul id="change-wins"></ul>
+        </div>
+        <div class="change-col cost">
+          <h4>What it costs</h4>
+          <ul id="change-costs"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- days -->
+  <section class="section wrap">
+    <div class="section-head">
+      <h2>Day by day</h2>
+      <span class="n">14 days · 13 nights</span>
+    </div>
+    <div id="days"></div>
+  </section>
+
+  <!-- hotels -->
+  <section class="section wrap" id="s-hotels">
+    <div class="section-head">
+      <h2>Where you sleep</h2>
+      <span class="n">6 hotels · <span id="hotels-total"></span></span>
+    </div>
+    <div class="grid c3" id="hotels"></div>
+  </section>
+
+  <!-- logistics -->
+  <section class="section wrap" id="s-logistics">
+    <div class="section-head">
+      <h2>Getting between them</h2>
+      <span class="n">drivers &amp; trains</span>
+    </div>
+    <div class="table-scroll reveal">
+      <table>
+        <thead><tr><th>Date</th><th>Service</th><th>Route</th><th>Hours</th><th>Quote</th></tr></thead>
+        <tbody id="drivers-body"></tbody>
+      </table>
+    </div>
+    <p class="colophon" id="drivers-note" style="margin-top:1rem;padding-top:0;border:0"></p>
+  </section>
+
+  <!-- bookings -->
+  <section class="section wrap" id="s-bookings">
+    <div class="section-head">
+      <h2>Book in this order</h2>
+      <span class="n">most urgent first</span>
+    </div>
+    <div class="book" id="bookings"></div>
+    <div class="ruled-out" id="ruled-out">
+      <div class="eyebrow" style="margin-bottom:.4rem">Ruled out</div>
+    </div>
+  </section>
+
+  <!-- budget -->
+  <section class="section wrap" id="s-budget">
+    <div class="section-head">
+      <h2>What it costs</h2>
+      <span class="n">estimates, cash, before points</span>
+    </div>
+    <div class="budget reveal" id="budget"></div>
+    <div class="btotal">
+      <span>Total</span>
+      <span class="amt tnum" id="budget-total"></span>
+    </div>
+    <p class="colophon" id="budget-note" style="padding-top:.6rem;margin-top:.4rem"></p>
+  </section>
+
+  <!-- photographers -->
+  <section class="section wrap">
+    <div class="section-head">
+      <h2>Photographers</h2>
+      <span class="n">旅拍</span>
+    </div>
+    <div class="table-scroll reveal">
+      <table>
+        <thead><tr><th>Where</th><th>Best spots &amp; timing</th><th>Platform</th><th>Est.</th><th>Book</th></tr></thead>
+        <tbody id="photo-body"></tbody>
+      </table>
+    </div>
+    <p class="colophon" id="photo-note" style="margin-top:1rem;padding-top:0;border:0"></p>
+  </section>
+
+  <!-- flags -->
+  <section class="section wrap">
+    <div class="section-head">
+      <h2>Corrections &amp; things to watch</h2>
+      <span class="n">found while reordering</span>
+    </div>
+    <div class="flags" id="flags"></div>
+  </section>
+
+  <!-- portals -->
+  <section class="section wrap">
+    <div class="section-head"><h2>Booking portals</h2></div>
+    <div class="portals" id="portals"></div>
+
+    <div class="colophon">
+      <p><strong>How to read this.</strong> Every day pairs an hour-by-hour timeline with a map of that day's stops. Click a pin to jump to the entry, or hover an entry to light up its pin. Drag to pan, scroll to zoom, ⟲ to reset. Links open the booking page for that item.</p>
+      <p>Maps are drawn from vector geometry embedded in this file — country outline from Natural Earth (public domain), the Campania coastline and the Tiber and Arno from OpenStreetMap (© OpenStreetMap contributors, ODbL). Positions are true Web Mercator; the styling is illustrative. Nothing here loads from the network, so the page works offline and prints to PDF.</p>
+      <p>Prices are estimates for two travellers, in USD, before points.</p>
+    </div>
+  </section>
+
+</main>
+
+<script type="module">__JS__</script>
+</body>
+</html>

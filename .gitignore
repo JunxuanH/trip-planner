@@ -1,0 +1,8 @@
+node_modules/
+.claude/settings.local.json
+.next/
+.env.local
+next-env.d.ts
+*.log
+.DS_Store
+Thumbs.db
