@@ -13,10 +13,11 @@
 
 <header class="masthead">
   <div class="wrap">
-    <div class="eyebrow">Itinerary · revised <span id="revised"></span></div>
+    <div class="eyebrow">Itinerary · updated <span id="revised"></span></div>
     <h1 id="mast-title"></h1>
     <div class="sub" id="mast-sub"></div>
     <div class="facts" id="facts"></div>
+    <div class="mast-art" id="mast-art" aria-hidden="true"></div>
   </div>
 </header>
 
@@ -34,28 +35,6 @@
 </nav>
 
 <main>
-
-  <!-- what changed -->
-  <section class="section wrap">
-    <div class="change reveal">
-      <div class="change-top">
-        <div class="eyebrow">The revision</div>
-        <h2 id="change-head"></h2>
-        <p class="lede" id="change-sum"></p>
-        <div class="routes" id="routes"></div>
-      </div>
-      <div class="change-cols">
-        <div class="change-col gain">
-          <h4>What it buys you</h4>
-          <ul id="change-wins"></ul>
-        </div>
-        <div class="change-col cost">
-          <h4>What it costs</h4>
-          <ul id="change-costs"></ul>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- days -->
   <section class="section wrap">
@@ -79,11 +58,11 @@
   <section class="section wrap" id="s-logistics">
     <div class="section-head">
       <h2>Getting between them</h2>
-      <span class="n">drivers &amp; trains</span>
+      <span class="n">self-drive, FCO to FCO</span>
     </div>
     <div class="table-scroll reveal">
       <table>
-        <thead><tr><th>Date</th><th>Service</th><th>Route</th><th>Hours</th><th>Quote</th></tr></thead>
+        <thead><tr><th>Date</th><th>Service</th><th>Route</th><th>Hours</th><th>Directions</th></tr></thead>
         <tbody id="drivers-body"></tbody>
       </table>
     </div>
@@ -113,7 +92,6 @@
       <span>Total</span>
       <span class="amt tnum" id="budget-total"></span>
     </div>
-    <p class="colophon" id="budget-note" style="padding-top:.6rem;margin-top:.4rem"></p>
   </section>
 
   <!-- photographers -->
@@ -129,15 +107,6 @@
       </table>
     </div>
     <p class="colophon" id="photo-note" style="margin-top:1rem;padding-top:0;border:0"></p>
-  </section>
-
-  <!-- flags -->
-  <section class="section wrap">
-    <div class="section-head">
-      <h2>Corrections &amp; things to watch</h2>
-      <span class="n">found while reordering</span>
-    </div>
-    <div class="flags" id="flags"></div>
   </section>
 
   <!-- portals -->

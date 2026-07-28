@@ -2,7 +2,9 @@
 
 import TRIP from '../../data/itinerary.json';
 import GEO from '../geo/italy.json';
+import STREETS from '../geo/streets.json';
 import { createMap, groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
+import { IMAGES } from './images.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -14,7 +16,14 @@ const h = (tag, attrs = {}, ...kids) => {
     if (k === 'class') n.className = v;
     else if (k === 'html') n.innerHTML = v;
     else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), v);
-    else if (k === 'style' && typeof v === 'object') Object.assign(n.style, v);
+    else if (k === 'style' && typeof v === 'object') {
+      // Object.assign silently drops CSS custom properties (--k, --c, ...):
+      // CSSStyleDeclaration only applies them through setProperty(), never
+      // through plain property assignment.
+      for (const [sk, sv] of Object.entries(v)) {
+        if (sk.startsWith('--')) n.style.setProperty(sk, sv); else n.style[sk] = sv;
+      }
+    }
     else n.setAttribute(k, v);
   }
   for (const kid of kids.flat()) {
@@ -53,6 +62,14 @@ function renderMast() {
     h('div', { class: 'fact' }, h('div', { class: 'v tnum' }, TRIP.hotels.length, ' ', h('small', {}, 'hotels'))),
     h('div', { class: 'fact' }, h('div', { class: 'v tnum' }, m.travelers, ' ', h('small', {}, 'travellers'))),
   );
+
+  // A strip of the six stops, as posters.
+  $('#mast-art').append(...TRIP.hotels.map((ht, i) => h('figure', {
+    style: { '--c': accentOf(ht.cityKey), '--i': i },
+  },
+    h('img', { src: IMAGES[ht.img], alt: `Illustration of ${ht.city}` }),
+    h('figcaption', {}, ht.city),
+  )));
 }
 
 /* ── rail ───────────────────────────────────────────────────────────────── */
@@ -69,28 +86,6 @@ function renderRail() {
   });
 }
 
-/* ── the change panel ───────────────────────────────────────────────────── */
-
-function renderChange() {
-  const c = TRIP.change;
-  $('#change-head').textContent = c.headline;
-  $('#change-sum').textContent = c.summary;
-
-  const chain = (list, hi) => h('div', { class: 'route-chain' },
-    list.flatMap((name, i) => [
-      i ? h('b', {}, '→') : null,
-      h('i', { class: hi.includes(name) ? 'hi' : '' }, name),
-    ]).filter(Boolean));
-
-  $('#routes').append(
-    h('div', { class: 'route-row is-old' }, h('div', { class: 'tag' }, 'Was'), chain(c.oldRoute, [])),
-    h('div', { class: 'route-row is-new' }, h('div', { class: 'tag' }, 'Now'), chain(c.newRoute, ['Florence', "Val d'Orcia"])),
-  );
-
-  $('#change-wins').append(...c.wins.map((t) => h('li', {}, t)));
-  $('#change-costs').append(...c.costs.map((t) => h('li', {}, t)));
-}
-
 /* ── days ───────────────────────────────────────────────────────────────── */
 
 const maps = new Map();
@@ -98,27 +93,43 @@ const maps = new Map();
 function renderDays() {
   const host = $('#days');
 
-  TRIP.days.forEach((d) => {
+  TRIP.days.forEach((d, di) => {
     const c = accentOf(d.city);
     const stops = groupStops(d.items);
 
-    const sec = h('section', { class: 'day reveal', id: `day-${d.n}`, style: { '--c': c } });
+    // A day you move in somewhere new gets the destination as a banner —
+    // by the specific hotel, not just the city: Rome alone has two (Trame,
+    // then The St. Regis on the finale), each with its own illustration.
+    const prevHotel = di ? TRIP.days[di - 1].hotel : null;
+    const arriving = d.hotel && d.hotel !== prevHotel;
+    const stayHotel = arriving && TRIP.hotels.find((ht) => ht.name === d.hotel);
+    const art = stayHotel ? IMAGES[stayHotel.img] : null;
+
+    const sec = h('section', {
+      class: 'day reveal' + (art ? ' has-art' : ''), id: `day-${d.n}`, style: { '--c': c },
+      'data-n': String(d.n).padStart(2, '0'),
+    });
 
     /* head */
     const idx = h('div', { class: 'day-index' },
       h('span', { class: 'num' }, `DAY ${String(d.n).padStart(2, '0')}`),
       h('span', { class: 'date' }, fmt(d.date, { weekday: 'long', day: 'numeric', month: 'long' })),
-      d.changed ? h('span', { class: 'badge moved' }, 'Rescheduled') : null,
       d.transfer ? h('span', { class: 'badge newleg' }, 'Travel day') : null,
     );
 
+    const banner = art ? h('div', { class: 'day-art' },
+      h('img', { src: art, alt: `Illustration of ${TRIP.cities[d.city].name}`, loading: 'lazy' }),
+      h('div', { class: 'day-art-cap' },
+        h('span', { class: 'art-tag' }, 'Illustration'),
+        h('b', {}, 'Checking in — ', d.hotel)),
+    ) : null;
+
     const head = h('div', { class: 'day-head' },
+      banner,
       idx,
       h('h3', {}, d.title),
       h('div', { class: 'kicker' }, d.kicker),
       d.note ? h('p', { class: 'note' }, d.note) : null,
-      d.changeNote ? h('div', { class: 'callout change' },
-        h('span', { class: 'ic' }, '⇄'), h('div', {}, h('b', {}, 'What moved. '), d.changeNote)) : null,
       d.warn ? h('div', { class: 'callout warn' },
         h('span', { class: 'ic' }, '⚠'), h('div', {}, h('b', {}, 'Watch this. '), d.warn)) : null,
     );
@@ -131,8 +142,8 @@ function renderDays() {
       const row = h('li', {
         class: 'tl', 'data-i': i, style: { '--k': k },
         onClick: () => focusStop(d.n, stopIdx, i),
-        onMouseenter: () => maps.get(d.n)?.select(stopIdx),
-        onMouseleave: () => maps.get(d.n)?.select(activeStop.get(d.n) ?? -1),
+        onMouseenter: () => ensureMap(d.n)?.select(stopIdx),
+        onMouseleave: () => ensureMap(d.n)?.select(activeStop.get(d.n) ?? -1),
       },
         h('div', { class: 'tl-time tnum' }, it.time),
         h('div', { class: 'tl-main' },
@@ -140,8 +151,6 @@ function renderDays() {
           it.detail ? h('div', { class: 'tl-detail' }, it.detail) : null,
           it.how ? h('div', { class: 'tl-how' }, it.how) : null,
           h('div', { class: 'tl-tags' },
-            it.moved ? h('span', { class: 'mini moved' }, 'Moved') : null,
-            it.isNew ? h('span', { class: 'mini newer' }, 'New') : null,
             it.optional ? h('span', { class: 'mini opt' }, 'Optional') : null,
             it.link ? h('a', {
               class: 'lk', href: it.link, target: '_blank', rel: 'noopener noreferrer',
@@ -160,9 +169,9 @@ function renderDays() {
     const cap = h('div', { class: 'map-cap' }, TRIP.cities[d.city].name);
     const info = h('div', { class: 'map-info' });
     const tools = h('div', { class: 'map-tools' },
-      h('button', { type: 'button', title: 'Zoom in', 'aria-label': 'Zoom in', onClick: () => maps.get(d.n).zoomIn() }, '+'),
-      h('button', { type: 'button', title: 'Zoom out', 'aria-label': 'Zoom out', onClick: () => maps.get(d.n).zoomOut() }, '−'),
-      h('button', { type: 'button', title: 'Reset view', 'aria-label': 'Reset view', onClick: () => { maps.get(d.n).reset(); clearStop(d.n); } }, '⟲'),
+      h('button', { type: 'button', title: 'Zoom in', 'aria-label': 'Zoom in', onClick: () => ensureMap(d.n)?.zoomIn() }, '+'),
+      h('button', { type: 'button', title: 'Zoom out', 'aria-label': 'Zoom out', onClick: () => ensureMap(d.n)?.zoomOut() }, '−'),
+      h('button', { type: 'button', title: 'Reset view', 'aria-label': 'Reset view', onClick: () => { ensureMap(d.n)?.reset(); clearStop(d.n); } }, '⟲'),
     );
     const hint = h('div', { class: 'map-hint' }, 'Drag to pan · scroll to zoom');
     frame.append(cap, tools, hint, info);
@@ -176,20 +185,40 @@ function renderDays() {
     sec.append(head, h('div', { class: 'day-body' }, tl, mapWrap));
     host.append(sec);
 
-    /* build the map once the element has a size */
-    const api = createMap(frame, {
-      stops, geo: GEO, alt: `Map of day ${d.n}: ${d.title}`,
+    /* Building fourteen street maps up front is slow; each one is created the
+       first time its day comes near the viewport (or is asked for). */
+    frame.style.setProperty('--c', c);
+    mapInfo.set(d.n, { info, stops });
+    pendingMaps.set(d.n, () => createMap(frame, {
+      stops, geo: GEO, streets: STREETS, alt: `Map of day ${d.n}: ${d.title}`,
       onPick: (i) => {
         if (i == null) return clearStop(d.n);
-        const first = stops[i].nums[0] - 1;
-        focusStop(d.n, i, first, false);
+        focusStop(d.n, i, stops[i].nums[0] - 1, false);
       },
-    });
-    frame.style.setProperty('--c', c);
-    maps.set(d.n, api);
-    mapInfo.set(d.n, { info, stops });
+    }));
+    mapIO.observe(sec);
   });
 }
+
+const pendingMaps = new Map();
+
+function ensureMap(dayN) {
+  if (maps.has(dayN)) return maps.get(dayN);
+  const make = pendingMaps.get(dayN);
+  if (!make) return null;
+  pendingMaps.delete(dayN);
+  const api = make();
+  maps.set(dayN, api);
+  return api;
+}
+
+const mapIO = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    ensureMap(Number(e.target.id.split('-')[1]));
+    mapIO.unobserve(e.target);
+  });
+}, { rootMargin: '600px 0px' });
 
 /* ── linking the timeline and the map ───────────────────────────────────── */
 
@@ -197,7 +226,7 @@ const activeStop = new Map();
 const mapInfo = new Map();
 
 function focusStop(dayN, stopIdx, itemIdx, scroll = true) {
-  const map = maps.get(dayN);
+  const map = ensureMap(dayN);
   if (!map || stopIdx < 0) return;
   activeStop.set(dayN, stopIdx);
   map.revealStop(stopIdx);
@@ -208,10 +237,13 @@ function focusStop(dayN, stopIdx, itemIdx, scroll = true) {
   const { info, stops } = mapInfo.get(dayN);
   const s = stops[stopIdx];
   info.textContent = '';
+  // Element.append() stringifies non-Node arguments (including null, as the
+  // literal text "null") rather than skipping them the way h()'s own kid
+  // handling does — so the optional detail line can only be passed when real.
   info.append(
     h('span', { class: 'tnum' }, s.items.map((it) => it.time).join(' · ')),
     h('b', {}, s.label),
-    s.items[0].detail ? h('div', {}, s.items[0].detail) : null,
+    ...(s.items[0].detail ? [h('div', {}, s.items[0].detail)] : []),
   );
   info.classList.add('is-on');
 
@@ -238,20 +270,27 @@ const isInView = (el) => {
 
 function renderHotels() {
   const host = $('#hotels');
-  TRIP.hotels.forEach((ht) => {
-    host.append(h('div', { class: 'card reveal', style: { '--c': accentOf(ht.cityKey) } },
-      h('div', { class: 'city' }, ht.city),
-      h('h4', {}, ht.name),
-      h('div', { class: 'brand' }, ht.brand),
-      h('div', { class: 'blurb' }, ht.blurb),
-      h('div', { class: 'dates' },
-        h('b', { class: 'tnum' }, `${dayLabel(ht.checkIn)} → ${dayLabel(ht.checkOut)}`),
-        h('span', {}, `${ht.nights} night${ht.nights > 1 ? 's' : ''}`)),
-      ht.moved ? h('div', { class: 'was' },
-        'Moved from ', h('s', {}, `${dayLabel(ht.wasCheckIn)} → ${dayLabel(ht.wasCheckOut)}`), ' — rebook') : null,
-      h('div', { class: 'foot' },
-        h('div', { class: 'price tnum' }, money(ht.total), ' ', h('small', {}, `· ${money(ht.nightly)}/night`)),
-        h('a', { class: 'lk', href: ht.link, target: '_blank', rel: 'noopener noreferrer' }, 'Trip.com')),
+  TRIP.hotels.forEach((ht, i) => {
+    const art = IMAGES[ht.img];
+    host.append(h('div', { class: 'card hotel reveal', style: { '--c': accentOf(ht.cityKey) } },
+      art ? h('div', { class: 'card-art' },
+        h('img', { src: art, alt: `Illustration of ${ht.city}`, loading: i > 1 ? 'lazy' : null }),
+        h('span', { class: 'art-tag' }, 'Illustration'),
+        h('span', { class: 'art-city' }, ht.city),
+      ) : null,
+      h('div', { class: 'card-body' },
+        h('h4', {}, ht.name),
+        h('div', { class: 'brand' }, ht.brand),
+        h('div', { class: 'blurb' }, ht.blurb),
+        ht.address ? h('div', { class: 'addr' }, ht.address) : null,
+        h('div', { class: 'dates' },
+          h('b', { class: 'tnum' }, `${dayLabel(ht.checkIn)} → ${dayLabel(ht.checkOut)}`),
+          h('span', {}, `${ht.nights} night${ht.nights > 1 ? 's' : ''}`)),
+        h('div', { class: 'foot' },
+          h('div', { class: 'price tnum' }, money(ht.total), ' ', h('small', {}, `· ${money(ht.nightly)}/night`)),
+          h('div', { class: 'foot-links' },
+            h('a', { class: 'lk', href: ht.link, target: '_blank', rel: 'noopener noreferrer' }, 'Photos & book'))),
+      ),
     ));
   });
 
@@ -264,14 +303,12 @@ function renderHotels() {
 function renderDrivers() {
   const body = $('#drivers-body');
   TRIP.drivers.forEach((dv) => {
-    body.append(h('tr', { class: dv.isNew ? 'is-new' : dv.changed ? 'is-changed' : '' },
+    body.append(h('tr', {},
       h('td', {}, h('b', { class: 'tnum' }, dayLabel(dv.date))),
-      h('td', {}, dv.service,
-        dv.isNew ? h('span', { class: 'mini newer', style: { marginLeft: '.4rem' } }, 'New') : null,
-        dv.changed ? h('span', { class: 'mini moved', style: { marginLeft: '.4rem' } }, 'Moved') : null),
+      h('td', {}, dv.service),
       h('td', {}, dv.route, dv.note ? h('div', { class: 'sub' }, dv.note) : null),
       h('td', { class: 'tnum' }, dv.hours),
-      h('td', {}, h('a', { class: 'lk', href: dv.link, target: '_blank', rel: 'noopener noreferrer' }, 'Quote')),
+      h('td', {}, h('a', { class: 'lk', href: dv.link, target: '_blank', rel: 'noopener noreferrer' }, 'Directions')),
     ));
   });
   $('#drivers-note').textContent = TRIP.driversNote;
@@ -308,18 +345,14 @@ function renderBudget() {
 
   TRIP.budget.forEach((b, i) => {
     const k = BUDGET_COLORS[i % BUDGET_COLORS.length];
-    const delta = b.was != null ? b.amount - b.was : 0;
     host.append(h('div', { class: 'brow', style: { '--k': k } },
       h('div', { class: 'cat' }, b.category, h('span', { class: 'sub' }, b.note)),
       h('div', { class: 'bar' }, h('i', { style: { width: (b.amount / max * 100).toFixed(1) + '%' } })),
-      h('div', { class: 'amt tnum' }, money(b.amount),
-        delta ? h('span', { class: 'delta' }, (delta > 0 ? '+' : '−') + money(Math.abs(delta))) : null),
+      h('div', { class: 'amt tnum' }, money(b.amount)),
     ));
   });
 
   $('#budget-total').textContent = money(total);
-  $('#budget-note').textContent =
-    TRIP.budget.filter((b) => b.fixNote).map((b) => `${b.category}: ${b.fixNote}`).join('  ');
 }
 
 /* ── photographers, flags, portals ──────────────────────────────────────── */
@@ -327,7 +360,7 @@ function renderBudget() {
 function renderPhotographers() {
   const body = $('#photo-body');
   TRIP.photographers.forEach((p) => {
-    body.append(h('tr', { class: p.moved ? 'is-changed' : '' },
+    body.append(h('tr', {},
       h('td', {}, h('b', {}, p.location), h('div', { class: 'sub' }, p.days)),
       h('td', {}, p.spots),
       h('td', {}, p.platform, h('div', { class: 'sub' }, '小红书: ', p.xhs)),
@@ -339,18 +372,6 @@ function renderPhotographers() {
     ));
   });
   $('#photo-note').textContent = TRIP.photographersNote;
-}
-
-const FLAG_TICK = { fixed: '✓', note: '·', watch: '⚠' };
-
-function renderFlags() {
-  const host = $('#flags');
-  TRIP.flags.forEach((f) => {
-    host.append(h('div', { class: `flag f-${f.level} reveal` },
-      h('div', { class: 'tick' }, FLAG_TICK[f.level] || '·'),
-      h('div', {}, h('h4', {}, f.title), h('p', {}, f.detail)),
-    ));
-  });
 }
 
 function renderPortals() {
@@ -404,14 +425,12 @@ function initReveal() {
 
 renderMast();
 renderRail();
-renderChange();
 renderDays();
 renderHotels();
 renderDrivers();
 renderBookings();
 renderBudget();
 renderPhotographers();
-renderFlags();
 renderPortals();
 initTheme();
 initSpy();

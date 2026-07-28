@@ -75,7 +75,8 @@ let totalNights = 0;
 trip.hotels.forEach((h, i) => {
   const n = nightsBetween(h.checkIn, h.checkOut);
   if (n !== h.nights) fail(`${h.name}: ${h.checkIn}→${h.checkOut} is ${n} nights, declared ${h.nights}`);
-  if (h.nightly * h.nights !== h.total) fail(`${h.name}: ${h.nightly} × ${h.nights} ≠ ${h.total}`);
+  // Cents don't always divide evenly across nights — allow a penny of rounding slack.
+  if (Math.abs(h.nightly * h.nights - h.total) > 0.02) fail(`${h.name}: ${h.nightly} × ${h.nights} ≠ ${h.total}`);
   totalNights += n;
 
   if (i > 0) {
@@ -117,7 +118,6 @@ const checkUrlDates = (url, where, expectIn, expectOut) => {
 trip.hotels.forEach((h) => checkUrlDates(h.link, `${h.name} (hotels)`, h.checkIn, h.checkOut));
 
 // The same booking URLs are repeated inside day items and the bookings list — they must agree.
-const byName = new Map(trip.hotels.map((h) => [h.name, h]));
 const scanForHotelUrls = (link, where) => {
   if (!link?.includes('checkIn=')) return;
   const hotel = trip.hotels.find((h) => {
@@ -135,8 +135,10 @@ const expected = ['rome', 'florence', 'tuscany', 'amalfi', 'naples', 'rome'];
 if (order.join('>') !== expected.join('>')) {
   fail(`hotel order is ${order.join(' → ')}, expected ${expected.join(' → ')}`);
 }
-if (byName.get('Casa G. Firenze')?.checkIn !== '2026-08-27') fail('Florence did not move to Aug 27');
-if (byName.get('Castello di Velona')?.checkIn !== '2026-08-29') fail('Tuscany did not move to Aug 29');
+// Checked by city slot, not hotel name — the specific property booked there can change.
+const byCityKey = (key) => trip.hotels.find((h) => h.cityKey === key);
+if (byCityKey('florence')?.checkIn !== '2026-08-27') fail('Florence stay did not start Aug 27');
+if (byCityKey('tuscany')?.checkIn !== '2026-08-29') fail('Tuscany stay did not start Aug 29');
 
 /* ---------- links are well-formed ---------- */
 

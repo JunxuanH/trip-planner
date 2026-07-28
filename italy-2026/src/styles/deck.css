@@ -113,27 +113,19 @@ body {
 }
 @keyframes cue { 0%,100% { opacity: .3; transform: scaleY(.6); } 50% { opacity: 1; transform: scaleY(1); } }
 
-/* ── compare ────────────────────────────────────────────────────────────── */
-
-.compare { max-width: 46ch; }
-.compare h2 { font-size: clamp(2rem, 5vw, 3.6rem); letter-spacing: -.02em; margin-bottom: .8rem; }
-.compare p { color: var(--ink-2); font-size: clamp(.98rem, 1.5vw, 1.12rem); max-width: 44ch; }
-
-.vs { display: grid; gap: 1rem; margin: 2rem 0 1.5rem; }
-.vs-row { display: grid; grid-template-columns: 3.4rem 1fr; gap: 1rem; align-items: center; }
-.vs-row .tag { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); text-align: right; }
-.vs-row.now .tag { color: var(--terracotta); font-weight: 700; }
-.vs-chain { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; }
-.vs-chain i {
-  font-style: normal; font-size: .88rem; padding: .22rem .6rem; border-radius: 100px;
-  background: var(--paper-2); color: var(--ink-2); white-space: nowrap;
+/* City names, projected from the live 3D camera onto the hero model. */
+.map-labels-3d {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0; transition: opacity .6s ease;
 }
-.vs-row.was .vs-chain i { opacity: .5; text-decoration: line-through; }
-.vs-row.now .vs-chain i.hi { background: rgba(224,120,90,.2); color: var(--terracotta); font-weight: 650; }
-.vs-chain b { color: var(--ink-3); font-weight: 400; font-size: .8rem; }
-
-.win { display: flex; gap: .6rem; align-items: baseline; margin-top: .5rem; font-size: .95rem; color: var(--ink-2); }
-.win::before { content: "→"; color: var(--olive); }
+.map-labels-3d.is-on { opacity: 1; }
+.geo-label-3d {
+  position: absolute; transform: translate(-50%, var(--dy, -145%));
+  font-family: var(--sans); font-size: .78rem; font-weight: 700;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--ink);
+  text-shadow: 0 1px 10px rgba(0,0,0,.65), 0 0 22px rgba(0,0,0,.4);
+  white-space: nowrap; opacity: 0; transition: opacity .3s ease, top .1s linear, left .1s linear;
+}
 
 /* ── day slides ─────────────────────────────────────────────────────────── */
 
@@ -184,12 +176,67 @@ body {
 .stay b { color: var(--ink-2); font-weight: 600; }
 
 .deck-map {
-  position: relative; width: 100%; aspect-ratio: 1 / 1;
+  /* justify-self:center (not the grid default of stretch) so aspect-ratio,
+     max-width and max-height alone decide the box — width:100% here would
+     fight the height cap below and force a distorted, zoomed-out shape. */
+  position: relative; justify-self: center;
+  max-width: 100%; aspect-ratio: 1 / 1;
   max-height: 74vh; margin: 0 auto;
   border: 1px solid var(--rule); border-radius: var(--radius);
   background: var(--paper-2); overflow: hidden;
 }
 @media (max-width: 900px) { .deck-map { max-height: 40vh; aspect-ratio: 3 / 2; } }
+
+.day-right { display: grid; gap: .8rem; align-content: center; min-width: 0; }
+.day-right:has(.slide-art) .deck-map { max-height: 34vh; }
+
+.slide-art {
+  margin: 0; position: relative; overflow: hidden;
+  border-radius: var(--radius); aspect-ratio: 16 / 7;
+  border: 1px solid var(--rule); box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.slide-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slide-art figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 2rem .8rem .6rem;
+  background: linear-gradient(transparent, rgba(8,11,12,.85));
+  color: #F6EFE2; font-size: .85rem; font-weight: 600;
+  display: flex; align-items: center; gap: .5rem;
+}
+.art-tag {
+  font-size: 9px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
+  padding: .16rem .42rem; border-radius: 2px;
+  background: rgba(255,255,255,.18); color: #F6EFE2;
+}
+
+/* ── OSM street layers (deck is always dark) ────────────────────────────── */
+
+:root {
+  --st-ground: #171C1F;
+  --st-build:  #202829;
+  --st-green:  #1B241C;
+  --st-water:  #142A31;
+  --st-square: #232B2D;
+  --st-case:   #0D1113;
+  --st-fill:   #38423F;
+}
+.st-ground { fill: var(--st-ground); }
+.st-green  { fill: var(--st-green); }
+.st-water  { fill: var(--st-water); }
+.st-square { fill: var(--st-square); }
+.st-buildings { fill: var(--st-build); stroke: none; }
+.st-road-case > path { fill: none; stroke: var(--st-case); vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.st-road-fill > path { fill: none; stroke: var(--st-fill); vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.st-road-case .rc-6 { stroke: none; }
+.st-road-fill .rc-6 { stroke: #2C3431; stroke-dasharray: 3 3; }
+.st-road-fill .rc-5 { stroke: var(--st-square); }
+.st-label {
+  fill: var(--ink-3); font-family: var(--sans); font-weight: 600;
+  letter-spacing: .04em; paint-order: stroke fill;
+  stroke: var(--st-ground); stroke-width: 2.5px; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.st-square-label { fill: var(--ink-2); font-style: italic; }
 
 /* map internals reuse the engine's classnames */
 .map-svg { width: 100%; height: 100%; display: block; touch-action: none; }
@@ -211,6 +258,50 @@ body {
 .map-scale i { display: block; height: 5px; border-left: 1px solid var(--ink-3); border-right: 1px solid var(--ink-3); border-bottom: 1px solid var(--ink-3); opacity: .5; }
 .map-scale b { display: block; margin-top: .15rem; font-family: var(--mono); font-size: 9.5px; font-weight: 500; color: var(--ink-3); }
 
+/* ── pin popup (click a pin for details + Google Maps / booking link) ──── */
+
+.pin-popup {
+  position: fixed; z-index: 60; max-width: 17rem;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0,0,0,.5);
+  transform: translate(-50%, -100%) translateY(-14px);
+}
+.pin-popup.is-below { transform: translate(-50%, 0) translateY(14px); }
+.pin-popup::after {
+  content: ""; position: absolute; left: 50%; width: 10px; height: 10px;
+  background: var(--paper); border: 1px solid var(--rule);
+  transform: translateX(-50%) rotate(45deg);
+}
+.pin-popup:not(.is-below)::after { bottom: -6px; border-top: none; border-left: none; }
+.pin-popup.is-below::after { top: -6px; border-bottom: none; border-right: none; }
+
+.pin-popup-close {
+  position: absolute; top: .3rem; right: .3rem; z-index: 1;
+  width: 1.4rem; height: 1.4rem; border: none; background: none; cursor: pointer;
+  color: var(--ink-3); font-size: 1rem; line-height: 1; border-radius: 50%;
+}
+.pin-popup-close:hover { background: var(--paper-2); color: var(--ink); }
+
+.pin-popup-body { max-height: 15rem; overflow-y: auto; padding: .9rem .9rem .7rem; }
+.pin-popup-item + .pin-popup-item { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--rule); }
+.pin-popup-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.pin-popup-time { font-family: var(--mono); font-size: .72rem; color: var(--ink-3); }
+.pin-popup-kind { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.pin-popup-title { font-weight: 650; font-size: .92rem; margin-top: .2rem; color: var(--ink); }
+.pin-popup-detail { font-size: .82rem; color: var(--ink-2); margin-top: .2rem; }
+.pin-popup-links { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.pin-popup-links a {
+  font-size: 11px; font-weight: 600; padding: .22rem .55rem; border-radius: 100px;
+  background: var(--paper-3); color: var(--ink-2); text-decoration: none;
+}
+.pin-popup-links a:hover { background: var(--terracotta); color: #10161A; }
+.pin-popup-zoom {
+  display: block; width: 100%; padding: .5rem .9rem; border: none; border-top: 1px solid var(--rule);
+  background: var(--paper-2); color: var(--terracotta); font-size: .78rem; font-weight: 650;
+  cursor: pointer; border-radius: 0 0 var(--radius) var(--radius);
+}
+.pin-popup-zoom:hover { background: color-mix(in oklab, var(--terracotta) 16%, var(--paper-2)); }
+
 /* ── generic panels ─────────────────────────────────────────────────────── */
 
 .slide h2.big { font-size: clamp(2rem, 5vw, 3.6rem); letter-spacing: -.02em; }
@@ -219,16 +310,27 @@ body {
 .chain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .9rem; margin-top: 2rem; }
 .chain-card {
   border: 1px solid var(--rule); border-radius: var(--radius);
-  padding: 1rem; background: var(--paper-2);
-  display: flex; flex-direction: column; gap: .25rem;
+  background: var(--paper-2); overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), border-color .35s;
 }
-.chain-card .c { font-size: 9.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--c); font-weight: 700; }
+.is-live .chain-card { animation: card-in .6s cubic-bezier(.2,.7,.3,1) backwards; animation-delay: calc(var(--i) * 70ms); }
+@keyframes card-in { from { opacity: 0; transform: translateY(16px); } }
+.chain-card:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--c) 55%, var(--rule)); }
+.chain-art { position: relative; aspect-ratio: 3 / 2; overflow: hidden; }
+.chain-art img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.7,.3,1); }
+.chain-card:hover .chain-art img { transform: scale(1.06); }
+.chain-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(8,11,12,.72)); }
+.chain-body { padding: .85rem 1rem 1rem; display: flex; flex-direction: column; gap: .25rem; flex: 1; }
+.chain-card .c {
+  position: absolute; left: .6rem; bottom: .45rem; z-index: 1;
+  font-size: 9.5px; letter-spacing: .13em; text-transform: uppercase;
+  color: #F6EFE2; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,.7);
+}
 .chain-card h4 { font-size: 1.05rem; }
 .chain-card .b { font-size: .74rem; color: var(--ink-3); }
 .chain-card .d { margin-top: auto; padding-top: .7rem; font-family: var(--mono); font-size: .74rem; color: var(--ink-2); }
 .chain-card .n { font-size: .72rem; color: var(--ink-3); }
-.chain-card.moved { border-color: rgba(224,120,90,.45); }
-.chain-card .mv { font-size: .68rem; color: var(--terracotta); margin-top: .2rem; }
 
 .legs { margin-top: 1.6rem; display: grid; gap: .4rem; max-height: 56vh; overflow: auto; }
 .leg {
@@ -237,8 +339,6 @@ body {
   border-left: 2px solid transparent;
 }
 .leg:nth-child(odd) { background: rgba(255,255,255,.02); }
-.leg.new { border-left-color: var(--olive); }
-.leg.chg { border-left-color: var(--terracotta); }
 .leg .d { font-family: var(--mono); font-size: .76rem; color: var(--ink-3); }
 .leg .r { color: var(--ink-2); }
 .leg .h { font-family: var(--mono); font-size: .76rem; color: var(--ink-3); }

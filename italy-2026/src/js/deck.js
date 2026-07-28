@@ -2,8 +2,10 @@
 
 import TRIP from '../../data/itinerary.json';
 import GEO from '../geo/italy.json';
+import STREETS from '../geo/streets.json';
 import { createMap, groupStops, frameAspect, PIN_COLORS } from './mapengine.js';
 import { createGlobe } from './globe.js';
+import { IMAGES } from './images.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -13,7 +15,14 @@ const h = (tag, attrs = {}, ...kids) => {
     if (k === 'class') n.className = v;
     else if (k === 'html') n.innerHTML = v;
     else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), v);
-    else if (k === 'style' && typeof v === 'object') Object.assign(n.style, v);
+    else if (k === 'style' && typeof v === 'object') {
+      // Object.assign silently drops CSS custom properties (--k, --c, ...):
+      // CSSStyleDeclaration only applies them through setProperty(), never
+      // through plain property assignment.
+      for (const [sk, sv] of Object.entries(v)) {
+        if (sk.startsWith('--')) n.style.setProperty(sk, sv); else n.style[sk] = sv;
+      }
+    }
     else n.setAttribute(k, v);
   }
   for (const kid of kids.flat()) {
@@ -63,49 +72,21 @@ addSlide(h('section', { class: 'hero-slide' },
     h('h1', { class: 'in' }, TRIP.meta.title),
     h('div', { class: 'dates in' }, TRIP.meta.window),
     h('div', { class: 'chain in' },
-      ...TRIP.change.newRoute.map((c) => h('i', {}, c))),
+      ...TRIP.meta.routeChain.map((c) => h('i', {}, c))),
   ),
   h('div', { class: 'scroll-cue' }, 'Scroll'),
 ), { clear: true, mode: 'hero', route: 'new', label: 'Italy 2026' });
 
-/* 2 — the old route */
-addSlide(h('section', {},
-  h('div', { class: 'compare' },
-    h('div', { class: 'eyebrow in' }, 'The problem'),
-    h('h2', { class: 'in' }, 'The old order doubled back'),
-    h('p', { class: 'in' }, TRIP.change.summary),
-    h('div', { class: 'vs in' },
-      h('div', { class: 'vs-row was' },
-        h('div', { class: 'tag' }, 'Was'),
-        h('div', { class: 'vs-chain' },
-          ...TRIP.change.oldRoute.flatMap((c, i) => [i ? h('b', {}, '→') : null, h('i', {}, c)]).filter(Boolean))),
-    ),
-  ),
-), { clear: true, mode: 'compare', route: 'old', label: 'Before' });
-
-/* 3 — the new route */
-addSlide(h('section', {},
-  h('div', { class: 'compare' },
-    h('div', { class: 'eyebrow in' }, 'The fix'),
-    h('h2', { class: 'in' }, 'Rome → Florence → Val d’Orcia'),
-    h('div', { class: 'vs in' },
-      h('div', { class: 'vs-row now' },
-        h('div', { class: 'tag' }, 'Now'),
-        h('div', { class: 'vs-chain' },
-          ...TRIP.change.newRoute.flatMap((c, i) => [
-            i ? h('b', {}, '→') : null,
-            h('i', { class: ['Florence', "Val d'Orcia"].includes(c) ? 'hi' : '' }, c),
-          ]).filter(Boolean))),
-    ),
-    h('div', { class: 'in' }, ...TRIP.change.wins.map((w) => h('div', { class: 'win' }, w))),
-  ),
-), { clear: true, mode: 'compare', route: 'new', label: 'After' });
-
-/* 4…17 — one per day */
+/* 2…15 — one per day */
 const dayMaps = [];
-TRIP.days.forEach((d) => {
+TRIP.days.forEach((d, di) => {
   const c = accentOf(d.city);
   const stops = groupStops(d.items);
+  // By the specific hotel, not just the city: Rome alone has two (Trame,
+  // then The St. Regis on the finale), each with its own illustration.
+  const prevHotel = di ? TRIP.days[di - 1].hotel : null;
+  const stayHotel = d.hotel && d.hotel !== prevHotel && TRIP.hotels.find((ht) => ht.name === d.hotel);
+  const art = stayHotel ? IMAGES[stayHotel.img] : null;
 
   const mapBox = h('div', { class: 'deck-map in' });
   mapBox.style.setProperty('--c', c);
@@ -116,7 +97,6 @@ TRIP.days.forEach((d) => {
       h('div', { class: 'day-meta in' },
         h('span', { class: 'n' }, `DAY ${String(d.n).padStart(2, '0')}`),
         h('span', { class: 'dt' }, fmt(d.date, { weekday: 'long', day: 'numeric', month: 'long' })),
-        d.changed ? h('span', { class: 'tag' }, 'Rescheduled') : null,
         d.transfer ? h('span', { class: 'tag new' }, 'Travel day') : null),
       h('h2', { class: 'in' }, d.title),
       h('div', { class: 'where in' }, d.kicker),
@@ -128,7 +108,13 @@ TRIP.days.forEach((d) => {
             it.detail ? h('span', {}, it.detail) : null)))),
       d.hotel ? h('div', { class: 'stay in' }, 'Sleeping at ', h('b', {}, d.hotel)) : null,
     ),
-    mapBox,
+    h('div', { class: 'day-right' },
+      art ? h('figure', { class: 'slide-art in' },
+        h('img', { src: art, alt: `Illustration of ${TRIP.cities[d.city].name}`, loading: 'lazy' }),
+        h('figcaption', {}, h('span', { class: 'art-tag' }, 'Illustration'), d.hotel),
+      ) : null,
+      mapBox,
+    ),
   );
 
   addSlide(node, { label: `Day ${d.n}` });
@@ -142,26 +128,27 @@ addSlide(h('section', {},
     h('h2', { class: 'big' }, 'Where you sleep'),
     h('div', { class: 'sub' }, TRIP.meta.chainStory)),
   h('div', { class: 'chain-grid in' },
-    ...TRIP.hotels.map((ht) => h('div', {
-      class: 'chain-card' + (ht.moved ? ' moved' : ''), style: { '--c': accentOf(ht.cityKey) },
+    ...TRIP.hotels.map((ht, i) => h('div', {
+      class: 'chain-card', style: { '--c': accentOf(ht.cityKey), '--i': i },
     },
-      h('div', { class: 'c' }, ht.city),
-      h('h4', {}, ht.name),
-      h('div', { class: 'b' }, ht.brand),
-      h('div', { class: 'd' }, `${fmt(ht.checkIn, { day: 'numeric', month: 'short' })} → ${fmt(ht.checkOut, { day: 'numeric', month: 'short' })}`),
-      h('div', { class: 'n' }, `${ht.nights} night${ht.nights > 1 ? 's' : ''} · ${money(ht.total)}`),
-      ht.moved ? h('div', { class: 'mv' }, 'Rebook — dates moved') : null,
+      h('div', { class: 'chain-art' },
+        h('img', { src: IMAGES[ht.img], alt: `Illustration of ${ht.city}`, loading: 'lazy' }),
+        h('span', { class: 'c' }, ht.city)),
+      h('div', { class: 'chain-body' },
+        h('h4', {}, ht.name),
+        h('div', { class: 'b' }, ht.brand),
+        h('div', { class: 'd' }, `${fmt(ht.checkIn, { day: 'numeric', month: 'short' })} → ${fmt(ht.checkOut, { day: 'numeric', month: 'short' })}`),
+        h('div', { class: 'n' }, `${ht.nights} night${ht.nights > 1 ? 's' : ''} · ${money(ht.total)}`)),
     ))),
 ), { label: 'Hotels' });
 
 /* 19 — logistics */
 addSlide(h('section', {},
   h('div', { class: 'in' },
-    h('div', { class: 'eyebrow' }, 'Drivers and trains'),
-    h('h2', { class: 'big' }, 'Getting between them'),
-    h('div', { class: 'sub' }, 'Green = new leg · orange = moved')),
+    h('div', { class: 'eyebrow' }, 'Self-drive, FCO to FCO'),
+    h('h2', { class: 'big' }, 'Getting between them')),
   h('div', { class: 'legs in' },
-    ...TRIP.drivers.map((dv) => h('div', { class: 'leg ' + (dv.isNew ? 'new' : dv.changed ? 'chg' : '') },
+    ...TRIP.drivers.map((dv) => h('div', { class: 'leg' },
       h('span', { class: 'd' }, fmt(dv.date, { day: 'numeric', month: 'short' })),
       h('span', { class: 'r' }, dv.route),
       h('span', { class: 'h' }, dv.hours)))),
@@ -188,7 +175,7 @@ addSlide(h('section', {},
   h('div', { class: 'in' },
     h('div', { class: 'eyebrow' }, `Departure is ${fmt(TRIP.meta.start, { day: 'numeric', month: 'long' })}`),
     h('h2', { class: 'big' }, 'Book these first'),
-    h('div', { class: 'sub' }, 'The reorder invalidated two hotel bookings and four driver days.')),
+    h('div', { class: 'sub' }, 'Late-August dates sell out fast — lock these in first.')),
   h('div', { class: 'todo in' },
     ...TRIP.bookings.filter((b) => b.urgency !== 'soon').slice(0, 8).map((b) =>
       h('div', { class: `todo-item ${b.urgency}` },
@@ -211,7 +198,7 @@ const mapIO = new IntersectionObserver((entries) => {
     const rec = dayMaps.find((m) => m.box === e.target);
     if (!rec || rec.built) return;
     rec.built = true;
-    createMap(rec.box, { stops: rec.stops, geo: GEO, alt: `Map of day ${rec.d.n}` });
+    createMap(rec.box, { stops: rec.stops, geo: GEO, streets: STREETS, alt: `Map of day ${rec.d.n}` });
   });
 }, { root: deck, rootMargin: '120% 0px' });
 dayMaps.forEach((m) => mapIO.observe(m.box));
@@ -231,16 +218,48 @@ try {
     reduced: REDUCED,
     routes: {
       new: ['rome', 'florence', 'tuscany', 'amalfi', 'naples', 'rome'],
-      old: ['rome', 'tuscany', 'florence', 'amalfi', 'naples', 'rome'],
     },
   });
   globe.resize();
   addEventListener('resize', () => globe.resize());
 } catch (err) {
-  // No WebGL: the deck still works, the hero slides just sit on the flat palette.
+  // No WebGL: the deck still works, the hero slide just sits on the flat palette.
   console.warn('3D stage unavailable:', err.message);
   stage.remove();
   document.documentElement.classList.add('no-webgl');
+}
+
+/* ── hero place names, positioned over the 3D map ────────────────────────
+   Projected from each city marker's world position through the live camera
+   every frame, so the labels track the model as it turns. Only shown while
+   the hero slide (the only slide using the globe now) is on screen. */
+
+const HERO_STOPS = ['rome', 'florence', 'tuscany', 'amalfi', 'naples'];
+const labelHost = $('#map-labels');
+let isHeroSlide = false;
+
+if (globe && labelHost) {
+  // Florence/Val d'Orcia and Amalfi/Naples sit close together on the model;
+  // stagger alternate labels upward so their text doesn't collide.
+  const labelEls = new Map(HERO_STOPS.map((key, i) => {
+    const span = h('span', { class: 'geo-label-3d' }, TRIP.cities[key].name);
+    if (i % 2) span.style.setProperty('--dy', '-260%');
+    labelHost.append(span);
+    return [key, span];
+  }));
+
+  const tickLabels = () => {
+    requestAnimationFrame(tickLabels);
+    if (!isHeroSlide) return;
+    for (const p of globe.getLabelPoints(HERO_STOPS)) {
+      const span = labelEls.get(p.key);
+      if (!span) continue;
+      span.style.left = `${(p.x * 100).toFixed(2)}%`;
+      span.style.top = `${(p.y * 100).toFixed(2)}%`;
+      span.style.opacity = p.visible ? '1' : '0';
+    }
+  };
+  tickLabels();
 }
 
 /* ── navigation ─────────────────────────────────────────────────────────── */
@@ -272,6 +291,8 @@ function setActive(i) {
   const mode = s.dataset.mode;
   stage?.classList.toggle('is-on', !!mode);
   veil.classList.toggle('is-on', !!mode);
+  isHeroSlide = mode === 'hero';
+  labelHost?.classList.toggle('is-on', isHeroSlide);
 
   if (globe) {
     if (mode) {
@@ -307,6 +328,8 @@ dotEls[0].classList.add('on');
 bar.style.width = `${(1 / slides.length) * 100}%`;
 stage?.classList.add('is-on');
 veil.classList.add('is-on');
+isHeroSlide = slides[0].dataset.mode === 'hero';
+labelHost?.classList.toggle('is-on', isHeroSlide);
 globe?.start();
 
 $('#corner-label').textContent = TRIP.meta.title;

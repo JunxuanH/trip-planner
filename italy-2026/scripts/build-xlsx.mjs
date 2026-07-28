@@ -18,7 +18,7 @@ const md = (iso) => utc(iso).toLocaleDateString('en-US', { timeZone: 'UTC', mont
 
 /* ── styling helpers ────────────────────────────────────────────────────── */
 
-const INK = 'FF241F1A', MUTED = 'FF7A6E62', TERRA = 'FF9E4529', OLIVE = 'FF5A6B3A';
+const INK = 'FF241F1A', MUTED = 'FF7A6E62', TERRA = 'FF9E4529';
 const BAND = 'FFF3ECE0', HEADBG = 'FF241F1A';
 
 const wb = new ExcelJS.Workbook();
@@ -68,7 +68,7 @@ const title = (ws, text, sub) => {
 /* ── 1 · Overview ───────────────────────────────────────────────────────── */
 {
   const ws = sheet('Overview', [30, 92]);
-  title(ws, 'ITALY 2026 PLAN', `Revised ${short(trip.meta.revised)} — Florence and the Val d'Orcia swapped places`);
+  title(ws, 'ITALY 2026 PLAN', `Updated ${short(trip.meta.revised)}`);
 
   const pairs = [
     ['Travelers', String(trip.meta.travelers)],
@@ -87,33 +87,15 @@ const title = (ws, text, sub) => {
   }
 
   ws.addRow([]);
-  const h = ws.addRow(['WHAT CHANGED']);
-  h.font = { bold: true, size: 11, color: { argb: TERRA } };
-  const c = ws.addRow(['', trip.change.summary]);
-  c.getCell(2).alignment = { wrapText: true, vertical: 'top' };
-  c.getCell(2).font = { size: 10 };
-  c.height = 58;
-  for (const w of trip.change.wins) {
-    const r = ws.addRow(['', '+  ' + w]);
-    r.getCell(2).font = { size: 10, color: { argb: OLIVE } };
-    r.getCell(2).alignment = { wrapText: true, vertical: 'top' };
-  }
-  for (const w of trip.change.costs) {
-    const r = ws.addRow(['', '–  ' + w]);
-    r.getCell(2).font = { size: 10, color: { argb: TERRA } };
-    r.getCell(2).alignment = { wrapText: true, vertical: 'top' };
-  }
-
-  ws.addRow([]);
   const h2 = ws.addRow(['HOW TO READ THIS WORKBOOK']);
   h2.font = { bold: true, size: 11, color: { argb: INK } };
   const guide = [
     ['Itinerary tab', "Hour-by-hour plan. 'Getting there' = how to travel between stops; 'Link' opens tickets/reservations."],
-    ['Hotels tab', '6 hotels with booking links. Check-in dates already carry the new order.'],
+    ['Hotels tab', '6 hotels with booking links.'],
     ['Budget tab', 'Estimated costs and totals.'],
-    ['Drivers tab', 'Paste-ready driver-guide brief; new and moved legs are flagged.'],
+    ['Drivers tab', 'Self-drive log, FCO to FCO, with a Google Maps link per leg.'],
     ['Opera & Bookings tab', 'What to reserve, in order, most urgent first.'],
-    ['Photographers tab', '旅拍 options per stop, renumbered for the new day order.'],
+    ['Photographers tab', '旅拍 options per stop.'],
   ];
   for (const [k, v] of guide) {
     const r = ws.addRow([k, v]);
@@ -144,17 +126,11 @@ const title = (ws, text, sub) => {
     head.eachCell((c) => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BAND } }; });
     head.getCell(3).alignment = { horizontal: 'left' };
 
-    if (d.changed || d.transfer) {
-      const flags = [d.changed && 'RESCHEDULED', d.transfer && 'TRAVEL DAY'].filter(Boolean).join(' · ');
-      head.getCell(6).value = flags;
+    if (d.transfer) {
+      head.getCell(6).value = 'TRAVEL DAY';
       head.getCell(6).font = { bold: true, size: 8, color: { argb: TERRA } };
     }
 
-    if (d.changeNote) {
-      const n = ws.addRow(['', '', '', 'What moved: ' + d.changeNote]);
-      n.getCell(4).font = { italic: true, size: 9, color: { argb: TERRA } };
-      n.getCell(4).alignment = { wrapText: true, vertical: 'top' };
-    }
     if (d.warn) {
       const n = ws.addRow(['', '', '', 'Watch this: ' + d.warn]);
       n.getCell(4).font = { italic: true, size: 9, color: { argb: 'FF8A6D1F' } };
@@ -162,7 +138,7 @@ const title = (ws, text, sub) => {
     }
 
     for (const it of d.items) {
-      const tags = [it.moved && '[moved]', it.isNew && '[new]', it.optional && '[optional]'].filter(Boolean).join(' ');
+      const tags = [it.optional && '[optional]'].filter(Boolean).join(' ');
       const label = it.linkLabel ? `${it.linkLabel} ->` : null;
       const r = ws.addRow([
         '', '', it.time,
@@ -194,10 +170,6 @@ const title = (ws, text, sub) => {
     ]);
     r.getCell(7).numFmt = '$#,##0';
     r.getCell(8).numFmt = '$#,##0';
-    if (ht.moved) {
-      r.eachCell((c) => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFBEDE6' } }; });
-      r.getCell(2).font = { bold: true, color: { argb: TERRA } };
-    }
     styleLinks(r);
   }
 
@@ -206,14 +178,6 @@ const title = (ws, text, sub) => {
   const t = ws.addRow(['', '', '', '', 'TOTAL', nights, '', total]);
   t.font = { bold: true };
   t.getCell(8).numFmt = '$#,##0';
-
-  ws.addRow([]);
-  const moved = ws.addRow(['Moved by the reorder:']);
-  moved.font = { bold: true, size: 10, color: { argb: TERRA } };
-  for (const ht of trip.hotels.filter((x) => x.moved)) {
-    const r = ws.addRow(['', `${ht.name}: was ${short(ht.wasCheckIn)} → ${short(ht.wasCheckOut)}, now ${short(ht.checkIn)} → ${short(ht.checkOut)} — rebook`]);
-    r.getCell(2).font = { size: 10 };
-  }
 }
 
 /* ── 4 · Budget ─────────────────────────────────────────────────────────── */
@@ -238,31 +202,17 @@ const title = (ws, text, sub) => {
 
 /* ── 5 · Drivers ────────────────────────────────────────────────────────── */
 {
-  const ws = sheet('Drivers', [13, 20, 62, 14, 12, 14]);
-  headerRow(ws, ['Date', 'Service', 'Route', 'Approx hours', 'Status', 'Quote link']);
+  const ws = sheet('Drivers', [13, 20, 62, 14, 14]);
+  headerRow(ws, ['Date', 'Service', 'Route', 'Approx hours', 'Directions link']);
 
   for (const dv of trip.drivers) {
-    const status = dv.isNew ? 'NEW LEG' : dv.changed ? 'MOVED' : '';
     const r = ws.addRow([
       md(dv.date), dv.service, dv.route + (dv.note ? `  (${dv.note})` : ''),
-      dv.hours, status,
-      link(dv.link.includes('trenitalia') ? 'Trenitalia ->' : 'Quote ->', dv.link),
+      dv.hours, link('Directions ->', dv.link),
     ]);
     r.getCell(3).alignment = { wrapText: true, vertical: 'top' };
-    if (dv.isNew) {
-      r.eachCell((c) => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF3E6' } }; });
-      r.getCell(5).font = { bold: true, size: 9, color: { argb: OLIVE } };
-    } else if (dv.changed) {
-      r.eachCell((c) => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFBEDE6' } }; });
-      r.getCell(5).font = { bold: true, size: 9, color: { argb: TERRA } };
-    }
     styleLinks(r);
   }
-
-  ws.addRow([]);
-  const cancelled = ws.addRow(['CANCELLED', '', 'The old Aug 30 Velona → Florence transfer no longer exists.']);
-  cancelled.getCell(1).font = { bold: true, size: 9, color: { argb: TERRA } };
-  cancelled.getCell(3).font = { size: 10, italic: true };
 
   ws.addRow([]);
   const n = ws.addRow(['', '', trip.driversNote]);
@@ -312,7 +262,6 @@ const title = (ws, text, sub) => {
     ]);
     r.getCell(4).alignment = { wrapText: true, vertical: 'top' };
     r.getCell(4).font = { size: 10 };
-    if (p.moved) r.getCell(2).font = { bold: true, color: { argb: TERRA } };
     styleLinks(r);
   }
 
@@ -321,10 +270,6 @@ const title = (ws, text, sub) => {
   n.getCell(4).font = { size: 10 };
   n.getCell(4).alignment = { wrapText: true, vertical: 'top' };
   n.height = 58;
-
-  ws.addRow([]);
-  const f = ws.addRow(['', '', '', 'Day numbers on this tab were wrong in the source workbook and are renumbered against the new order.']);
-  f.getCell(4).font = { size: 9, italic: true, color: { argb: TERRA } };
 }
 
 /* ── write ──────────────────────────────────────────────────────────────── */

@@ -40,7 +40,7 @@ for (const page of PAGES) {
     target: ['es2022'],
     minify: true,
     write: false,
-    loader: { '.json': 'json' },
+    loader: { '.json': 'json', '.webp': 'dataurl', '.png': 'dataurl', '.jpg': 'dataurl' },
     legalComments: 'none',
   });
   const js = result.outputFiles[0].text;

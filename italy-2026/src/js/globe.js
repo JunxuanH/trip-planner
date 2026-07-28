@@ -1,7 +1,7 @@
 /* ── globe ─────────────────────────────────────────────────────────────────
    The deck's 3D hero: Italy extruded from real (simplified) Natural Earth
-   geometry, with the trip's route drawn on top as glowing arcs. Used to show
-   the old routing against the new one, which is the whole point of the deck.
+   geometry, with the trip's route drawn on top as a glowing arc and each
+   city's name projected onto the model as it turns.
    ------------------------------------------------------------------------ */
 
 import * as THREE from 'three';
@@ -181,8 +181,7 @@ export function createGlobe(canvas, opts) {
 
   const arcSets = {};
   for (const [name, seq] of Object.entries(routes)) {
-    // The old route reads as a cold, spent grey; the new one glows.
-    const colour = name === 'old' ? 0x7E8C93 : 0xFF6B3D;
+    const colour = 0xFF6B3D;
     const group = new THREE.Group();
     group.visible = false;
     const arcs = [];
@@ -201,7 +200,6 @@ export function createGlobe(canvas, opts) {
   // of the frame, clear of the text panel.
   const VIEWS = {
     hero:    { pos: new THREE.Vector3(6.5, 12.5, 17),  look: new THREE.Vector3(-0.8, 0, 1.2),  spin: 0.028 },
-    compare: { pos: new THREE.Vector3(-2.4, 15, 8.5),  look: new THREE.Vector3(-2.6, 0, -0.6), spin: 0 },
     closing: { pos: new THREE.Vector3(-8, 16, 20),     look: new THREE.Vector3(0, 0, 0),       spin: 0.02 },
   };
 
@@ -240,7 +238,7 @@ export function createGlobe(canvas, opts) {
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.getElapsedTime();
 
-    const view = VIEWS[mode === 'compare' ? 'compare' : mode] || VIEWS.hero;
+    const view = VIEWS[mode] || VIEWS.hero;
 
     // Ease the camera toward the target of the current mode.
     spinT += dt * view.spin;
@@ -298,9 +296,33 @@ export function createGlobe(canvas, opts) {
     camera.updateProjectionMatrix();
   }
 
+  /** Project each named city marker's world position through the live camera,
+   *  so an HTML label can be positioned over the canvas at that screen point. */
+  function labelPoints(keys) {
+    camera.updateMatrixWorld();
+    const camDir = new THREE.Vector3();
+    camera.getWorldDirection(camDir);
+    const out = [];
+    for (const key of keys) {
+      const m = markers.get(key);
+      if (!m) continue;
+      const world = m.group.position.clone();
+      const inFront = world.clone().sub(camera.position).dot(camDir) > 0;
+      const ndc = world.project(camera);
+      out.push({
+        key,
+        x: (ndc.x + 1) / 2,
+        y: (1 - ndc.y) / 2,
+        visible: inFront && ndc.z > -1 && ndc.z < 1,
+      });
+    }
+    return out;
+  }
+
   return {
     setMode,
     resize,
+    getLabelPoints: labelPoints,
     replay() { restartRoute(); markers.forEach((m) => { m.pulse = 0; }); },
     start() { if (running) return; running = true; clock.getDelta(); frame(); },
     stop()  { running = false; cancelAnimationFrame(raf); },
