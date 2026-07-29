@@ -128,7 +128,10 @@ body { padding-bottom: 4rem; }
 
 /* ── section furniture ──────────────────────────────────────────────────── */
 
-.section { padding: clamp(2.5rem, 6vw, 4.5rem) 0 0; }
+/* padding-top only — a `padding` shorthand here would reset the inline gutter
+   `.wrap` sets, leaving section content flush to the screen edge on a phone
+   while the masthead and rail stayed inset. */
+.section { padding-top: clamp(2.5rem, 6vw, 4.5rem); }
 .section-head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; }
 .section-head h2 { font-size: clamp(1.6rem, 3.6vw, 2.4rem); letter-spacing: -.015em; }
 .section-head .n { font-family: var(--mono); font-size: .8rem; color: var(--ink-3); }
@@ -221,7 +224,12 @@ body { padding-bottom: 4rem; }
   border-radius: var(--radius);
   transition: background .15s;
 }
-@media (max-width: 520px) { .tl { grid-template-columns: 3.6rem 1fr; gap: 0 .8rem; } }
+/* The dot straddles the rule at 3.6rem, so right-aligned times need to stop
+   short of it or the marker sits on the final character. */
+@media (max-width: 520px) {
+  .tl { grid-template-columns: 3.6rem 1fr; gap: 0 .8rem; }
+  .tl-time { padding-right: .45rem; }
+}
 .tl:hover { background: var(--paper-2); }
 .tl.is-active { background: color-mix(in oklab, var(--c) 10%, transparent); }
 
@@ -256,6 +264,8 @@ body { padding-bottom: 4rem; }
   transition: background .15s, color .15s;
 }
 .lk:hover { background: var(--c); color: #fff; }
+/* These pills are the booking links — the main thing you tap on a phone. */
+@media (pointer: coarse) { .lk { min-height: 2.1rem; padding: .3rem .75rem; } }
 .lk::after { content: "↗"; font-size: 9px; opacity: .7; }
 .mini {
   font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
@@ -576,13 +586,17 @@ td .sub { font-size: .78rem; color: var(--ink-3); }
 /* ── budget ─────────────────────────────────────────────────────────────── */
 
 .budget { display: grid; gap: .55rem; }
-.brow { display: grid; grid-template-columns: 12rem 1fr 6rem; gap: 1rem; align-items: center; }
-@media (max-width: 620px) { .brow { grid-template-columns: 1fr 4.5rem; } .brow .bar { grid-column: 1 / -1; order: 3; } }
+/* The amount track is `auto`, not a fixed width: a five-figure total in the
+   mono face needs ~85px, and a fixed 4.5rem track pushed the whole page into
+   horizontal scroll on a phone. `minmax(0, …)` lets the note column shrink
+   rather than being held open by its longest unbreakable token. */
+.brow { display: grid; grid-template-columns: 12rem minmax(0, 1fr) auto; gap: 1rem; align-items: center; }
+@media (max-width: 620px) { .brow { grid-template-columns: minmax(0, 1fr) auto; } .brow .bar { grid-column: 1 / -1; order: 3; } }
 .brow .cat { font-size: .92rem; }
 .brow .cat .sub { display: block; font-size: .74rem; color: var(--ink-3); }
 .bar { height: 9px; background: var(--paper-3); border-radius: 100px; overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--k); border-radius: 100px; transform-origin: left; }
-.brow .amt { font-family: var(--mono); font-size: .88rem; text-align: right; }
+.brow .amt { font-family: var(--mono); font-size: .88rem; text-align: right; white-space: nowrap; }
 .btotal {
   display: flex; justify-content: space-between; align-items: baseline;
   padding-top: .9rem; margin-top: .5rem; border-top: 2px solid var(--ink);
@@ -613,6 +627,14 @@ td .sub { font-size: .78rem; color: var(--ink-3); }
   display: grid; place-items: center; font-size: .85rem; flex: 0 0 auto;
 }
 .theme-btn:hover { border-color: var(--ink-3); color: var(--ink); }
+
+/* A fingertip needs more than the ~30px a cursor is happy with. Scoped to
+   coarse pointers so the desktop chrome keeps its lighter proportions. */
+@media (pointer: coarse) {
+  .theme-btn { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+  .map-tools { gap: .35rem; }
+  .map-tools button { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; }
+}
 
 /* ── entrance animation ─────────────────────────────────────────────────── */
 
