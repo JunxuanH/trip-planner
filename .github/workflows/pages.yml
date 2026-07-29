@@ -2,7 +2,7 @@ name: Deploy Italy 2026 plan to Pages
 
 on:
   push:
-    branches: [claude/travel-planner-italy-2026]
+    branches: [main]
     paths:
       - 'italy-2026/dist/**'
       - '.github/workflows/pages.yml'
