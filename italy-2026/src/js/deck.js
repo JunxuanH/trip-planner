@@ -217,7 +217,7 @@ try {
     geo: GEO,
     reduced: REDUCED,
     routes: {
-      new: ['rome', 'florence', 'tuscany', 'amalfi', 'naples', 'rome'],
+      new: ['rome', 'florence', 'tuscany', 'naples', 'amalfi', 'rome'],
     },
   });
   globe.resize();
@@ -234,7 +234,7 @@ try {
    every frame, so the labels track the model as it turns. Only shown while
    the hero slide (the only slide using the globe now) is on screen. */
 
-const HERO_STOPS = ['rome', 'florence', 'tuscany', 'amalfi', 'naples'];
+const HERO_STOPS = ['rome', 'florence', 'tuscany', 'naples', 'amalfi'];
 const labelHost = $('#map-labels');
 let isHeroSlide = false;
 

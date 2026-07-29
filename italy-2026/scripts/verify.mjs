@@ -131,7 +131,7 @@ trip.bookings.forEach((b) => scanForHotelUrls(b.link, `booking #${b.priority}`))
 /* ---------- the reorder actually happened ---------- */
 
 const order = trip.hotels.map((h) => h.cityKey);
-const expected = ['rome', 'florence', 'tuscany', 'amalfi', 'naples', 'rome'];
+const expected = ['rome', 'florence', 'tuscany', 'naples', 'amalfi', 'rome'];
 if (order.join('>') !== expected.join('>')) {
   fail(`hotel order is ${order.join(' → ')}, expected ${expected.join(' → ')}`);
 }
