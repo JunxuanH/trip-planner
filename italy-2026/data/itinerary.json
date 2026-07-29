@@ -11,7 +11,7 @@
     "departure": "FCO Sun Sep 6, 10:20am",
     "revised": "2026-07-27",
     "routeLine": "Rome (3) → Florence (2) → Tuscany (3) → Amalfi (3) → Naples (1) → Rome finale (1)",
-    "transportLine": "Self-drive rental, FCO to FCO (Aug 24 – Sep 6) — Benz C-Class or similar, IDP in hand",
+    "transportLine": "Private driver in from FCO · Frecciarossa to Florence · self-drive from Aug 29 (Florence → FCO), IDP in hand",
     "chainStory": "Hotel Trame (Rome, independent) → Casa G. Firenze (Florence, Michelin Guide) → Il Castelfalfi (Tuscany, TUI Blue Selection) → Anantara Convento (Amalfi, Minor / GHA) → De Bonart (Naples, Hilton Curio) → The St. Regis Rome (Marriott Bonvoy)",
     "routeChain": ["Rome", "Florence", "Tuscany", "Amalfi", "Naples", "Rome"]
   },
@@ -36,8 +36,7 @@
       "note": "Jet-lag day. Nothing ticketed, nothing timed — the only fixed point is dinner.",
       "items": [
         { "time": "11:50am", "title": "Land at FCO", "detail": "Immigration + bags, about 45 min", "how": "ITA Airways from IAH", "coord": [41.8003, 12.2389], "kind": "transport" },
-        { "time": "12:00pm", "title": "Pick up the rental car", "detail": "Benz C-Class or similar, automatic — reservation #21586310US4. Have the IDP and licence ready.", "how": "FCO rental desk", "coord": [41.8003, 12.2389], "kind": "transport" },
-        { "time": "12:45pm", "title": "Drive to a garage near the hotel", "detail": "Hotel Trame sits inside Rome's ZTL — park in a garage just outside it (e.g. near Largo Argentina) and walk in. The car stays there until Day 4.", "how": "Self-drive, ~45 min", "coord": [41.8500, 12.3600], "kind": "transport" },
+        { "time": "12:35pm", "title": "Private driver to Hotel Trame", "detail": "Pre-booked NCC, meeting you inside arrivals with a name board. Licensed cars may enter the ZTL to set down, so you are dropped at the hotel door — no garage, no walk with the bags.", "how": "Private transfer, ~45 min", "coord": [41.8003, 12.2389], "kind": "transport" },
         { "time": "2:00pm", "title": "Check in at Hotel Trame", "detail": "A former Franciscan monastery a few streets off Campo de' Fiori", "how": "Arrive", "coord": [41.8955, 12.4715], "kind": "hotel" },
         { "time": "3:00pm", "title": "First walk: Pantheon → Piazza Navona → Campo de' Fiori", "detail": "The Pantheon is an eight-minute walk. Go before the nap, not after.", "how": "On foot", "coord": [41.8986, 12.4769], "kind": "sight" },
         { "time": "6:00pm", "title": "Nap, deliberately", "detail": "Set an alarm. This is the single best defence against day-two jet lag.", "how": "At the hotel", "coord": [41.8955, 12.4715], "kind": "rest" },
@@ -78,21 +77,22 @@
     },
     {
       "n": 4, "date": "2026-08-27", "dow": "Thu", "city": "florence",
-      "title": "North to Florence, by way of Orvieto",
+      "title": "North to Florence by Frecciarossa",
       "kicker": "ROME → FLORENCE — Casa G. Firenze",
       "hotel": "Casa G. Firenze",
-      "transfer": { "from": "rome", "to": "florence", "via": "orvieto", "mode": "driver", "duration": "≈5 hrs door to door" },
+      "transfer": { "from": "rome", "to": "florence", "mode": "rail", "duration": "≈1h30 station to station" },
       "changed": true,
-      "changeNote": "Was Rome → Tuscany. The Orvieto lunch stop survives the swap; it sits on the A1 between Rome and Florence either way.",
-      "warn": "Tight evening. The 8:00pm opera assumes the car reaches Florence by 4pm — hold the driver to a 2:00pm departure from Orvieto. If the drive slips, move the opera to Fri Aug 28 and pull Borgo San Jacopo forward to tonight.",
+      "changeNote": "Now high-speed rail rather than a self-drive up the A1. Orvieto came off with the car — the Frecciarossa does not stop there, and reaching it by regional train would cost the whole day.",
       "items": [
-        { "time": "9:30am", "title": "Check out; collect the car", "detail": "North on the A1", "how": "Self-drive", "coord": [41.8955, 12.4715], "kind": "transport" },
-        { "time": "12:00pm", "title": "Orvieto — the Duomo and lunch", "detail": "A hilltop Umbrian town with one of the great striped façades in Italy. Ninety minutes is enough.", "how": "Just off the A1, ~1h15 from Rome", "coord": [42.7167, 12.1122], "kind": "sight", "link": "https://www.opsm.it/en/", "linkLabel": "Duomo" },
-        { "time": "2:00pm", "title": "Back on the road — hold this departure", "detail": "Orvieto → Florence is about two hours", "how": "Driver", "coord": [42.7172, 12.1110], "kind": "transport" },
-        { "time": "3:45pm", "title": "Check in — Casa G. Firenze", "detail": "Via dei Rondinelli, between the Duomo and Santa Maria Novella", "how": "Arrive", "coord": [43.7735, 11.2515], "kind": "hotel", "link": "https://www.trip.com/hotels/florence-hotel-detail-92373569/casa-g-firenze/?checkIn=2026-08-27&checkOut=2026-08-29&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
-        { "time": "5:00pm", "title": "Unpack and reset", "detail": "You have been in a car since morning", "how": "At the hotel", "coord": [43.7735, 11.2515], "kind": "rest" },
+        { "time": "9:30am", "title": "Check out; taxi to Roma Termini", "detail": "About fifteen minutes from Campo de' Fiori. Aim to be at the platform twenty minutes before departure.", "how": "Taxi, ~15 min", "coord": [41.9010, 12.5015], "kind": "transport" },
+        { "time": "10:35am", "title": "Frecciarossa — Roma Termini → Firenze S.M.N.", "detail": "Book Trenitalia or Italo well ahead; advance fares are a fraction of the walk-up price and both run the route hourly.", "how": "High-speed rail, ~1h30", "coord": [41.9010, 12.5015], "kind": "transport", "link": "https://www.trenitalia.com/en.html", "linkLabel": "Trenitalia" },
+        { "time": "12:10pm", "title": "Arrive Firenze Santa Maria Novella", "detail": "The station is a nine-minute walk from Via dei Rondinelli — no transfer needed", "how": "Walk, ~9 min", "coord": [43.7764, 11.2481], "kind": "transport" },
+        { "time": "12:45pm", "title": "Drop bags at Casa G. Firenze", "detail": "Via dei Rondinelli, between the Duomo and Santa Maria Novella. Rooms are ready from 3:00pm; they will hold luggage until then.", "how": "Arrive", "coord": [43.7735, 11.2515], "kind": "hotel", "link": "https://www.trip.com/hotels/florence-hotel-detail-92373569/casa-g-firenze/?checkIn=2026-08-27&checkOut=2026-08-29&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
+        { "time": "1:15pm", "title": "Lunch at the Mercato Centrale", "detail": "Five minutes north — the upstairs food hall, no booking, no ceremony", "how": "Walk, ~5 min", "coord": [43.7767, 11.2536], "kind": "meal" },
+        { "time": "2:45pm", "title": "First orientation walk", "detail": "The Duomo and Baptistery from the outside, then Piazza della Repubblica and down to the Arno. The ticketed interiors are all tomorrow — today is just getting your bearings.", "how": "On foot", "coord": [43.7731, 11.2560], "kind": "sight" },
+        { "time": "5:00pm", "title": "Unpack and reset", "detail": "The train bought you an afternoon the drive would have eaten", "how": "At the hotel", "coord": [43.7735, 11.2515], "kind": "rest" },
         { "time": "6:45pm", "title": "Aperitivo on the secret patio", "detail": "Casa G.'s courtyard bar", "how": "At the hotel", "coord": [43.7735, 11.2515], "kind": "meal", "link": "https://www.trip.com/hotels/florence-hotel-detail-92373569/casa-g-firenze/?checkIn=2026-08-27&checkOut=2026-08-29&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
-        { "time": "8:00pm", "title": "OPERA — La Traviata at St. Mark's Anglican", "detail": "Via Maggio, across Ponte Santa Trinita — booked for arrival evening, right after the drive from Orvieto.", "how": "Walk, ~10 min", "coord": [43.7669, 11.2481], "kind": "opera", "link": "https://www.classictic.com/en/city/florence-t16/la-traviata-at-stmarks-anglican-church/111519/", "linkLabel": "Tickets" },
+        { "time": "8:00pm", "title": "OPERA — La Traviata at St. Mark's Anglican", "detail": "Via Maggio, across Ponte Santa Trinita — booked for arrival evening, comfortably clear now the train lands you at midday.", "how": "Walk, ~10 min", "coord": [43.7669, 11.2481], "kind": "opera", "link": "https://www.classictic.com/en/city/florence-t16/la-traviata-at-stmarks-anglican-church/111519/", "linkLabel": "Tickets" },
         { "time": "9:45pm", "title": "Dinner — Trattoria Sostanza", "detail": "Cash only. The butter chicken and the tortino. Alternative: Buca dell'Orafo.", "how": "Walk, ~12 min", "coord": [43.7745, 11.2464], "kind": "meal", "link": "https://www.google.com/search?q=Trattoria+Sostanza+Florence+reservation", "linkLabel": "Reserve" }
       ]
     },
@@ -123,7 +123,8 @@
       "hotel": "Il Castelfalfi",
       "transfer": { "from": "florence", "to": "tuscany", "via": "certaldo", "mode": "driver", "duration": "≈2 hrs with the stop" },
       "items": [
-        { "time": "9:30am", "title": "Check out; driver southwest", "detail": "Florence → Certaldo is about 45 minutes", "how": "Self-drive", "coord": [43.7735, 11.2515], "kind": "transport" },
+        { "time": "9:00am", "title": "Check out; collect the rental car", "detail": "The agencies cluster on Borgo Ognissanti, ~10 min on foot and just outside the ZTL — so you never drive into the centro storico. Have the IDP and licence ready.", "how": "Walk, ~10 min", "coord": [43.7743, 11.2434], "kind": "transport" },
+        { "time": "9:45am", "title": "Southwest out of the city", "detail": "Florence → Certaldo is about 45 minutes", "how": "Self-drive", "coord": [43.7743, 11.2434], "kind": "transport" },
         { "time": "10:30am", "title": "Certaldo Alto, by funicular", "detail": "Boccaccio's birthplace — a walled brick town, the funicular climbs from Piazza Boccaccio in under two minutes", "how": "Arrive Certaldo", "coord": [43.5477, 11.0410], "kind": "sight", "link": "https://www.visitcertaldo.com/site/?lang=en", "linkLabel": "Info" },
         { "time": "11:15am", "title": "Casa Boccaccio", "detail": "The Decameron's author was born here; the house is now a small, quiet museum", "how": "Walk", "coord": [43.5482, 11.0405], "kind": "sight" },
         { "time": "1:00pm", "title": "Lunch on Via Boccaccio", "detail": "A terrace table in the upper town before the drive on", "how": "Walk", "coord": [43.5480, 11.0412], "kind": "meal" },
@@ -274,8 +275,9 @@
   ],
 
   "drivers": [
-    { "date": "2026-08-24", "service": "Pick up the car", "route": "FCO → garage near Hotel Trame, Rome", "hours": "~45 min", "note": "Reservation #21586310US4 — Benz C-Class or similar", "link": "https://www.google.com/maps/dir/?api=1&origin=41.8003,12.2389&destination=41.8955,12.4715&travelmode=driving" },
-    { "date": "2026-08-27", "service": "Self-drive", "route": "Rome → Orvieto (lunch stop) → Casa G. Firenze, Florence", "hours": "~5 hrs", "note": "Florence ZTL ~€200 if you drive into the centro storico", "link": "https://www.google.com/maps/dir/?api=1&origin=41.8955,12.4715&destination=43.7735,11.2515&waypoints=42.7167,12.1122&travelmode=driving" },
+    { "date": "2026-08-24", "service": "Private driver", "route": "FCO → Hotel Trame, Rome", "hours": "~45 min", "note": "Pre-booked NCC, name board at arrivals — book before you fly", "link": "https://www.google.com/maps/dir/?api=1&origin=41.8003,12.2389&destination=41.8955,12.4715&travelmode=driving" },
+    { "date": "2026-08-27", "service": "High-speed rail", "route": "Roma Termini → Firenze S.M.N.", "hours": "~1h30", "note": "Frecciarossa or Italo, hourly — no car in Rome, nothing to park", "link": "https://www.trenitalia.com/en.html" },
+    { "date": "2026-08-29", "service": "Collect the car", "route": "Borgo Ognissanti, Florence — outside the ZTL", "hours": "~30 min", "note": "Reservation #21586310US4 — needs rebooking from FCO Aug 24 to Florence Aug 29", "link": "https://www.google.com/maps/search/?api=1&query=car+rental+Borgo+Ognissanti+Florence" },
     { "date": "2026-08-29", "service": "Self-drive", "route": "Florence → Certaldo (lunch stop) → Il Castelfalfi", "hours": "~2 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.7735,11.2515&destination=43.5555,10.9095&waypoints=43.5477,11.0410&travelmode=driving" },
     { "date": "2026-08-30", "service": "Full day", "route": "Castelfalfi → San Gimignano → Volterra → back", "hours": "~8 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=43.5555,10.9095&waypoints=43.4674,11.0431|43.4013,10.8606&travelmode=driving" },
     { "date": "2026-08-31", "service": "Half day", "route": "Castelfalfi → Montespertoli wine estates → back", "hours": "~6 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=43.5555,10.9095&waypoints=43.6280,11.1180&travelmode=driving" },
@@ -286,21 +288,22 @@
     { "date": "2026-09-06", "service": "Drop off the car", "route": "The St. Regis Rome → FCO", "hours": "~40 min", "note": "Drop-off is booked for noon — move it earlier so it isn't after the flight", "link": "https://www.google.com/maps/dir/?api=1&origin=41.9040,12.4950&destination=41.8003,12.2389&travelmode=driving" }
   ],
 
-  "driversNote": "The IDP ships by Aug 3 — pack it with the physical licence, not just a photo of it. Rome and Florence's historic centres are ZTL zones: enter only to check in/out, then park in a garage just outside (Rome ~€35–45/night, Florence ~€30–35/night) and walk. Castelfalfi and the Amalfi hotel have their own parking. Budget roughly €80 in tolls for the full route and a full tank about every 2–3 driving days.",
+  "driversNote": "You are car-free for the first five days: a private driver in from FCO, taxis and your feet in Rome, the Frecciarossa to Florence. The car is only collected on Aug 29, on Borgo Ognissanti just outside Florence's ZTL, and runs from there to the FCO drop-off on Sep 6 — eight days rather than fourteen, and no Rome garage at all. The IDP ships by Aug 3; pack it with the physical licence, not just a photo of it. Never drive into either historic centre — Florence's ZTL alone is ~€200 a crossing. Castelfalfi and the Amalfi hotel have their own parking, Naples has hotel valet. Budget roughly €60 in tolls from Aug 29 on and a full tank about every 2–3 driving days.",
 
   "bookings": [
     { "priority": 1, "urgency": "now", "item": "Book Casa G. Firenze for Aug 27–29", "detail": "Two nights in Florence, wedged between Rome and Tuscany — the tightest hotel window on the trip.", "link": "https://www.trip.com/hotels/florence-hotel-detail-92373569/casa-g-firenze/?checkIn=2026-08-27&checkOut=2026-08-29&adult=2&children=0&curr=USD" },
     { "priority": 2, "urgency": "week", "item": "Reserve dinners at Il Castelfalfi — La Via del Sale, Aug 29 & 31", "detail": "The estate's fine-dining room. Worth booking ahead even though the room itself is already confirmed.", "link": "https://www.google.com/search?q=La+Via+del+Sale+Castelfalfi+reservation" },
-    { "priority": 3, "urgency": "now", "item": "Fix the rental car's drop-off time", "detail": "Reservation #21586310US4 has drop-off at noon on Sep 6, but the flight leaves at 10:20am. Call and move it to around 6:00am.", "link": "https://www.google.com/search?q=car+rental+customer+service+change+drop+off+time" },
-    { "priority": 4, "urgency": "week", "item": "Plan Rome and Florence parking before you land", "detail": "Both hotels sit inside a ZTL — pick a garage just outside each one now, rather than improvising on arrival with a rental car and jet lag.", "link": "https://www.google.com/search?q=parking+garage+near+Campo+de+Fiori+Rome" },
-    { "priority": 5, "urgency": "week", "item": "Florence opera — La Traviata at St. Mark's, Aug 27", "detail": "Lands the same evening as the Orvieto drive north — the fallback is Aug 28 if the drive runs late.", "link": "https://www.classictic.com/en/city/florence-t16/la-traviata-at-stmarks-anglican-church/111519/" },
-    { "priority": 6, "urgency": "week", "item": "Rome opera — All Saints' Anglican, Aug 25", "detail": "Confirm the programme is posted before booking.", "link": "https://www.classictic.com/en/city/rome-t14/rome-concert-venues-vc1/all-saints-church-vl51/" },
-    { "priority": 7, "urgency": "week", "item": "Montespertoli estate visit for Mon Aug 31", "detail": "A Chianti Montespertoli producer, plus lunch — most require an appointment rather than taking walk-ins.", "link": "https://www.google.com/search?q=Chianti+Montespertoli+winery+tour+booking" },
-    { "priority": 8, "urgency": "week", "item": "Timed entries — Accademia, Duomo dome, Uffizi, all on Aug 28", "detail": "Three in one morning, in that order. Book the dome climb first; it has the fewest slots.", "link": "https://www.uffizi.it/en/tickets" },
-    { "priority": 9, "urgency": "week", "item": "Vatican early entry (Aug 25), Colosseum arena floor (Aug 26), Pompeii guide (Sep 1)", "detail": "All three need booking — the Vatican and Colosseum slots go first.", "link": "https://tickets.museivaticani.va/" },
-    { "priority": 10, "urgency": "soon", "item": "Capri private boat — Lucibello, Sep 2", "detail": "Roughly seven hours with a skipper from the hotel jetty — book a few weeks out in peak season.", "link": "https://www.lucibello.it/en/" },
-    { "priority": 11, "urgency": "soon", "item": "Ravello Festival — check the Sep 3 programme", "detail": "Festival runs to Sep 5. The confirmed Aug 29 Mahler date falls on your Florence→Castelfalfi transfer, so it was never reachable.", "link": "https://www.ravellofestival.com/en/" },
-    { "priority": 12, "urgency": "soon", "item": "Headline dinners on their dates", "detail": "Sostanza Aug 27 · Borgo San Jacopo Aug 28 · La Via del Sale Aug 29 & 31 · San Gimignano lunch Aug 30. Plus Armando, Roscioli, Lo Scoglio — reserve ahead where they take bookings.", "link": "https://www.google.com/search?q=Trattoria+Sostanza+Florence+reservation" }
+    { "priority": 3, "urgency": "now", "item": "Rebook the rental car — Florence pickup, not FCO", "detail": "Reservation #21586310US4 is still FCO Aug 24 → FCO Sep 6. It needs to become Borgo Ognissanti, Florence, Aug 29 → FCO Sep 6: six days shorter, but a different pickup city usually carries a one-way fee, so the €1,087.81 quote will not hold. Re-quote before cancelling. While you are on the phone, move the Sep 6 drop-off off noon — the flight leaves at 10:20am, so around 6:00am.", "link": "https://www.google.com/search?q=car+rental+customer+service+change+pickup+location" },
+    { "priority": 4, "urgency": "now", "item": "Book the FCO → Hotel Trame private driver", "detail": "Pre-booked NCC, meeting you inside arrivals with a name board — roughly €70–90 for the two of you, against a €55 flat-rate official taxi if you would rather just walk to the rank. Give them the ITA flight number so the driver tracks the landing.", "link": "https://www.google.com/search?q=private+driver+transfer+Fiumicino+airport+to+Rome+city+centre" },
+    { "priority": 5, "urgency": "now", "item": "Frecciarossa tickets — Roma Termini → Firenze S.M.N., Aug 27", "detail": "Trenitalia and Italo both run the route hourly in about 1h30. Advance fares open around four months out and are a fraction of the walk-up price, so book as soon as the date is loaded. Aim for a departure around 10:35am.", "link": "https://www.trenitalia.com/en.html" },
+    { "priority": 6, "urgency": "week", "item": "Florence opera — La Traviata at St. Mark's, Aug 27", "detail": "The train lands you at midday, so the evening is no longer tight — but book it before the seats go.", "link": "https://www.classictic.com/en/city/florence-t16/la-traviata-at-stmarks-anglican-church/111519/" },
+    { "priority": 7, "urgency": "week", "item": "Rome opera — All Saints' Anglican, Aug 25", "detail": "Confirm the programme is posted before booking.", "link": "https://www.classictic.com/en/city/rome-t14/rome-concert-venues-vc1/all-saints-church-vl51/" },
+    { "priority": 8, "urgency": "week", "item": "Montespertoli estate visit for Mon Aug 31", "detail": "A Chianti Montespertoli producer, plus lunch — most require an appointment rather than taking walk-ins.", "link": "https://www.google.com/search?q=Chianti+Montespertoli+winery+tour+booking" },
+    { "priority": 9, "urgency": "week", "item": "Timed entries — Accademia, Duomo dome, Uffizi, all on Aug 28", "detail": "Three in one morning, in that order. Book the dome climb first; it has the fewest slots.", "link": "https://www.uffizi.it/en/tickets" },
+    { "priority": 10, "urgency": "week", "item": "Vatican early entry (Aug 25), Colosseum arena floor (Aug 26), Pompeii guide (Sep 1)", "detail": "All three need booking — the Vatican and Colosseum slots go first.", "link": "https://tickets.museivaticani.va/" },
+    { "priority": 11, "urgency": "soon", "item": "Capri private boat — Lucibello, Sep 2", "detail": "Roughly seven hours with a skipper from the hotel jetty — book a few weeks out in peak season.", "link": "https://www.lucibello.it/en/" },
+    { "priority": 12, "urgency": "soon", "item": "Ravello Festival — check the Sep 3 programme", "detail": "Festival runs to Sep 5. The confirmed Aug 29 Mahler date falls on your Florence→Castelfalfi transfer, so it was never reachable.", "link": "https://www.ravellofestival.com/en/" },
+    { "priority": 13, "urgency": "soon", "item": "Headline dinners on their dates", "detail": "Sostanza Aug 27 · Borgo San Jacopo Aug 28 · La Via del Sale Aug 29 & 31 · San Gimignano lunch Aug 30. Plus Armando, Roscioli, Lo Scoglio — reserve ahead where they take bookings.", "link": "https://www.google.com/search?q=Trattoria+Sostanza+Florence+reservation" }
   ],
 
   "bookingsRuledOut": [
@@ -310,7 +313,7 @@
 
   "budget": [
     { "category": "Lodging", "amount": 12802.66, "note": "6 hotels, 13 nights. Trame, Castelfalfi and Convento are actual quotes." },
-    { "category": "Transport", "amount": 1775, "note": "Rental car $1,175 (€1,087.81, actual), plus fuel, tolls, ZTL/garage parking." },
+    { "category": "Transport", "amount": 1775, "note": "Holding the old total pending a re-quote: the rental drops from 14 days to 8 (Florence Aug 29 → FCO Sep 6), but a one-way pickup fee eats into that, and the FCO private transfer (~€70–90) and two Frecciarossa fares are new. Rome garage parking is gone entirely. Fuel and tolls now only from Aug 29." },
     { "category": "Excursions & guides", "amount": 2100, "note": "Vatican, Colosseum, Pompeii, Capri boat, wineries, Florence galleries, operas." },
     { "category": "Food & wine", "amount": 2400, "note": "~$185/day for two, outside hotel-included meals." },
     { "category": "Buffer & gratuities", "amount": 400, "note": "Taxis, tips, Naples street food, incidentals." }
