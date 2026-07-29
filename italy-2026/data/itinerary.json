@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Italy 2026",
-    "subtitle": "Rome · Florence · Tuscany · Amalfi · Naples",
+    "subtitle": "Rome · Florence · Tuscany · Naples · Amalfi",
     "travelers": 2,
     "start": "2026-08-24",
     "end": "2026-09-06",
@@ -10,10 +10,10 @@
     "arrival": "FCO Mon Aug 24, 11:50am (ITA Airways from IAH)",
     "departure": "FCO Sun Sep 6, 10:20am",
     "revised": "2026-07-27",
-    "routeLine": "Rome (3) → Florence (2) → Tuscany (3) → Amalfi (3) → Naples (1) → Rome finale (1)",
+    "routeLine": "Rome (3) → Florence (2) → Tuscany (3) → Naples (2) → Amalfi (2) → Rome finale (1)",
     "transportLine": "Private driver in from FCO · Frecciarossa to Florence · self-drive from Aug 29 (Florence → FCO), IDP in hand",
-    "chainStory": "Hotel Trame (Rome, independent) → Casa G. Firenze (Florence, Michelin Guide) → Il Castelfalfi (Tuscany, TUI Blue Selection) → Anantara Convento (Amalfi, Minor / GHA) → De Bonart (Naples, Hilton Curio) → The St. Regis Rome (Marriott Bonvoy)",
-    "routeChain": ["Rome", "Florence", "Tuscany", "Amalfi", "Naples", "Rome"]
+    "chainStory": "Hotel Trame (Rome, independent) → Casa G. Firenze (Florence, Michelin Guide) → Il Castelfalfi (Tuscany, TUI Blue Selection) → De Bonart (Naples, Hilton Curio) → Anantara Convento (Amalfi, Minor / GHA) → The St. Regis Rome (Marriott Bonvoy)",
+    "routeChain": ["Rome", "Florence", "Tuscany", "Naples", "Amalfi", "Rome"]
   },
 
   "cities": {
@@ -171,82 +171,84 @@
       ]
     },
     {
-      "n": 9, "date": "2026-09-01", "dow": "Tue", "city": "amalfi",
+      "n": 9, "date": "2026-09-01", "dow": "Tue", "city": "naples",
       "title": "The long haul south",
-      "kicker": "TUSCANY → AMALFI, self-drive via Pompeii",
-      "hotel": "Anantara Convento di Amalfi",
-      "transfer": { "from": "tuscany", "to": "amalfi", "via": "naples", "mode": "driver", "duration": "≈9 hrs with Pompeii" },
-      "warn": "The longest drive of the trip — about 4.5 hours of highway before you've even reached Pompeii. Swap drivers if you can, fill the tank before you leave Castelfalfi, and expect Naples-area traffic to eat into the buffer.",
+      "kicker": "TUSCANY → NAPLES — De Bonart",
+      "hotel": "De Bonart Naples",
+      "transfer": { "from": "tuscany", "to": "naples", "mode": "driver", "duration": "≈5 hrs" },
+      "warn": "The longest drive of the trip — roughly five hours of autostrada, most of it past Rome and Caserta. Fill the tank before you leave Castelfalfi, swap drivers if you can, and expect Naples traffic to eat the last half hour.",
       "items": [
-        { "time": "6:30am", "title": "Check out; on the road early", "detail": "South on the A1 — Florence's ring road, then the long autostrada stretch past Rome and Caserta", "how": "Self-drive", "coord": [43.5555, 10.9095], "kind": "transport" },
-        { "time": "9:30am", "title": "Fuel and coffee stop", "detail": "An Autogrill service area north of Rome — top up the tank, swap drivers", "how": "Self-drive", "coord": [42.6000, 12.3000], "kind": "transport" },
-        { "time": "11:15am", "title": "Toward Naples and Pompeii", "detail": "The A1 becomes the A2 past Rome; exit for Pompei Scavi", "how": "Self-drive", "coord": [40.9500, 14.1500], "kind": "transport" },
-        { "time": "12:45pm", "title": "Pompeii, guided", "detail": "Two hours is the right length in September heat. Ask for the Villa of the Mysteries. Parking is at the Pompei Scavi lot by the entrance.", "how": "Arrive; on-site parking", "coord": [40.7497, 14.4869], "kind": "sight", "link": "https://www.pompeiisites.org/en/", "linkLabel": "Tickets" },
-        { "time": "3:15pm", "title": "Snack, then onto the corniche", "detail": "The coast road starts properly after Vietri — narrow, slow, spectacular. Take it easy.", "how": "Self-drive", "coord": [40.6740, 14.7280], "kind": "transport" },
-        { "time": "5:15pm", "title": "Check in — Anantara Convento di Amalfi", "detail": "A 13th-century monastery on the cliff edge, with the original cloister still standing", "how": "Scenic drive, ~1.5 hrs", "coord": [40.6350, 14.6030], "kind": "hotel", "link": "https://us.trip.com/hotels/list?city=10255&cityName=Amalfi&provinceId=10136&countryId=106&checkIn=2026-09-01&checkOut=2026-09-04&lat=40.63291&lon=14.597252&districtId=0&barCurr=USD&searchType=H&searchWord=Anantara%20Convento%20di%20Amalfi%20Grand%20Hotel&searchValue=31%7C2290869*31*2290869*1&crn=1&adult=2&children=0&searchBoxArg=t&travelPurpose=0&domestic=false", "linkLabel": "Trip.com" },
+        { "time": "8:00am", "title": "Check out; on the road", "detail": "South on the A1 — Florence's ring road, then the long autostrada stretch past Rome and Caserta", "how": "Self-drive", "coord": [43.5555, 10.9095], "kind": "transport" },
+        { "time": "10:45am", "title": "Fuel and coffee stop", "detail": "An Autogrill service area north of Rome — top up the tank, swap drivers", "how": "Self-drive", "coord": [42.6000, 12.3000], "kind": "transport" },
+        { "time": "1:30pm", "title": "Check in — De Bonart, Curio Collection", "detail": "An art palazzo on Via Partenope in Chiaia, facing the bay. Hand the car to the hotel valet and leave it there — you won't need it again until Thursday.", "how": "Arrive", "coord": [40.8296, 14.2470], "kind": "hotel", "link": "https://www.trip.com/hotels/naples-hotel-detail-2150889/de-bonart-naples-curio-collection-by-hilton/?checkIn=2026-09-01&checkOut=2026-09-03&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
+        { "time": "3:00pm", "title": "Naples Archaeological Museum", "detail": "The frescoes, mosaics and bronzes lifted out of Pompeii all ended up here. You see the rooms they came from on Thursday, so this is the right way round.", "how": "Taxi, ~10 min", "coord": [40.8535, 14.2506], "kind": "sight", "link": "https://mann-napoli.it/en/", "linkLabel": "Tickets" },
+        { "time": "5:00pm", "title": "Spaccanapoli", "detail": "The dead-straight Greek road that still splits the old city in half", "how": "Walk from the museum", "coord": [40.8483, 14.2570], "kind": "sight" },
+        { "time": "6:30pm", "title": "Street food, standing up", "detail": "Pizza fritta, zeppoline, a sfogliatella riccia straight from the oven", "how": "Walk", "coord": [40.8511, 14.2578], "kind": "meal" },
+        { "time": "8:00pm", "title": "Rooftop aperitivo", "detail": "Vesuvius on one side, the bay on the other", "how": "At the hotel", "coord": [40.8296, 14.2470], "kind": "meal" },
+        { "time": "9:15pm", "title": "Dinner — pizza on Via dei Tribunali", "detail": "Sorbillo or Di Matteo. You are in the city that invented it; do this before anything fancier.", "how": "Taxi, ~15 min", "coord": [40.8511, 14.2578], "kind": "meal", "link": "https://www.google.com/search?q=Sorbillo+Via+dei+Tribunali+Naples", "linkLabel": "Find" }
+      ]
+    },
+    {
+      "n": 10, "date": "2026-09-02", "dow": "Wed", "city": "capri",
+      "title": "Capri, by ferry",
+      "kicker": "NAPLES — Capri day trip",
+      "hotel": "De Bonart Naples",
+      "note": "Weather-dependent. The Blue Grotto only opens in a flat sea — treat it as a bonus, not a plan. Buy the return leg when you buy the outbound, and check the last sailing before you settle in for the afternoon.",
+      "items": [
+        { "time": "8:30am", "title": "Walk down to Molo Beverello", "detail": "The fast-ferry pier is fifteen minutes along the seafront from the hotel", "how": "Walk, ~15 min", "coord": [40.8399, 14.2569], "kind": "transport" },
+        { "time": "9:20am", "title": "Fast ferry — Naples → Capri", "detail": "NLG, SNAV and Caremar all run it in about fifty minutes. Sailings are frequent in September but sell out at the counter — book online the night before.", "how": "Fast ferry, ~50 min", "coord": [40.8399, 14.2569], "kind": "transport", "link": "https://www.directferries.com/naples_capri_ferry.htm", "linkLabel": "Timetable" },
+        { "time": "10:30am", "title": "The Faraglioni, the grottoes, the swim coves", "detail": "Pick up a round-the-island boat at Marina Grande — Blue Grotto if the sea is calm enough to enter", "how": "Local boat from Marina Grande", "coord": [40.5433, 14.2450], "kind": "sight" },
+        { "time": "1:00pm", "title": "Lunch — Da Paolino", "detail": "Under the lemon trees. Il Riccio is the Michelin alternative, on the cliff by the grotto.", "how": "Marina Grande, then the funicular", "coord": [40.5603, 14.2394], "kind": "meal", "link": "https://www.google.com/search?q=Da+Paolino+Capri+reservation", "linkLabel": "Reserve" },
+        { "time": "3:30pm", "title": "The Piazzetta and the Gardens of Augustus", "detail": "Gelato on the terrace above Via Krupp", "how": "On foot", "coord": [40.5476, 14.2401], "kind": "sight", "link": "https://www.google.com/search?q=Gardens+of+Augustus+Capri+Via+Krupp", "linkLabel": "Info" },
+        { "time": "6:15pm", "title": "Ferry back to Naples", "detail": "Check the final sailing when you arrive — the last fast boats go early evening, and missing one means a night on the island", "how": "Fast ferry, ~50 min", "coord": [40.5556, 14.2400], "kind": "transport" },
+        { "time": "8:30pm", "title": "Dinner — Palazzo Petrucci", "detail": "Michelin-starred Neapolitan tasting menu, back in the old city", "how": "Taxi, ~15 min", "coord": [40.8340, 14.2480], "kind": "meal", "link": "https://www.google.com/search?q=Palazzo+Petrucci+Naples+reservation", "linkLabel": "Reserve" }
+      ]
+    },
+    {
+      "n": 11, "date": "2026-09-03", "dow": "Thu", "city": "amalfi",
+      "title": "Pompeii, then the corniche",
+      "kicker": "NAPLES → AMALFI, via Pompeii",
+      "hotel": "Anantara Convento di Amalfi",
+      "transfer": { "from": "naples", "to": "amalfi", "via": "pompeii", "mode": "driver", "duration": "≈5 hrs with Pompeii" },
+      "note": "Pompeii sits directly between the two hotels, so the site costs you no detour at all — it is simply where you stop on the way south. Book the guide for a morning slot; the site has almost no shade by noon.",
+      "items": [
+        { "time": "8:30am", "title": "Check out; collect the car from the valet", "detail": "First time behind the wheel since Tuesday", "how": "At the hotel", "coord": [40.8296, 14.2470], "kind": "transport" },
+        { "time": "9:15am", "title": "Drive to Pompeii", "detail": "Half an hour southeast on the A3 — exit for Pompei Scavi", "how": "Self-drive, ~30 min", "coord": [40.7497, 14.4869], "kind": "transport" },
+        { "time": "10:00am", "title": "Pompeii, guided", "detail": "Two and a half hours is the right length in September heat. Ask for the Villa of the Mysteries. Parking is at the Pompei Scavi lot by the entrance.", "how": "Arrive; on-site parking", "coord": [40.7497, 14.4869], "kind": "sight", "link": "https://www.pompeiisites.org/en/", "linkLabel": "Tickets" },
+        { "time": "1:00pm", "title": "Lunch, then onto the corniche", "detail": "The coast road starts properly after Vietri — narrow, slow, spectacular. Take it easy.", "how": "Self-drive", "coord": [40.6740, 14.7280], "kind": "meal" },
+        { "time": "3:00pm", "title": "Check in — Anantara Convento di Amalfi", "detail": "A 13th-century monastery on the cliff edge, with the original cloister still standing", "how": "Scenic drive, ~1.5 hrs", "coord": [40.6350, 14.6030], "kind": "hotel", "link": "https://us.trip.com/hotels/list?city=10255&cityName=Amalfi&provinceId=10136&countryId=106&checkIn=2026-09-03&checkOut=2026-09-05&lat=40.63291&lon=14.597252&districtId=0&barCurr=USD&searchType=H&searchWord=Anantara%20Convento%20di%20Amalfi%20Grand%20Hotel&searchValue=31%7C2290869*31*2290869*1&crn=1&adult=2&children=0&searchBoxArg=t&travelPurpose=0&domestic=false", "linkLabel": "Trip.com" },
+        { "time": "5:00pm", "title": "The beach club, by cliff lift", "detail": "Down to sea level for what's left of the afternoon", "how": "Hotel cliff lift", "coord": [40.6335, 14.6045], "kind": "rest" },
         { "time": "7:45pm", "title": "Aperitivo in the cloister", "detail": "", "how": "At the hotel", "coord": [40.6350, 14.6030], "kind": "meal" },
         { "time": "9:00pm", "title": "Dinner — Dei Cappuccini", "detail": "The hotel's Michelin room, or La Locanda for pizza if the day has beaten you", "how": "At the hotel", "coord": [40.6350, 14.6030], "kind": "meal", "link": "https://www.google.com/search?q=Dei+Cappuccini+Anantara+Convento+Amalfi+restaurant", "linkLabel": "Reserve" }
       ]
     },
     {
-      "n": 10, "date": "2026-09-02", "dow": "Wed", "city": "capri",
-      "title": "Capri, by private boat",
-      "kicker": "AMALFI — Capri boat day",
-      "hotel": "Anantara Convento di Amalfi",
-      "note": "Weather-dependent. The Blue Grotto only opens in a flat sea — treat it as a bonus, not a plan.",
-      "items": [
-        { "time": "9:30am", "title": "Private boat from the hotel jetty", "detail": "Lucibello, roughly seven hours with skipper", "how": "Private boat", "coord": [40.6340, 14.6027], "kind": "transport", "link": "https://www.lucibello.it/en/", "linkLabel": "Book" },
-        { "time": "10:30am", "title": "The Faraglioni, the grottoes, the swim coves", "detail": "Blue Grotto if the sea is calm enough to enter", "how": "By boat", "coord": [40.5433, 14.2450], "kind": "sight" },
-        { "time": "1:00pm", "title": "Lunch — Da Paolino", "detail": "Under the lemon trees. Il Riccio is the Michelin alternative, on the cliff by the grotto.", "how": "Marina Grande, then the funicular", "coord": [40.5603, 14.2394], "kind": "meal", "link": "https://www.google.com/search?q=Da+Paolino+Capri+reservation", "linkLabel": "Reserve" },
-        { "time": "3:30pm", "title": "The Piazzetta and the Gardens of Augustus", "detail": "Gelato on the terrace above Via Krupp", "how": "On foot", "coord": [40.5476, 14.2401], "kind": "sight", "link": "https://www.google.com/search?q=Gardens+of+Augustus+Capri+Via+Krupp", "linkLabel": "Info" },
-        { "time": "5:00pm", "title": "Cruise home, prosecco at sunset", "detail": "About forty minutes back along the coast", "how": "By boat", "coord": [40.5900, 14.4000], "kind": "photo" },
-        { "time": "9:00pm", "title": "Dinner — La Conca del Sogno", "detail": "Reachable by boat, in a cove near Nerano. Or stay in on the cloister terrace.", "how": "Hotel car or boat, ~30 min", "coord": [40.5867, 14.3667], "kind": "meal", "link": "https://www.google.com/search?q=La+Conca+del+Sogno+Nerano+reservation", "linkLabel": "Reserve" }
-      ]
-    },
-    {
-      "n": 11, "date": "2026-09-03", "dow": "Thu", "city": "amalfi",
+      "n": 12, "date": "2026-09-04", "dow": "Fri", "city": "amalfi",
       "title": "Ravello, above everything",
       "kicker": "AMALFI — Nerano lunch and Ravello",
       "hotel": "Anantara Convento di Amalfi",
       "note": "The Ravello Festival runs to Sep 5. Check tonight's programme — the stage is built out over the cliff at Villa Rufolo. The switchbacks up from the coast are tight and slow to self-drive; if you'd rather not, the hotel can call a local driver for this one leg.",
       "items": [
-        { "time": "9:00am", "title": "The beach club, by cliff lift", "detail": "A slow morning at sea level before the day starts properly", "how": "Hotel cliff lift", "coord": [40.6335, 14.6045], "kind": "rest" },
+        { "time": "9:00am", "title": "A slow morning on the cloister terrace", "detail": "The one unhurried morning on the coast — use it", "how": "At the hotel", "coord": [40.6350, 14.6030], "kind": "rest" },
         { "time": "12:30pm", "title": "Lunch — Lo Scoglio", "detail": "Nerano. The original spaghetti alla Nerano, and worth the boat ride on its own.", "how": "Hotel car or boat, ~40 min", "coord": [40.5885, 14.3540], "kind": "meal", "link": "https://www.google.com/search?q=Lo+Scoglio+Nerano+reservation", "linkLabel": "Reserve" },
         { "time": "3:00pm", "title": "Up to Ravello", "detail": "Forty-five minutes of switchbacks above the coast", "how": "Self-drive", "coord": [40.6494, 14.6116], "kind": "transport" },
         { "time": "3:45pm", "title": "Villa Cimbrone", "detail": "The Terrace of Infinity — a marble balustrade lined with busts, and a thousand-foot drop to the sea", "how": "On foot; Ravello is car-free", "coord": [40.6461, 14.6118], "kind": "sight", "link": "https://villacimbrone.com/en/", "linkLabel": "Tickets" },
         { "time": "6:30pm", "title": "Aperitivo, then Villa Rufolo's gardens", "detail": "", "how": "Walk", "coord": [40.6494, 14.6122], "kind": "sight", "link": "https://www.villarufolo.com/en/", "linkLabel": "Tickets" },
-        { "time": "7:30pm", "title": "RAVELLO FESTIVAL — check the Sep 3 programme", "detail": "Confirmed concerts run to Sep 5. The Aug 29 Mahler Youth Orchestra date falls on your Florence → Siena transfer, so it is out either way.", "how": "Walk to Villa Rufolo", "coord": [40.6494, 14.6122], "kind": "opera", "link": "https://www.ravellofestival.com/en/", "linkLabel": "Programme" },
+        { "time": "7:30pm", "title": "RAVELLO FESTIVAL — check the Sep 4 programme", "detail": "Confirmed concerts run to Sep 5, so both your Amalfi nights are inside the festival window.", "how": "Walk to Villa Rufolo", "coord": [40.6494, 14.6122], "kind": "opera", "link": "https://www.ravellofestival.com/en/", "linkLabel": "Programme" },
         { "time": "9:30pm", "title": "Late dinner — Il Flauto di Pan", "detail": "In the Villa Cimbrone gardens. Rossellinis is the other option.", "how": "Walk; drive down after", "coord": [40.6461, 14.6118], "kind": "meal", "link": "https://www.google.com/search?q=Il+Flauto+di+Pan+Villa+Cimbrone+Ravello+reservation", "linkLabel": "Reserve" }
-      ]
-    },
-    {
-      "n": 12, "date": "2026-09-04", "dow": "Fri", "city": "naples",
-      "title": "Naples, loud and worth it",
-      "kicker": "AMALFI → NAPLES — De Bonart",
-      "hotel": "De Bonart Naples",
-      "transfer": { "from": "amalfi", "to": "naples", "mode": "driver", "duration": "≈1.5 hrs" },
-      "items": [
-        { "time": "10:00am", "title": "Check out; last look at the coast", "detail": "", "how": "At the hotel", "coord": [40.6350, 14.6030], "kind": "transport" },
-        { "time": "11:00am", "title": "Drive to Naples", "detail": "Coast road, then the A3, ~1.5 hrs", "how": "Self-drive", "coord": [40.7200, 14.4500], "kind": "transport" },
-        { "time": "12:30pm", "title": "Check in — De Bonart, Curio Collection", "detail": "An art palazzo on Via Partenope in Chiaia, facing the bay. Use the hotel's valet — Naples is not a city for a rental car to sit unattended.", "how": "Arrive", "coord": [40.8296, 14.2470], "kind": "hotel", "link": "https://www.trip.com/hotels/naples-hotel-detail-2150889/de-bonart-naples-curio-collection-by-hilton/?checkIn=2026-09-04&checkOut=2026-09-05&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
-        { "time": "2:00pm", "title": "Naples Archaeological Museum", "detail": "Where everything good from Pompeii actually ended up. Go after seeing the site, not before.", "how": "Taxi, ~10 min", "coord": [40.8535, 14.2506], "kind": "sight", "link": "https://mann-napoli.it/en/", "linkLabel": "Tickets" },
-        { "time": "4:30pm", "title": "Spaccanapoli", "detail": "The dead-straight Greek road that still splits the old city in half", "how": "Walk from the museum", "coord": [40.8483, 14.2570], "kind": "sight", "link": "https://www.google.com/search?q=Spaccanapoli+Naples+walk+guide", "linkLabel": "Guide" },
-        { "time": "6:00pm", "title": "Street food, standing up", "detail": "Pizza fritta, zeppoline, a sfogliatella riccia straight from the oven", "how": "Walk", "coord": [40.8511, 14.2578], "kind": "meal" },
-        { "time": "7:30pm", "title": "Rooftop aperitivo", "detail": "Vesuvius on one side, the bay on the other", "how": "At the hotel", "coord": [40.8296, 14.2470], "kind": "meal" },
-        { "time": "9:00pm", "title": "Dinner — Palazzo Petrucci", "detail": "Michelin-starred Neapolitan tasting menu", "how": "Taxi, ~15 min", "coord": [40.8340, 14.2480], "kind": "meal", "link": "https://www.palazzopetrucci.it/en/", "linkLabel": "Reserve" }
       ]
     },
     {
       "n": 13, "date": "2026-09-05", "dow": "Sat", "city": "rome",
       "title": "Back to Rome, in style",
-      "kicker": "NAPLES → ROME — The St. Regis",
+      "kicker": "AMALFI → ROME — The St. Regis",
       "hotel": "The St. Regis Rome",
-      "transfer": { "from": "naples", "to": "rome", "mode": "driver", "duration": "≈2.5 hrs" },
+      "transfer": { "from": "amalfi", "to": "rome", "mode": "driver", "duration": "≈4 hrs" },
       "items": [
-        { "time": "9:00am", "title": "Pizza for breakfast", "detail": "Sorbillo or Di Matteo on Via dei Tribunali. Yes, at 9am. It's Naples.", "how": "Walk, ~10 min", "coord": [40.8511, 14.2578], "kind": "meal", "link": "https://www.sorbillo.it/en/", "linkLabel": "Sorbillo" },
-        { "time": "10:30am", "title": "Collect the car; on the road", "detail": "Naples → Rome is about two and a half hours on the A1", "how": "Self-drive", "coord": [40.8530, 14.2725], "kind": "transport" },
-        { "time": "1:00pm", "title": "Check in — The St. Regis Rome", "detail": "The hotel is inside Rome's ZTL — use valet or a garage nearby; don't try to park at the curb.", "how": "Arrive", "coord": [41.9040, 12.4950], "kind": "hotel", "link": "https://www.trip.com/hotels/rome-hotel-detail-2005587/the-st-regis-rome/?checkIn=2026-09-05&checkOut=2026-09-06&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
-        { "time": "2:00pm", "title": "Last Roman afternoon", "detail": "Piazza di Spagna and the windows along Via Condotti", "how": "Walk, ~15 min", "coord": [41.9058, 12.4823], "kind": "sight" },
+        { "time": "8:30am", "title": "Check out; last look at the coast", "detail": "Breakfast on the cloister terrace before you give the cliff back", "how": "At the hotel", "coord": [40.6350, 14.6030], "kind": "meal" },
+        { "time": "9:30am", "title": "Down the corniche, then north", "detail": "The coast road as far as Vietri, then the A3 and the A1 — Amalfi → Rome is about four hours all told", "how": "Self-drive", "coord": [40.6740, 14.7280], "kind": "transport" },
+        { "time": "1:30pm", "title": "Check in — The St. Regis Rome", "detail": "The hotel is inside Rome's ZTL — use valet or a garage nearby; don't try to park at the curb.", "how": "Arrive", "coord": [41.9040, 12.4950], "kind": "hotel", "link": "https://www.trip.com/hotels/rome-hotel-detail-2005587/the-st-regis-rome/?checkIn=2026-09-05&checkOut=2026-09-06&adult=2&children=0&curr=USD", "linkLabel": "Trip.com" },
+        { "time": "3:00pm", "title": "Last Roman afternoon", "detail": "Piazza di Spagna and the windows along Via Condotti", "how": "Walk, ~15 min", "coord": [41.9058, 12.4823], "kind": "sight" },
         { "time": "6:00pm", "title": "Aperitivo at Lumen", "detail": "The St. Regis bar — the grand-hotel version of a last night", "how": "At the hotel", "coord": [41.9040, 12.4950], "kind": "meal" },
         { "time": "8:30pm", "title": "Farewell dinner — Aroma", "detail": "A rooftop table level with the top tier of the Colosseum. Imago is the alternative, over the Spanish Steps.", "how": "Taxi, ~15 min", "coord": [41.8898, 12.4955], "kind": "meal", "link": "https://www.aromarestaurant.it/en/", "linkLabel": "Reserve" }
       ]
@@ -266,11 +268,11 @@
   ],
 
   "hotels": [
-    { "city": "Rome", "cityKey": "rome", "img": "rome-trame", "name": "Hotel Trame", "brand": "Independent boutique", "checkIn": "2026-08-24", "checkOut": "2026-08-27", "nights": 3, "nightly": 523.33, "total": 1570, "coord": [41.8955, 12.4715], "blurb": "A former Franciscan monastery two streets from Campo de' Fiori.", "link": "https://www.trip.com/hotels/rome-hotel-detail-133328373/hotel-trame/?checkIn=2026-08-24&checkOut=2026-08-27&adult=2&children=0&curr=USD" },
+    { "city": "Rome", "cityKey": "rome", "img": "rome-trame", "name": "Hotel Trame", "brand": "Independent boutique", "checkIn": "2026-08-24", "checkOut": "2026-08-27", "nights": 3, "nightly": 523.86, "total": 1571.58, "coord": [41.8955, 12.4715], "blurb": "A former Franciscan monastery two streets from Campo de' Fiori.", "link": "https://www.trip.com/hotels/rome-hotel-detail-133328373/hotel-trame/?checkIn=2026-08-24&checkOut=2026-08-27&adult=2&children=0&curr=USD" },
     { "city": "Florence", "cityKey": "florence", "img": "florence-casag", "name": "Casa G. Firenze", "brand": "Independent / Michelin Guide", "checkIn": "2026-08-27", "checkOut": "2026-08-29", "nights": 2, "nightly": 735, "total": 1470, "coord": [43.7735, 11.2515], "blurb": "Via dei Rondinelli, midway between the Duomo and Santa Maria Novella.", "link": "https://www.trip.com/hotels/florence-hotel-detail-92373569/casa-g-firenze/?checkIn=2026-08-27&checkOut=2026-08-29&adult=2&children=0&curr=USD" },
-    { "city": "Tuscany", "cityKey": "tuscany", "img": "tuscany-castelfalfi", "name": "Il Castelfalfi", "brand": "TUI Blue Selection", "checkIn": "2026-08-29", "checkOut": "2026-09-01", "nights": 3, "nightly": 1254.22, "total": 3762.66, "coord": [43.5555, 10.9095], "blurb": "A restored 14th-century hamlet on a 2,700-acre estate, with Tuscany's largest golf course and its own vineyards.", "address": "Via Castelfalfi, 50050 Castelfalfi (Montaione), Italy", "link": "https://www.google.com/search?q=Il+Castelfalfi+TUI+BLUE+Montaione+booking" },
-    { "city": "Amalfi Coast", "cityKey": "amalfi", "img": "amalfi-convento", "name": "Anantara Convento di Amalfi", "brand": "Minor / GHA Discovery", "checkIn": "2026-09-01", "checkOut": "2026-09-04", "nights": 3, "nightly": 1500, "total": 4500, "coord": [40.6350, 14.6030], "blurb": "A 13th-century monastery on the cliff, cloister intact.", "link": "https://us.trip.com/hotels/list?city=10255&cityName=Amalfi&provinceId=10136&countryId=106&checkIn=2026-09-01&checkOut=2026-09-04&lat=40.63291&lon=14.597252&districtId=0&barCurr=USD&searchType=H&searchWord=Anantara%20Convento%20di%20Amalfi%20Grand%20Hotel&searchValue=31%7C2290869*31*2290869*1&crn=1&adult=2&children=0&searchBoxArg=t&travelPurpose=0&domestic=false" },
-    { "city": "Naples", "cityKey": "naples", "img": "naples-debonart", "name": "De Bonart Naples", "brand": "Curio Collection / Hilton Honors", "checkIn": "2026-09-04", "checkOut": "2026-09-05", "nights": 1, "nightly": 500, "total": 500, "coord": [40.8296, 14.2470], "blurb": "An art palazzo on Via Partenope, facing the bay.", "link": "https://www.trip.com/hotels/naples-hotel-detail-2150889/de-bonart-naples-curio-collection-by-hilton/?checkIn=2026-09-04&checkOut=2026-09-05&adult=2&children=0&curr=USD" },
+    { "city": "Tuscany", "cityKey": "tuscany", "img": "tuscany-castelfalfi", "name": "Il Castelfalfi", "brand": "TUI Blue Selection", "checkIn": "2026-08-29", "checkOut": "2026-09-01", "nights": 3, "nightly": 1254.99, "total": 3764.98, "coord": [43.5555, 10.9095], "blurb": "A restored 14th-century hamlet on a 2,700-acre estate, with Tuscany's largest golf course and its own vineyards.", "address": "Via Castelfalfi, 50050 Castelfalfi (Montaione), Italy", "link": "https://www.google.com/search?q=Il+Castelfalfi+TUI+BLUE+Montaione+booking" },
+    { "city": "Naples", "cityKey": "naples", "img": "naples-debonart", "name": "De Bonart Naples", "brand": "Curio Collection / Hilton Honors", "checkIn": "2026-09-01", "checkOut": "2026-09-03", "nights": 2, "nightly": 549.14, "total": 1098.27, "coord": [40.8296, 14.2470], "blurb": "An art palazzo on Via Partenope, facing the bay.", "link": "https://www.trip.com/hotels/naples-hotel-detail-2150889/de-bonart-naples-curio-collection-by-hilton/?checkIn=2026-09-01&checkOut=2026-09-03&adult=2&children=0&curr=USD" },
+    { "city": "Amalfi Coast", "cityKey": "amalfi", "img": "amalfi-convento", "name": "Anantara Convento di Amalfi", "brand": "Minor / GHA Discovery", "checkIn": "2026-09-03", "checkOut": "2026-09-05", "nights": 2, "nightly": 1500, "total": 3000, "coord": [40.6350, 14.6030], "blurb": "A 13th-century monastery on the cliff, cloister intact.", "link": "https://us.trip.com/hotels/list?city=10255&cityName=Amalfi&provinceId=10136&countryId=106&checkIn=2026-09-03&checkOut=2026-09-05&lat=40.63291&lon=14.597252&districtId=0&barCurr=USD&searchType=H&searchWord=Anantara%20Convento%20di%20Amalfi%20Grand%20Hotel&searchValue=31%7C2290869*31*2290869*1&crn=1&adult=2&children=0&searchBoxArg=t&travelPurpose=0&domestic=false" },
     { "city": "Rome (finale)", "cityKey": "rome", "img": "rome-stregis", "name": "The St. Regis Rome", "brand": "Marriott Bonvoy", "checkIn": "2026-09-05", "checkOut": "2026-09-06", "nights": 1, "nightly": 1000, "total": 1000, "coord": [41.9040, 12.4950], "blurb": "Five minutes from Termini, for one grand last night.", "link": "https://www.trip.com/hotels/rome-hotel-detail-2005587/the-st-regis-rome/?checkIn=2026-09-05&checkOut=2026-09-06&adult=2&children=0&curr=USD" }
   ],
 
@@ -281,10 +283,11 @@
     { "date": "2026-08-29", "service": "Self-drive", "route": "Florence → Certaldo (lunch stop) → Il Castelfalfi", "hours": "~2 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.7735,11.2515&destination=43.5555,10.9095&waypoints=43.5477,11.0410&travelmode=driving" },
     { "date": "2026-08-30", "service": "Full day", "route": "Castelfalfi → San Gimignano → Volterra → back", "hours": "~8 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=43.5555,10.9095&waypoints=43.4674,11.0431|43.4013,10.8606&travelmode=driving" },
     { "date": "2026-08-31", "service": "Half day", "route": "Castelfalfi → Montespertoli wine estates → back", "hours": "~6 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=43.5555,10.9095&waypoints=43.6280,11.1180&travelmode=driving" },
-    { "date": "2026-09-01", "service": "Self-drive", "route": "Il Castelfalfi → Pompeii (guided) → Amalfi corniche", "hours": "~9 hrs", "note": "The longest drive of the trip — start early and swap drivers", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=40.6350,14.6030&waypoints=40.7497,14.4869&travelmode=driving" },
-    { "date": "2026-09-03", "service": "Self-drive", "route": "Anantara Convento → Ravello (evening concert) → back", "hours": "~5 hrs", "note": "Tight switchbacks — a local driver is a fine substitute for this one leg", "link": "https://www.google.com/maps/dir/?api=1&origin=40.6350,14.6030&destination=40.6350,14.6030&waypoints=40.6494,14.6116&travelmode=driving" },
-    { "date": "2026-09-04", "service": "Self-drive", "route": "Anantara Convento → De Bonart Naples", "hours": "~1.5 hrs", "note": "Use the hotel valet in Naples", "link": "https://www.google.com/maps/dir/?api=1&origin=40.6350,14.6030&destination=40.8296,14.2470&travelmode=driving" },
-    { "date": "2026-09-05", "service": "Self-drive", "route": "De Bonart Naples → The St. Regis Rome", "hours": "~2.5 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=40.8296,14.2470&destination=41.9040,12.4950&travelmode=driving" },
+    { "date": "2026-09-01", "service": "Self-drive", "route": "Il Castelfalfi → De Bonart Naples", "hours": "~5 hrs", "note": "The longest drive of the trip — then the car goes to the hotel valet until Thursday", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=40.8296,14.2470&travelmode=driving" },
+    { "date": "2026-09-02", "service": "Fast ferry", "route": "Molo Beverello, Naples → Capri → back", "hours": "~50 min each way", "note": "NLG / SNAV / Caremar — book online the night before, and check the last sailing back", "link": "https://www.directferries.com/naples_capri_ferry.htm" },
+    { "date": "2026-09-03", "service": "Self-drive", "route": "Naples → Pompeii (guided) → Anantara Convento, Amalfi", "hours": "~5 hrs with the site", "note": "Pompeii is directly on the way — no detour at all", "link": "https://www.google.com/maps/dir/?api=1&origin=40.8296,14.2470&destination=40.6350,14.6030&waypoints=40.7497,14.4869&travelmode=driving" },
+    { "date": "2026-09-04", "service": "Self-drive", "route": "Anantara Convento → Ravello (evening concert) → back", "hours": "~5 hrs", "note": "Tight switchbacks — a local driver is a fine substitute for this one leg", "link": "https://www.google.com/maps/dir/?api=1&origin=40.6350,14.6030&destination=40.6350,14.6030&waypoints=40.6494,14.6116&travelmode=driving" },
+    { "date": "2026-09-05", "service": "Self-drive", "route": "Anantara Convento → The St. Regis Rome", "hours": "~4 hrs", "note": "Corniche as far as Vietri, then the A3 and A1", "link": "https://www.google.com/maps/dir/?api=1&origin=40.6350,14.6030&destination=41.9040,12.4950&travelmode=driving" },
     { "date": "2026-09-06", "service": "Drop off the car", "route": "The St. Regis Rome → FCO", "hours": "~40 min", "note": "Drop-off is booked for noon — move it earlier so it isn't after the flight", "link": "https://www.google.com/maps/dir/?api=1&origin=41.9040,12.4950&destination=41.8003,12.2389&travelmode=driving" }
   ],
 
@@ -300,21 +303,21 @@
     { "priority": 7, "urgency": "week", "item": "Rome opera — All Saints' Anglican, Aug 25", "detail": "Confirm the programme is posted before booking.", "link": "https://www.classictic.com/en/city/rome-t14/rome-concert-venues-vc1/all-saints-church-vl51/" },
     { "priority": 8, "urgency": "week", "item": "Montespertoli estate visit for Mon Aug 31", "detail": "A Chianti Montespertoli producer, plus lunch — most require an appointment rather than taking walk-ins.", "link": "https://www.google.com/search?q=Chianti+Montespertoli+winery+tour+booking" },
     { "priority": 9, "urgency": "week", "item": "Timed entries — Accademia, Duomo dome, Uffizi, all on Aug 28", "detail": "Three in one morning, in that order. Book the dome climb first; it has the fewest slots.", "link": "https://www.uffizi.it/en/tickets" },
-    { "priority": 10, "urgency": "week", "item": "Vatican early entry (Aug 25), Colosseum arena floor (Aug 26), Pompeii guide (Sep 1)", "detail": "All three need booking — the Vatican and Colosseum slots go first.", "link": "https://tickets.museivaticani.va/" },
-    { "priority": 11, "urgency": "soon", "item": "Capri private boat — Lucibello, Sep 2", "detail": "Roughly seven hours with a skipper from the hotel jetty — book a few weeks out in peak season.", "link": "https://www.lucibello.it/en/" },
-    { "priority": 12, "urgency": "soon", "item": "Ravello Festival — check the Sep 3 programme", "detail": "Festival runs to Sep 5. The confirmed Aug 29 Mahler date falls on your Florence→Castelfalfi transfer, so it was never reachable.", "link": "https://www.ravellofestival.com/en/" },
+    { "priority": 10, "urgency": "week", "item": "Vatican early entry (Aug 25), Colosseum arena floor (Aug 26), Pompeii guide (Sep 3)", "detail": "All three need booking — the Vatican and Colosseum slots go first. Pompeii moved to Sep 3 with the reorder; take a morning slot, the site has almost no shade by noon.", "link": "https://tickets.museivaticani.va/" },
+    { "priority": 11, "urgency": "soon", "item": "Capri ferry — Naples → Capri return, Sep 2", "detail": "Fast ferries from Molo Beverello take about fifty minutes; NLG, SNAV and Caremar all run the route. Book both legs online the night before rather than queueing at the counter, and note the last sailing back. The round-the-island boat can be picked up at Marina Grande on the day.", "link": "https://www.directferries.com/naples_capri_ferry.htm" },
+    { "priority": 12, "urgency": "soon", "item": "Ravello Festival — check the Sep 4 programme", "detail": "Festival runs to Sep 5, so both Amalfi nights now fall inside the window. The Aug 29 Mahler date still lands on your Florence→Castelfalfi transfer, so it was never reachable.", "link": "https://www.ravellofestival.com/en/" },
     { "priority": 13, "urgency": "soon", "item": "Headline dinners on their dates", "detail": "Sostanza Aug 27 · Borgo San Jacopo Aug 28 · La Via del Sale Aug 29 & 31 · San Gimignano lunch Aug 30. Plus Armando, Roscioli, Lo Scoglio — reserve ahead where they take bookings.", "link": "https://www.google.com/search?q=Trattoria+Sostanza+Florence+reservation" }
   ],
 
   "bookingsRuledOut": [
     { "item": "Rome — Caracalla / Circo Massimo opera", "reason": "2026 season runs Jun 29 – Jul 31 only." },
-    { "item": "Arena di Verona — Aida (Zeffirelli), Sep 4 & 10", "reason": "Needs a Verona overnight; Sep 4 is the Amalfi → Naples transfer." }
+    { "item": "Arena di Verona — Aida (Zeffirelli), Sep 4 & 10", "reason": "Needs a Verona overnight, and Sep 4 is your Ravello night on the Amalfi Coast." }
   ],
 
   "budget": [
-    { "category": "Lodging", "amount": 12802.66, "note": "6 hotels, 13 nights. Trame, Castelfalfi and Convento are actual quotes." },
+    { "category": "Lodging", "amount": 11904.83, "note": "6 hotels, 13 nights. Trame ($1,571.58), Castelfalfi ($3,764.98) and De Bonart ($1,098.27) are confirmed bookings; Convento is a quote, now 2 nights rather than 3. The St. Regis is still an estimate." },
     { "category": "Transport", "amount": 1775, "note": "Holding the old total pending a re-quote: the rental drops from 14 days to 8 (Florence Aug 29 → FCO Sep 6), but a one-way pickup fee eats into that, and the FCO private transfer (~€70–90) and two Frecciarossa fares are new. Rome garage parking is gone entirely. Fuel and tolls now only from Aug 29." },
-    { "category": "Excursions & guides", "amount": 2100, "note": "Vatican, Colosseum, Pompeii, Capri boat, wineries, Florence galleries, operas." },
+    { "category": "Excursions & guides", "amount": 2100, "note": "Vatican, Colosseum, Pompeii, Capri, wineries, Florence galleries, operas. Held pending a re-quote: swapping the private Lucibello charter for the Capri ferry takes a four-figure line down to about €50 of tickets for the two of you, so this should come down materially." },
     { "category": "Food & wine", "amount": 2400, "note": "~$185/day for two, outside hotel-included meals." },
     { "category": "Buffer & gratuities", "amount": 400, "note": "Taxis, tips, Naples street food, incidentals." }
   ],
