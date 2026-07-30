@@ -268,6 +268,21 @@ body {
   text-shadow: 0 1px 10px rgba(0,0,0,.65), 0 0 22px rgba(0,0,0,.4);
   white-space: nowrap; opacity: 0; transition: opacity .3s ease, top .1s linear, left .1s linear;
 }
+/* In portrait the model fills the width, so these projected names land on top
+   of the hero title and "Amalfi Coast" runs off the right edge. The route
+   chips directly below already name every stop — drop the overlay instead of
+   crowding the type. */
+@media (max-width: 700px) {
+  .map-labels-3d { display: none; }
+  /* The veil's angled gradient assumes a landscape hero with the model off to
+     one side. In portrait the model sits directly under the copy and the
+     gradient has already faded out by the end of a line, so the type needs to
+     carry its own backing rather than the whole model being dimmed. */
+  .hero .eyebrow, .hero h1, .hero .dates {
+    text-shadow: 0 1px 14px rgba(11, 16, 18, .95), 0 0 32px rgba(11, 16, 18, .85);
+  }
+  .hero .eyebrow { color: var(--ink-2); }
+}
 
 /* ── day slides ─────────────────────────────────────────────────────────── */
 
