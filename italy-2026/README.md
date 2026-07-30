@@ -1,13 +1,13 @@
 # Italy 2026 — itinerary
 
-Rome → Florence → Tuscany (Il Castelfalfi) → Amalfi Coast → Naples → Rome.
-Mon 24 Aug – Sun 6 Sep 2026 · 13 nights · 2 travellers. Self-drive, FCO to FCO.
+Rome → Florence → Tuscany (Il Castelfalfi) → Naples → Amalfi Coast → Rome.
+Mon 24 Aug – Sun 6 Sep 2026 · 13 nights · 2 travellers. Train, self-drive (Florence–Tuscany only) & private drivers, FCO to FCO.
 
 ## Deliverables
 
 | File | What it is |
 |---|---|
-| `dist/plan.html` | The working plan. Day-by-day timelines paired with interactive street maps, every booking link, illustrated hotel cards, a self-drive log, a prioritised booking list, budget. Prints to PDF. |
+| `dist/plan.html` | The working plan. Day-by-day timelines paired with interactive street maps, every booking link, illustrated hotel cards, a logistics log, a prioritised booking list, budget. Prints to PDF. |
 | `dist/presentation.html` | A 20-slide deck for sharing. Opens on a 3D Italy with the route drawn on, then one slide per day, the six hotels, logistics, budget, and a booking checklist. |
 | `dist/Italy 2026 (revised).xlsx` | The same seven tabs as the original workbook, with corrected booking URLs. |
 

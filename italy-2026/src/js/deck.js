@@ -145,7 +145,7 @@ addSlide(h('section', {},
 /* 19 — logistics */
 addSlide(h('section', {},
   h('div', { class: 'in' },
-    h('div', { class: 'eyebrow' }, 'Self-drive, FCO to FCO'),
+    h('div', { class: 'eyebrow' }, 'Train, self-drive & drivers, FCO to FCO'),
     h('h2', { class: 'big' }, 'Getting between them')),
   h('div', { class: 'legs in' },
     ...TRIP.drivers.map((dv) => h('div', { class: 'leg' },
