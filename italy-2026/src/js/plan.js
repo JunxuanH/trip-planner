@@ -392,7 +392,7 @@ function initTheme() {
   };
   let saved = null;
   try { saved = localStorage.getItem('italy26-theme'); } catch {}
-  set(saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  set(saved || 'light');
   btn.addEventListener('click', () => set(root.dataset.theme === 'dark' ? 'light' : 'dark'));
 }
 

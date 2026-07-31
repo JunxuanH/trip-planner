@@ -37,30 +37,8 @@
   --radius: 3px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper:   #14120F;
-    --paper-2: #1D1A16;
-    --paper-3: #262119;
-    --ink:     #F2EADC;
-    --ink-2:   #C7BAA6;
-    --ink-3:   #9B8D7C;
-    --rule:    #362F26;
-
-    --terracotta: #E0785A;
-    --terracotta-d: #C25A3A;
-    --olive:      #9DAE76;
-    --tyrrhenian: #5AA9BC;
-    --gold:       #D6B166;
-    --plum:       #B27FA3;
-
-    --sea:  #3E7E90;
-    --land: #221E18;
-
-    --shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3);
-    --shadow-2: 0 2px 6px rgba(0,0,0,.45), 0 12px 32px rgba(0,0,0,.4);
-  }
-}
+/* Light is the default regardless of system preference — dark is opt-in
+   only via the theme toggle, which sets data-theme="dark" explicitly. */
 
 :root[data-theme="dark"] {
   --paper:   #14120F;

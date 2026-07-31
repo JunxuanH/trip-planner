@@ -226,18 +226,20 @@
     },
     {
       "n": 12, "date": "2026-09-04", "dow": "Fri", "city": "tuscany",
-      "title": "Towers, then the vines",
-      "kicker": "TUSCANY — San Gimignano and a Chianti Montespertoli estate",
+      "title": "Towers, then on horseback through the vines",
+      "kicker": "TUSCANY — San Gimignano and a horseback vineyard tour",
       "hotel": "Il Castelfalfi",
-      "note": "One day for both San Gimignano and the Montespertoli wine country, now that Tuscany is down to two nights — Volterra doesn't fit this time.",
+      "changed": true,
+      "changeNote": "Swaps the Montespertoli estate visit for a horseback tour through vineyards and olive groves near San Gimignano — it already bundles lunch and a winery, so it replaces both the old lunch stop and the afternoon wine estate in one booking.",
+      "note": "One day for both San Gimignano and a horseback vineyard tour, now that Tuscany is down to two nights — Volterra and the separate Montespertoli visit don't fit this time.",
       "items": [
         { "time": "9:00am", "title": "Driver to San Gimignano", "detail": "About twenty-five minutes", "how": "Self-drive", "coord": [43.5555, 10.9095], "kind": "transport" },
         { "time": "9:30am", "title": "The towers of San Gimignano", "detail": "Fourteen of the original seventy-two medieval towers still stand — best seen from Piazza della Cisterna", "how": "Arrive", "coord": [43.4674, 11.0431], "kind": "sight" },
-        { "time": "10:30am", "title": "The Collegiata", "detail": "Ghirlandaio and Gozzoli frescoes wall to wall in a church the size of a chapel", "how": "Walk", "coord": [43.4677, 11.0433], "kind": "sight" },
-        { "time": "12:00pm", "title": "Gelato at Dondoli, then lunch and a Vernaccia tasting", "detail": "A two-time world gelato champion on Piazza della Cisterna, then San Gimignano's own DOCG white with lunch", "how": "Walk", "coord": [43.4674, 11.0431], "kind": "meal" },
-        { "time": "2:00pm", "title": "Driver to a Montespertoli estate", "detail": "About forty minutes across the Val d'Elsa", "how": "Self-drive", "coord": [43.6280, 11.1180], "kind": "transport" },
-        { "time": "2:45pm", "title": "A Chianti Montespertoli cellar", "detail": "The smallest Chianti DOCG sub-zone, carved out of the old Colli Fiorentini in 1997 — quieter than Chianti Classico proper. Small enough to see the village on foot between tastings.", "how": "Arrive", "coord": [43.6280, 11.1180], "kind": "wine" },
-        { "time": "5:30pm", "title": "Back to Castelfalfi", "detail": "About forty minutes", "how": "Driver", "coord": [43.6280, 11.1180], "kind": "transport" },
+        { "time": "10:15am", "title": "The Collegiata", "detail": "Ghirlandaio and Gozzoli frescoes wall to wall in a church the size of a chapel", "how": "Walk", "coord": [43.4677, 11.0433], "kind": "sight" },
+        { "time": "10:45am", "title": "Gelato at Dondoli", "detail": "A two-time world gelato champion on Piazza della Cisterna — quick, before the horses", "how": "Walk", "coord": [43.4674, 11.0431], "kind": "meal" },
+        { "time": "11:00am", "title": "Horseback riding, lunch and a winery", "detail": "San Gimignano Experience: about an hour in the saddle through vineyards, olive groves and native woods, then a traditional Tuscan lunch (antipasti, truffle lasagna, bread soup), a cellar tour and tastings of Chianti Classico, Vernaccia and Super Tuscans. No riding experience needed; book ahead — 3-4 hours all told.", "how": "Meet at the Bivio Volterra bus stop", "coord": [43.4610, 11.0280], "kind": "wine", "link": "https://www.sangimignanoexperience.it/en/prodotto/horseback-riding-san-gimignano-with-lunch-visit-of-the-cellar-and-wine-tastings/", "linkLabel": "Book" },
+        { "time": "3:15pm", "title": "Back to Castelfalfi", "detail": "About twenty-five minutes", "how": "Self-drive", "coord": [43.5555, 10.9095], "kind": "transport" },
+        { "time": "4:00pm", "title": "Pool or spa terrace", "detail": "You've earned it after a day in the saddle", "how": "At the hotel", "coord": [43.5555, 10.9095], "kind": "rest" },
         { "time": "8:30pm", "title": "Dinner — La Via del Sale", "detail": "The estate's fine-dining room, on your last Tuscan night", "how": "At the hotel", "coord": [43.5555, 10.9095], "kind": "meal" }
       ]
     },
@@ -293,7 +295,7 @@
     { "date": "2026-08-31", "service": "High-speed rail", "route": "Salerno → Firenze S.M.N. (Frecciarossa)", "hours": "~3.5 hrs", "note": "Direct via Naples and Rome, 10+ departures a day", "link": "https://www.google.com/maps/dir/?api=1&origin=40.6702,14.7906&destination=43.7766,11.2480&travelmode=transit" },
     { "date": "2026-09-03", "service": "Collect the car", "route": "Borgo Ognissanti, Florence — outside the ZTL", "hours": "~30 min", "note": "Reservation #21586310US4 — Florence pickup, Florence drop-off, not FCO", "link": "https://www.google.com/maps/search/?api=1&query=car+rental+Borgo+Ognissanti+Florence" },
     { "date": "2026-09-03", "service": "Self-drive", "route": "Florence → Certaldo (lunch stop) → Il Castelfalfi", "hours": "~2 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.7735,11.2515&destination=43.5555,10.9095&waypoints=43.5477,11.0410&travelmode=driving" },
-    { "date": "2026-09-04", "service": "Full day", "route": "Castelfalfi → San Gimignano → Montespertoli → back", "hours": "~8 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=43.5555,10.9095&waypoints=43.4674,11.0431|43.6280,11.1180&travelmode=driving" },
+    { "date": "2026-09-04", "service": "Full day", "route": "Castelfalfi → San Gimignano → horseback tour → back", "hours": "~7 hrs", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=43.5555,10.9095&waypoints=43.4674,11.0431&travelmode=driving" },
     { "date": "2026-09-05", "service": "Self-drive, then rail", "route": "Il Castelfalfi → Borgo Ognissanti (drop the car) → Roma Termini", "hours": "~1.5 hrs drive + 1.5 hrs train", "note": "Rental ends where it started, in Florence — then the Frecciarossa to Rome", "link": "https://www.google.com/maps/dir/?api=1&origin=43.5555,10.9095&destination=41.9010,12.5017&travelmode=driving" },
     { "date": "2026-09-06", "service": "Taxi", "route": "Nobu Hotel Roma → FCO", "hours": "~40 min", "note": "No rental to return — that was dropped off in Florence on Sep 5", "link": "https://www.google.com/maps/dir/?api=1&origin=41.9066,12.4884&destination=41.8003,12.2389&travelmode=driving" }
   ],
@@ -313,7 +315,7 @@
     { "priority": 10, "urgency": "week", "item": "Timed entries — Accademia, Duomo dome, Uffizi, all on Sep 1", "detail": "Three in one morning, in that order. Book the dome climb first; it has the fewest slots.", "link": "https://www.uffizi.it/en/tickets" },
     { "priority": 11, "urgency": "week", "item": "Florence opera — La Traviata at St. Mark's, Sep 2", "detail": "Now on the second, lighter Florence day rather than the arrival evening — book before the seats go.", "link": "https://www.classictic.com/en/city/florence-t16/la-traviata-at-stmarks-anglican-church/111519/" },
     { "priority": 12, "urgency": "week", "item": "Rome opera — All Saints' Anglican, Aug 25", "detail": "Confirm the programme is posted before booking.", "link": "https://www.classictic.com/en/city/rome-t14/rome-concert-venues-vc1/all-saints-church-vl51/" },
-    { "priority": 13, "urgency": "week", "item": "Montespertoli estate visit for Fri Sep 4", "detail": "A Chianti Montespertoli producer, now paired with San Gimignano in one day — most require an appointment rather than taking walk-ins.", "link": "https://www.google.com/search?q=Chianti+Montespertoli+winery+tour+booking" },
+    { "priority": 13, "urgency": "now", "item": "Horseback riding, lunch & winery tour — San Gimignano, Fri Sep 4", "detail": "San Gimignano Experience, 11am–3pm, ~€120pp: about an hour on horseback through vineyards and olive groves, then lunch, a cellar tour and wine tastings. Replaces the old Montespertoli visit. Meets at the Bivio Volterra bus stop — book ahead, it's a small-group tour.", "link": "https://www.sangimignanoexperience.it/en/prodotto/horseback-riding-san-gimignano-with-lunch-visit-of-the-cellar-and-wine-tastings/" },
     { "priority": 14, "urgency": "week", "item": "Reserve dinners at Il Castelfalfi — La Via del Sale, Sep 3 & 4", "detail": "The estate's fine-dining room. Worth booking ahead even though the room itself is already confirmed.", "link": "https://www.google.com/search?q=La+Via+del+Sale+Castelfalfi+reservation" },
     { "priority": 15, "urgency": "soon", "item": "Ravello Festival — check the Aug 30 programme", "detail": "Festival runs to Sep 5, so your one Ravello night is well inside the window.", "link": "https://www.ravellofestival.com/en/" },
     { "priority": 16, "urgency": "soon", "item": "Nobu Roma farewell dinner, Sep 5", "detail": "The hotel's own restaurant, on your last night — worth reserving ahead given the brand.", "link": "https://www.noburestaurants.com/rome/contact-and-hours" },
@@ -323,13 +325,13 @@
   "bookingsRuledOut": [
     { "item": "Rome — Caracalla / Circo Massimo opera", "reason": "2026 season runs Jun 29 – Jul 31 only." },
     { "item": "Arena di Verona — Aida (Zeffirelli), Sep 4 & 10", "reason": "No open night in the schedule for a Verona detour — every night from Aug 24 to Sep 5 has a confirmed hotel booking elsewhere." },
-    { "item": "Volterra", "reason": "Fit fine as a full day when Tuscany was three nights; with the coast now taking a night from it, San Gimignano and Montespertoli fill the single Tuscan day instead." }
+    { "item": "Volterra", "reason": "Fit fine as a full day when Tuscany was three nights; with the coast now taking a night from it, San Gimignano and the horseback vineyard tour fill the single Tuscan day instead." }
   ],
 
   "budget": [
     { "category": "Lodging", "amount": 12097.74, "note": "6 hotels, 13 nights — all six are now confirmed bookings. Trame ($1,588), Grand Hotel Vesuvio ($1,180), Anantara Convento ($4,115.74, includes breakfast for two and a $100 experience credit), The Hoxton ($1,492), Castelfalfi ($2,848), Nobu Hotel Roma ($874)." },
     { "category": "Transport", "amount": 1850, "note": "Estimate. FCO private driver, Rome→Naples train, Naples↔Capri ferry, Naples→Amalfi→Positano ferry, Amalfi→Salerno private driver, Salerno→Florence train, a 2-day Florence–Tuscany rental car, and Florence→Rome train." },
-    { "category": "Excursions & guides", "amount": 1800, "note": "Vatican, Colosseum, Capri boat tour, wineries, Florence galleries, operas — no Pompeii or Volterra guide fees this time." },
+    { "category": "Excursions & guides", "amount": 2050, "note": "Vatican, Colosseum, Capri boat tour, Florence galleries, operas, and the San Gimignano horseback/lunch/winery tour (~€120pp, ~$260 for two) — no Pompeii or Volterra guide fees this time." },
     { "category": "Food & wine", "amount": 2400, "note": "~$185/day for two, outside hotel-included meals." },
     { "category": "Buffer & gratuities", "amount": 400, "note": "Taxis, tips, Naples street food, incidentals." }
   ],
@@ -338,7 +340,7 @@
     { "location": "Rome", "days": "Days 1–3", "platform": "Flytographer Rome / Localgrapher", "spots": "Pincio terrace and Villa Borghese at sunset; the Colosseum and Trevi at dawn, empty; the Spanish Steps", "xhs": "罗马旅拍", "price": "~$325 / 30 min", "link": "https://www.flytographer.com/destinations/rome/", "xhsLink": "https://www.xiaohongshu.com/search_result?keyword=%E7%BD%97%E9%A9%AC%E6%97%85%E6%8B%8D" },
     { "location": "Amalfi Coast", "days": "Days 6–8", "platform": "Flytographer Amalfi / Giuseppe Di Martino", "spots": "Positano's pastel stairs, seen from the ferry; the Ravello gardens; Amalfi's Duomo steps", "xhs": "阿马尔菲/positano旅拍", "price": "~$325–425", "link": "https://www.flytographer.com/destinations/amalfi-coast/", "xhsLink": "https://www.xiaohongshu.com/search_result?keyword=%E9%98%BF%E9%A9%AC%E5%B0%94%E8%8F%B2+%E6%97%85%E6%8B%8D" },
     { "location": "Florence", "days": "Days 8–11", "platform": "Flytographer Florence / Localgrapher", "spots": "Piazzale Michelangelo at sunset; Ponte Vecchio at dawn; the Fiesole hillside; the Uffizi loggia", "xhs": "佛罗伦萨旅拍", "price": "~$325 / 30 min", "link": "https://www.flytographer.com/destinations/florence/", "xhsLink": "https://www.xiaohongshu.com/search_result?keyword=%E4%BD%9B%E7%BD%97%E4%BC%A6%E8%90%A8%E6%97%85%E6%8B%8D" },
-    { "location": "Tuscany / San Gimignano", "days": "Days 11–13", "platform": "Flytographer Tuscany / Localgrapher", "spots": "San Gimignano's towers at golden hour; the Castelfalfi vineyards and golf course; Montespertoli's vine rows", "xhs": "托斯卡纳旅拍", "price": "~$425 / 60 min", "link": "https://www.flytographer.com/destinations/tuscany/", "xhsLink": "https://www.xiaohongshu.com/search_result?keyword=%E6%89%98%E6%96%AF%E5%8D%A1%E7%BA%B3+%E6%97%85%E6%8B%8D" },
+    { "location": "Tuscany / San Gimignano", "days": "Days 11–13", "platform": "Flytographer Tuscany / Localgrapher", "spots": "San Gimignano's towers at golden hour; the Castelfalfi vineyards and golf course; on horseback in the vines outside town", "xhs": "托斯卡纳旅拍", "price": "~$425 / 60 min", "link": "https://www.flytographer.com/destinations/tuscany/", "xhsLink": "https://www.xiaohongshu.com/search_result?keyword=%E6%89%98%E6%96%AF%E5%8D%A1%E7%BA%B3+%E6%97%85%E6%8B%8D" },
     { "location": "Capri", "days": "Day 5, optional", "platform": "Flytographer Capri", "spots": "Gardens of Augustus over the Faraglioni; Via Krupp; Marina Grande", "xhs": "capri旅拍", "price": "~$325 / 30 min", "link": "https://www.flytographer.com/destinations/capri/", "xhsLink": "https://www.xiaohongshu.com/search_result?keyword=%E5%8D%A1%E6%99%AE%E9%87%8C+%E6%97%85%E6%8B%8D" }
   ],
 

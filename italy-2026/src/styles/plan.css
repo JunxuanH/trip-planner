@@ -371,17 +371,6 @@ body { padding-bottom: 4rem; }
   --st-case:   #0F0D0A;
   --st-fill:   #3A322A;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --st-ground: #1A1712;
-    --st-build:  #241F18;
-    --st-green:  #1D2418;
-    --st-water:  #16262B;
-    --st-square: #262019;
-    --st-case:   #0F0D0A;
-    --st-fill:   #3A322A;
-  }
-}
 
 .st-ground { fill: var(--st-ground); }
 .st-green  { fill: var(--st-green); }
