@@ -131,14 +131,14 @@ trip.bookings.forEach((b) => scanForHotelUrls(b.link, `booking #${b.priority}`))
 /* ---------- the reorder actually happened ---------- */
 
 const order = trip.hotels.map((h) => h.cityKey);
-const expected = ['rome', 'florence', 'tuscany', 'naples', 'amalfi', 'rome'];
+const expected = ['rome', 'naples', 'amalfi', 'florence', 'tuscany', 'rome'];
 if (order.join('>') !== expected.join('>')) {
   fail(`hotel order is ${order.join(' → ')}, expected ${expected.join(' → ')}`);
 }
 // Checked by city slot, not hotel name — the specific property booked there can change.
 const byCityKey = (key) => trip.hotels.find((h) => h.cityKey === key);
-if (byCityKey('florence')?.checkIn !== '2026-08-27') fail('Florence stay did not start Aug 27');
-if (byCityKey('tuscany')?.checkIn !== '2026-08-29') fail('Tuscany stay did not start Aug 29');
+if (byCityKey('florence')?.checkIn !== '2026-08-31') fail('Florence stay did not start Aug 31');
+if (byCityKey('tuscany')?.checkIn !== '2026-09-03') fail('Tuscany stay did not start Sep 3');
 
 /* ---------- links are well-formed ---------- */
 
