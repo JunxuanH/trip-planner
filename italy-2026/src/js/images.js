@@ -3,17 +3,15 @@
    properties — every card that shows one links through to the real gallery. */
 
 import romeTrame from '../img/rome-trame.webp';
-import florenceCasag from '../img/florence-casag.webp';
+import florenceW from '../img/florence-w.webp';
 import tuscanyCastelfalfi from '../img/tuscany-castelfalfi.webp';
-import amalfiConvento from '../img/amalfi-convento.webp';
-import naplesDebonart from '../img/naples-debonart.webp';
-import romeStregis from '../img/rome-stregis.webp';
+import sorrentoVittoria from '../img/sorrento-vittoria.webp';
+import romeIntercon from '../img/rome-intercon.webp';
 
 export const IMAGES = {
   'rome-trame': romeTrame,
-  'florence-casag': florenceCasag,
+  'florence-w': florenceW,
   'tuscany-castelfalfi': tuscanyCastelfalfi,
-  'amalfi-convento': amalfiConvento,
-  'naples-debonart': naplesDebonart,
-  'rome-stregis': romeStregis,
+  'sorrento-vittoria': sorrentoVittoria,
+  'rome-intercon': romeIntercon,
 };

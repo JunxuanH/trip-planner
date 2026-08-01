@@ -430,7 +430,13 @@ body { padding-bottom: 4rem; }
   border: 1px solid var(--rule); border-radius: var(--radius);
   box-shadow: var(--shadow-2);
 }
-.tm-pop .leaflet-popup-content { margin: .8rem .9rem .7rem; font-size: .84rem; line-height: 1.45; }
+/* A merged pin can hold three or four stops, which makes a popup taller than
+   the frame — and the frame clips it, so the top entries were simply gone.
+   Cap it and let it scroll, the way the SVG engine's popup body does. */
+.tm-pop .leaflet-popup-content {
+  margin: .8rem .9rem .7rem; font-size: .84rem; line-height: 1.45;
+  max-height: 9.5rem; overflow-y: auto; overscroll-behavior: contain;
+}
 .tm-pop .leaflet-popup-tip { background: var(--paper); border: 1px solid var(--rule); }
 .tm-pop-item + .tm-pop-item { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--rule); }
 .tm-pop-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }

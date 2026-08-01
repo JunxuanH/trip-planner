@@ -114,7 +114,14 @@ export function createTileMap(host, opts) {
   const markers = stops.map((s, i) => {
     const m = L.marker(latlngs[i], { icon: pinIcon(s, false), keyboard: true, alt: s.label })
       .addTo(map);
-    m.bindPopup(popupHtml(s), { className: 'tm-pop', maxWidth: 272, autoPanPadding: [24, 24] });
+    /* The frame clips anything that leaves it, so the popup has to be kept
+       inside rather than merely panned toward: keepInView makes Leaflet shift
+       the map until it fits, and the CSS caps the body so "fits" is reachable
+       even for a merged pin holding four stops. */
+    m.bindPopup(popupHtml(s), {
+      className: 'tm-pop', maxWidth: 272,
+      autoPan: true, keepInView: true, autoPanPadding: [18, 18],
+    });
     m.on('click', () => onPick?.(i));
     return m;
   });
