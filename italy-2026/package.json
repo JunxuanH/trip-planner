@@ -11,8 +11,6 @@
     "build": "node scripts/verify.mjs && node scripts/build.mjs && node scripts/build-xlsx.mjs"
   },
   "devDependencies": {
-    "@fontsource-variable/archivo": "^5.3.0",
-    "@fontsource/martian-mono": "^5.3.0",
     "esbuild": "^0.28.1",
     "exceljs": "^4.4.0",
     "three": "^0.180.0"

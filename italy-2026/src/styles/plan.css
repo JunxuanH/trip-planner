@@ -13,60 +13,41 @@ body { padding-bottom: 4rem; }
 
 .masthead {
   position: relative;
-  padding: var(--space-8) 0 var(--space-5);
-  border-bottom: 3px solid var(--rule);
+  padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(1.5rem, 3vw, 2.5rem);
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+}
+.masthead::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60rem 22rem at 82% -10%, color-mix(in oklab, var(--terracotta) 13%, transparent), transparent 70%),
+    radial-gradient(44rem 20rem at 8% 110%, color-mix(in oklab, var(--olive) 12%, transparent), transparent 70%);
+  pointer-events: none;
 }
 .masthead > * { position: relative; z-index: 1; }
 
-/* Set as one solid block of wide caps — a station name, not a book title. */
 .masthead h1 {
-  font-size: var(--step-7);
-  font-stretch: var(--wide);
-  font-weight: 800;
-  letter-spacing: -.035em;
-  text-transform: uppercase;
-  margin: var(--space-2) 0 var(--space-2);
+  font-size: clamp(2.6rem, 8vw, 5.4rem);
+  letter-spacing: -.025em;
+  margin: .35rem 0 .1rem;
 }
 .masthead .sub {
-  font-family: var(--display);
-  font-stretch: var(--wide);
-  font-size: var(--step-1);
-  font-weight: 500;
-  letter-spacing: .01em;
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
   color: var(--ink-2);
-  max-width: 34ch;
+  font-style: italic;
 }
 
-/* The facts read as a board strip: labels dim, values lit. */
 .facts {
-  display: flex; flex-wrap: wrap;
-  gap: var(--space-2) var(--space-6);
-  margin-top: var(--space-6);
-  padding: var(--space-4) var(--space-5);
-  background: var(--board);
+  display: flex; flex-wrap: wrap; gap: 0 clamp(1.5rem, 4vw, 3rem);
+  margin-top: 2rem;
 }
-.fact { padding: 0; }
-.fact .k {
-  font-family: var(--display); font-stretch: var(--wide);
-  font-size: var(--step--2); font-weight: 700;
-  letter-spacing: .18em; text-transform: uppercase;
-  color: color-mix(in oklab, var(--ambra) 45%, var(--board));
-}
-.fact .v {
-  font-family: var(--mono);
-  font-size: var(--step-1);
-  font-weight: 400;
-  line-height: 1.25;
-  color: var(--ambra);
-  font-variant-numeric: tabular-nums;
-}
-.fact .v small {
-  font-size: var(--step--2);
-  font-family: var(--mono);
-  color: color-mix(in oklab, var(--ambra) 55%, var(--board));
-}
+.fact { padding: .25rem 0; }
+.fact .v { font-family: var(--serif); font-size: 1.5rem; line-height: 1.2; }
+.fact .v small { font-size: .8rem; color: var(--ink-3); font-family: var(--sans); }
 
-.countdown .v { color: #FFF; }
+.countdown .v { color: var(--terracotta); }
 
 /* ── poster strip under the masthead ────────────────────────────────────── */
 
@@ -201,54 +182,25 @@ body { padding-bottom: 4rem; }
   backdrop-filter: blur(4px);
 }
 
-.day-head { margin-bottom: var(--space-5); }
-
-/* The signature. A board strip across the full width of the day: number, date,
-   destination, and the hours the day runs. The accent shows as a lit edge so
-   per-city colour still reads without competing with the amber. */
+.day-head { margin-bottom: 1.5rem; }
 .day-index {
-  display: flex; align-items: center; flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  margin-bottom: var(--space-4);
-  border-left: 5px solid var(--c);
-  font-size: var(--step--1);
+  display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap;
+  margin-bottom: .35rem;
 }
 .day-index .num {
-  font-size: var(--step-2); font-weight: 700; line-height: 1;
-  color: var(--ambra);
+  font-family: var(--mono); font-size: .78rem; letter-spacing: .1em;
+  color: var(--c); font-weight: 700;
 }
-.day-index .date { text-transform: uppercase; letter-spacing: .1em; font-size: var(--step--2); }
-.day-index .name { font-size: var(--step-1); margin-right: auto; }
-.day-index .span { font-size: var(--step--1); letter-spacing: -.03em; }
-
+.day-index .date { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .badge {
-  font-family: var(--display); font-stretch: var(--wide);
-  font-size: var(--step--2); letter-spacing: .14em;
-  text-transform: uppercase; font-weight: 700;
-  padding: .2rem .5rem; border-radius: var(--radius);
+  font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+  padding: .18rem .45rem; border-radius: 2px;
 }
-.badge.newleg { background: var(--ambra); color: var(--board); }
+.badge.newleg { background: color-mix(in oklab, var(--olive) 20%, transparent); color: var(--olive); }
 
-.day h3 {
-  font-size: var(--step-5);
-  font-stretch: var(--wide);
-  text-transform: uppercase;
-  letter-spacing: -.03em;
-  max-width: 20ch;
-}
-.day .kicker {
-  font-family: var(--display); font-stretch: var(--wide);
-  font-size: var(--step--2); letter-spacing: .16em; text-transform: uppercase;
-  color: var(--c); font-weight: 700; margin-top: var(--space-2);
-}
-/* Notes were serif italic. With the serif gone they carry as a quieter,
-   narrower voice against the wide caps above them. */
-.day .note {
-  color: var(--ink-2); margin-top: var(--space-3);
-  max-width: 62ch; font-size: var(--step-0);
-  padding-left: var(--space-3); border-left: 2px solid var(--rule-soft);
-}
+.day h3 { font-size: clamp(1.7rem, 4vw, 2.6rem); letter-spacing: -.02em; }
+.day .kicker { font-size: .8rem; letter-spacing: .13em; text-transform: uppercase; color: var(--c); font-weight: 650; margin-top: .3rem; }
+.day .note { font-family: var(--serif); font-style: italic; color: var(--ink-2); margin-top: .7rem; max-width: 60ch; }
 
 .callout {
   display: flex; gap: .7rem; margin-top: 1rem; padding: .75rem .9rem;
@@ -263,80 +215,59 @@ body { padding-bottom: 4rem; }
 
 /* ── timeline ───────────────────────────────────────────────────────────── */
 
-/* The timeline is the departures list under the board. The mono is Martian,
-   which is appreciably wider than a system mono — the time column is sized
-   from its actual advance width, not inherited from the old measurements. */
 .timeline { list-style: none; margin: 0; padding: 0; position: relative; }
 .timeline::before {
-  content: ""; position: absolute; left: 5.3rem; top: .6rem; bottom: .6rem;
-  width: 2px; background: var(--rule-soft);
+  content: ""; position: absolute; left: 4.55rem; top: .6rem; bottom: .6rem;
+  width: 1px; background: var(--rule);
 }
-@media (max-width: 520px) { .timeline::before { left: 4.5rem; } }
+@media (max-width: 520px) { .timeline::before { left: 3.6rem; } }
 
 .tl {
-  display: grid; grid-template-columns: 5.3rem 1fr; gap: 0 1.1rem;
-  padding: var(--space-2) 0; position: relative; cursor: pointer;
+  display: grid; grid-template-columns: 4.55rem 1fr; gap: 0 1.1rem;
+  padding: .5rem 0; position: relative; cursor: pointer;
+  border-radius: var(--radius);
   transition: background .15s;
 }
-/* The dot straddles the rule, so right-aligned times stop short of it or the
-   marker sits on the final character. */
+/* The dot straddles the rule at 3.6rem, so right-aligned times need to stop
+   short of it or the marker sits on the final character. */
 @media (max-width: 520px) {
-  .tl { grid-template-columns: 4.5rem 1fr; gap: 0 .8rem; }
+  .tl { grid-template-columns: 3.6rem 1fr; gap: 0 .8rem; }
   .tl-time { padding-right: .45rem; }
 }
-@media (hover: hover) { .tl:hover { background: var(--paper-2); } }
-.tl.is-active { background: color-mix(in oklab, var(--c) 12%, transparent); }
+.tl:hover { background: var(--paper-2); }
+.tl.is-active { background: color-mix(in oklab, var(--c) 10%, transparent); }
 
 .tl-time {
-  font-family: var(--mono); font-size: var(--step--2); color: var(--ink-3);
-  text-align: right; padding-top: .3rem; letter-spacing: -.05em;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--mono); font-size: .72rem; color: var(--ink-3);
+  text-align: right; padding-top: .28rem; letter-spacing: -.01em;
 }
-.tl.is-active .tl-time { color: var(--ink); font-weight: 700; }
-
 .tl-main { position: relative; padding-left: .35rem; }
-/* Square markers, to match the surfaces. */
 .tl-main::before {
-  content: ""; position: absolute; left: -1.1rem; top: .58rem;
-  width: 9px; height: 9px; margin-left: -4px;
+  content: ""; position: absolute; left: -1.1rem; top: .62rem;
+  width: 9px; height: 9px; margin-left: -4px; border-radius: 50%;
   background: var(--paper); border: 2px solid var(--k, var(--ink-3));
-  transition: transform .25s var(--ease-spring), background .15s;
 }
 @media (max-width: 520px) { .tl-main::before { left: -.8rem; } }
-.tl.is-active .tl-main::before {
-  background: var(--k, var(--c));
-  transform: scale(1.35) rotate(45deg);
-}
+.tl.is-active .tl-main::before { background: var(--k, var(--c)); box-shadow: 0 0 0 3px color-mix(in oklab, var(--k, var(--c)) 22%, transparent); }
 
-.tl-title { font-weight: 600; font-size: var(--step-0); line-height: 1.35; }
-.tl-title .idx {
-  color: var(--ink-3); font-family: var(--mono);
-  font-size: var(--step--2); margin-right: .4rem; letter-spacing: -.05em;
-}
-.tl-detail { font-size: var(--step--1); color: var(--ink-2); margin-top: .15rem; }
+.tl-title { font-weight: 600; font-size: .97rem; line-height: 1.4; }
+.tl-title .idx { color: var(--ink-3); font-family: var(--mono); font-size: .72rem; margin-right: .35rem; }
+.tl-detail { font-size: .89rem; color: var(--ink-2); margin-top: .12rem; }
 .tl-how {
-  font-family: var(--display); font-stretch: var(--wide);
-  font-size: var(--step--2); letter-spacing: .1em; text-transform: uppercase;
-  color: var(--ink-3); margin-top: .3rem;
-  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .78rem; color: var(--ink-3); margin-top: .2rem;
+  display: inline-flex; align-items: center; gap: .3rem;
 }
 .tl-how::before { content: "→"; opacity: .6; }
 
-.tl-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: var(--space-2); align-items: center; }
-/* Interactive things are pills; structural things are square. */
+.tl-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .4rem; align-items: center; }
 .lk {
   display: inline-flex; align-items: center; gap: .3rem;
-  font-family: var(--display); font-stretch: var(--wide);
-  font-size: var(--step--2); letter-spacing: .1em; text-transform: uppercase;
-  font-weight: 700;
-  padding: .28rem .7rem; border-radius: var(--radius-pill); text-decoration: none;
-  background: transparent; color: var(--ink-2); white-space: nowrap;
-  border: 2px solid var(--rule-soft);
-  transition: background .18s, color .18s, border-color .18s;
+  font-size: 11px; letter-spacing: .04em; font-weight: 600;
+  padding: .18rem .5rem; border-radius: 100px; text-decoration: none;
+  background: var(--paper-3); color: var(--ink-2); white-space: nowrap;
+  transition: background .15s, color .15s;
 }
-@media (hover: hover) {
-  .lk:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-}
+.lk:hover { background: var(--c); color: #fff; }
 /* These pills are the booking links — the main thing you tap on a phone. */
 @media (pointer: coarse) { .lk { min-height: 2.1rem; padding: .3rem .75rem; } }
 .lk::after { content: "↗"; font-size: 9px; opacity: .7; }

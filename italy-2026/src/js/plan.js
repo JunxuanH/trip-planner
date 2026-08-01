@@ -38,13 +38,7 @@ const fmt = (iso, o) => utc(iso).toLocaleDateString('en-GB', { timeZone: 'UTC', 
 const dayLabel = (iso) => fmt(iso, { weekday: 'short', day: 'numeric', month: 'short' });
 const money = (n) => '$' + n.toLocaleString('en-US');
 
-const accentOf = (key) => TRIP.cities[key]?.accent || 'var(--rosso)';
-
-/* Split-flap: each character animates on its own delay, so a time settles
-   left-to-right the way a board does. Purely decorative — the text content is
-   unchanged, so it still reads and copies normally. */
-const flap = (text) => h('span', { class: 'flap' },
-  ...[...text].map((ch, i) => h('i', { style: { '--i': i } }, ch)));
+const accentOf = (key) => TRIP.cities[key]?.accent || 'var(--terracotta)';
 
 /* ── masthead ───────────────────────────────────────────────────────────── */
 
@@ -60,16 +54,13 @@ function renderMast() {
     : days === 0 ? 'departure day'
     : 'under way';
 
-  // Rendered as a departures-board strip: dim label above, lit value below.
-  const fact = (k, v, cls = 'fact') => h('div', { class: cls },
-    h('div', { class: 'k' }, k), h('div', { class: 'v tnum' }, v));
-
   $('#facts').append(
-    fact(cdNote, cd, 'fact countdown'),
-    fact('window', m.window),
-    fact('nights', m.nights),
-    fact('hotels', TRIP.hotels.length),
-    fact('travelling', m.travelers),
+    h('div', { class: 'fact countdown' },
+      h('div', { class: 'v tnum' }, cd, ' ', h('small', {}, cdNote))),
+    h('div', { class: 'fact' }, h('div', { class: 'v' }, m.window)),
+    h('div', { class: 'fact' }, h('div', { class: 'v tnum' }, m.nights, ' ', h('small', {}, 'nights'))),
+    h('div', { class: 'fact' }, h('div', { class: 'v tnum' }, TRIP.hotels.length, ' ', h('small', {}, 'hotels'))),
+    h('div', { class: 'fact' }, h('div', { class: 'v tnum' }, m.travelers, ' ', h('small', {}, 'travellers'))),
   );
 
   // A strip of the six stops, as posters.
@@ -119,14 +110,10 @@ function renderDays() {
       'data-n': String(d.n).padStart(2, '0'),
     });
 
-    /* head — the day opens as a departures board: number, date, destination,
-       and the hours the day actually runs, in the mono. */
-    const idx = h('div', { class: 'day-index board' },
-      h('span', { class: 'num' }, flap(String(d.n).padStart(2, '0'))),
-      h('span', { class: 'date dim' }, fmt(d.date, { weekday: 'short', day: 'numeric', month: 'short' })),
-      h('span', { class: 'name' }, TRIP.cities[d.city].name),
-      h('span', { class: 'span lit' },
-        flap(`${d.items[0].time.replace(/[ap]m$/, '')}–${d.items.at(-1).time.replace(/[ap]m$/, '')}`)),
+    /* head */
+    const idx = h('div', { class: 'day-index' },
+      h('span', { class: 'num' }, `DAY ${String(d.n).padStart(2, '0')}`),
+      h('span', { class: 'date' }, fmt(d.date, { weekday: 'long', day: 'numeric', month: 'long' })),
       d.transfer ? h('span', { class: 'badge newleg' }, 'Travel day') : null,
     );
 
