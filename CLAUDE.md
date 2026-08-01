@@ -93,6 +93,13 @@ cluster's span, queries one area at a time and checkpoints after each — so it 
 safe to interrupt and re-run, and it skips areas it already has. Building footprints
 are deliberately never fetched: in a dense centre they outweigh every other layer.
 
+**The resume cache is keyed by area index, and the indices come from clustering the
+*current* stops.** So "skips areas it already has" is only correct while the stops
+stay put. After a route change, `a7` no longer covers the ground the stored `a7`
+does, and re-running is a silent no-op that leaves every map drawing the old city's
+streets. Whenever stops move between towns, `rm src/geo/streets.json` first and let
+it fetch the whole set — several minutes, but it's the only way to get real geometry.
+
 ## Conventions
 
 - **Dates are handled in UTC throughout.** Every script and page parses `YYYY-MM-DD`
