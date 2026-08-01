@@ -174,8 +174,9 @@ function renderDays() {
       h('button', { type: 'button', title: 'Reset view', 'aria-label': 'Reset view', onClick: () => { ensureMap(d.n)?.reset(); clearStop(d.n); } }, '⟲'),
     );
     const coarse = matchMedia('(pointer: coarse)').matches;
+    const zoomKey = /Mac|iP(hone|ad|od)/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
     const hint = h('div', { class: 'map-hint' },
-      coarse ? 'Two fingers to pan and zoom' : 'Drag to pan · scroll to zoom');
+      coarse ? 'Two fingers to pan and zoom' : `Drag to pan · ${zoomKey}-scroll to zoom`);
     frame.append(cap, tools, hint, info);
 
     const kinds = [...new Set(d.items.map((i) => i.kind))];

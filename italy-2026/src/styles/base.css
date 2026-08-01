@@ -63,8 +63,12 @@
 /* Shared map chrome. A one-finger drag on a touch map deliberately does
    nothing — the page keeps that gesture — so say why, briefly. mapengine sets
    this class on the map's frame for ~1.6s; it works in both documents. */
-.wants-two-fingers::after {
-  content: "Use two fingers to move the map";
+/* Gesture hint. Both documents' maps deliberately ignore the gesture the page
+   owns — a one-finger drag on touch, a bare wheel on a pointer — so when one
+   arrives, the frame says what does work instead. mapengine sets the message
+   in --gesture-hint and adds the class for ~1.6s. */
+.gesture-hint::after {
+  content: var(--gesture-hint, "");
   position: absolute; inset: 0; z-index: 2;
   display: grid; place-items: center; text-align: center;
   padding: 1rem;
@@ -73,9 +77,9 @@
   background: color-mix(in oklab, var(--paper) 62%, transparent);
   backdrop-filter: blur(2px);
   pointer-events: none;
-  animation: two-finger-fade 1.6s ease forwards;
+  animation: gesture-hint-fade 1.6s ease forwards;
 }
-@keyframes two-finger-fade {
+@keyframes gesture-hint-fade {
   0%   { opacity: 0; }
   12%  { opacity: 1; }
   70%  { opacity: 1; }

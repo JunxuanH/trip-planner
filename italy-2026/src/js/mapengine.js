@@ -661,7 +661,14 @@ export function createMap(host, opts) {
      have no nearby OSM roads at all, so the target radius widens in steps
      until it lands somewhere with real geometry, rather than flying in on
      an empty tile. */
-  const FOCUS_SPAN = () => Math.min(0.01, Math.max(0.004, HOME.w / 8));
+  /* Half the day's extent, not an eighth. Clicking a stop used to drop you at
+     ~370 m on a Rome day — street level, five of the seven stops out of frame,
+     and no way back but the reset button. Half keeps the neighbours and the
+     landmarks that orient you (the river, the big piazze) in view while street
+     names still read, so the fly-in says "here, within the day" instead of
+     handing you a different map. The ceiling still bites on a travel day,
+     where the stops are too far apart to hold together at any useful scale. */
+  const FOCUS_SPAN = () => Math.min(0.022, Math.max(0.005, HOME.w / 2));
 
   function focusSpanFor(cx, cy) {
     let span = FOCUS_SPAN();
@@ -708,7 +715,31 @@ export function createMap(host, opts) {
   }
 
   /* — interaction — */
-  const clampZoom = (nw) => Math.min(Math.max(nw, HOME.w / 260), HOME.w * 6);
+
+  /* Absolute limits, not multiples of the day's extent. The old relative floor
+     (HOME.w/260) let a compact day zoom to an ~11 m span — far below the
+     simplification the street geometry was stored at, so you arrived at blank
+     ground — while the ceiling let a travel day zoom out past Italy entirely.
+     ~100 m is as deep as the data supports; ~9° still frames the country. */
+  const MIN_SPAN = 0.0012;
+  const clampZoom = (nw) => Math.min(Math.max(nw, MIN_SPAN), Math.min(HOME.w * 4, 9));
+
+  const IS_MAC = /Mac|iP(hone|ad|od)/.test(navigator.userAgent);
+  const ZOOM_HINT = `"Hold ${IS_MAC ? '\\2318' : 'Ctrl'} and scroll to zoom"`;
+
+  /** Flash a message over the frame, then let it fade. */
+  function hint(msg) {
+    const frame = svg.parentElement;
+    if (!frame) return;
+    clearTimeout(frame._hintT);
+    frame.classList.remove('gesture-hint');
+    if (!msg) return;
+    frame.style.setProperty('--gesture-hint', msg);
+    // Restart the animation rather than letting a re-add be a no-op.
+    void frame.offsetWidth;
+    frame.classList.add('gesture-hint');
+    frame._hintT = setTimeout(() => frame.classList.remove('gesture-hint'), 1600);
+  }
 
   function zoomAt(factor, cx, cy) {
     const nw = clampZoom(view.w * factor);
@@ -727,7 +758,18 @@ export function createMap(host, opts) {
     ];
   };
 
+  /* A bare wheel belongs to the page. Each day's map is a tall column beside
+     the timeline, so capturing the wheel meant scrolling down the document
+     stopped dead and zoomed the map the moment the cursor crossed one. Zoom is
+     on the modifier — the same bargain the touch handlers strike with one
+     finger versus two. */
   svg.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey && !e.metaKey) {
+      // Trackpad pinch arrives as a wheel event with ctrlKey already set, so
+      // it still zooms; a plain two-finger scroll falls through to the page.
+      hint(ZOOM_HINT);
+      return;
+    }
     e.preventDefault();
     const [cx, cy] = toUser(e.clientX, e.clientY);
     zoomAt(Math.exp(e.deltaY * 0.0016), cx, cy);
@@ -781,25 +823,17 @@ export function createMap(host, opts) {
       const [mx, my] = midpoint(e.touches);
       pinch = { d: spread(e.touches), mx, my };
       svg.classList.add('is-dragging');
-      hint(false);
+      hint(null);
     }
   }, { passive: true });
 
-  // Only explain the two-finger rule once the finger has actually travelled —
-  // a plain tap on a pin shouldn't be answered with an instruction.
-  const hint = (on) => {
-    const frame = svg.parentElement;
-    if (!frame) return;
-    clearTimeout(frame._hintT);
-    frame.classList.toggle('wants-two-fingers', on);
-    if (on) frame._hintT = setTimeout(() => frame.classList.remove('wants-two-fingers'), 1600);
-  };
-
   svg.addEventListener('touchmove', (e) => {
+    // Only explain the two-finger rule once the finger has actually travelled —
+    // a plain tap on a pin shouldn't be answered with an instruction.
     if (e.touches.length === 1 && tap) {
       if (Math.hypot(e.touches[0].clientX - tap.x, e.touches[0].clientY - tap.y) > 12) {
         tap = null;
-        hint(true);
+        hint('"Use two fingers to move the map"');
       }
       return;
     }
