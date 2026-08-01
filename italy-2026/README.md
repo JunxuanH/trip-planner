@@ -1,7 +1,7 @@
 # Italy 2026 — itinerary
 
-Rome → Florence → Tuscany (Il Castelfalfi) → Naples → Amalfi Coast → Rome.
-Mon 24 Aug – Sun 6 Sep 2026 · 13 nights · 2 travellers. Train, self-drive (Florence–Tuscany only) & private drivers, FCO to FCO.
+Rome → Florence → Tuscany (Il Castelfalfi) → Sorrento (5 nights, one base) → Rome.
+Mon 24 Aug – Sun 6 Sep 2026 · 13 nights · 2 travellers. Rail, ferries & private drivers, with a two-day Florence–Tuscany rental as the only driving.
 
 ## Deliverables
 

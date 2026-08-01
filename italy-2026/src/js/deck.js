@@ -145,7 +145,7 @@ addSlide(h('section', {},
 /* 19 — logistics */
 addSlide(h('section', {},
   h('div', { class: 'in' },
-    h('div', { class: 'eyebrow' }, 'Train, self-drive & drivers, FCO to FCO'),
+    h('div', { class: 'eyebrow' }, 'Rail, ferries & drivers — two days of driving in all'),
     h('h2', { class: 'big' }, 'Getting between them')),
   h('div', { class: 'legs in' },
     ...TRIP.drivers.map((dv) => h('div', { class: 'leg' },
@@ -234,12 +234,12 @@ try {
    every frame, so the labels track the model as it turns. Only shown while
    the hero slide (the only slide using the globe now) is on screen. */
 
-const HERO_STOPS = ['rome', 'florence', 'tuscany', 'naples', 'amalfi'];
+const HERO_STOPS = ['rome', 'florence', 'tuscany', 'sorrento', 'amalfi'];
 const labelHost = $('#map-labels');
 let isHeroSlide = false;
 
 if (globe && labelHost) {
-  // Florence/Val d'Orcia and Amalfi/Naples sit close together on the model;
+  // Florence/Tuscany and Sorrento/Amalfi sit close together on the model;
   // stagger alternate labels upward so their text doesn't collide.
   const labelEls = new Map(HERO_STOPS.map((key, i) => {
     const span = h('span', { class: 'geo-label-3d' }, TRIP.cities[key].name);

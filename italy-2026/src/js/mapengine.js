@@ -34,11 +34,13 @@ export const PIN_COLORS = {
   hotel:     'var(--ink)',
   transport: 'var(--ink-3)',
   rest:      'var(--ink-3)',
+  work:      'var(--ink-2)',
 };
 
 export const PIN_LABELS = {
   sight: 'Sight', meal: 'Food & drink', wine: 'Wine', opera: 'Music',
   photo: 'Photo stop', hotel: 'Hotel', transport: 'Travel', rest: 'Downtime',
+  work: 'Desk hours',
 };
 
 /* ── geometry helpers ───────────────────────────────────────────────────── */

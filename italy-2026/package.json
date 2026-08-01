@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Italy 2026 travel plan — Rome → Florence → Tuscany → Naples → Amalfi → Rome",
+  "description": "Italy 2026 travel plan — Rome → Florence → Tuscany → Sorrento → Rome",
   "scripts": {
     "verify": "node scripts/verify.mjs",
     "build:html": "node scripts/build.mjs",

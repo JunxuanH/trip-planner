@@ -131,14 +131,24 @@ trip.bookings.forEach((b) => scanForHotelUrls(b.link, `booking #${b.priority}`))
 /* ---------- the reorder actually happened ---------- */
 
 const order = trip.hotels.map((h) => h.cityKey);
-const expected = ['rome', 'naples', 'amalfi', 'florence', 'tuscany', 'rome'];
+const expected = ['rome', 'florence', 'tuscany', 'sorrento', 'rome'];
 if (order.join('>') !== expected.join('>')) {
   fail(`hotel order is ${order.join(' → ')}, expected ${expected.join(' → ')}`);
 }
 // Checked by city slot, not hotel name — the specific property booked there can change.
 const byCityKey = (key) => trip.hotels.find((h) => h.cityKey === key);
-if (byCityKey('florence')?.checkIn !== '2026-08-31') fail('Florence stay did not start Aug 31');
-if (byCityKey('tuscany')?.checkIn !== '2026-09-03') fail('Tuscany stay did not start Sep 3');
+if (byCityKey('florence')?.checkIn !== '2026-08-27') fail('Florence stay did not start Aug 27');
+if (byCityKey('tuscany')?.checkIn !== '2026-08-29') fail('Tuscany stay did not start Aug 29');
+
+// The whole point of the replan: one bed for the working stretch, Aug 31 → Sep 5.
+const coast = byCityKey('sorrento');
+if (coast?.checkIn !== '2026-08-31' || coast?.checkOut !== '2026-09-05') {
+  fail(`the coast base must run 2026-08-31 → 2026-09-05, found ${coast?.checkIn} → ${coast?.checkOut}`);
+}
+const workNights = trip.days.filter((d) => d.date >= '2026-08-31' && d.date < '2026-09-05');
+if (new Set(workNights.map((d) => d.hotel)).size !== 1) {
+  fail('the Aug 31 – Sep 5 stretch is split across more than one hotel');
+}
 
 /* ---------- links are well-formed ---------- */
 
