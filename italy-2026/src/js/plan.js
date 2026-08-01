@@ -41,6 +41,20 @@ const money = (n) => '$' + n.toLocaleString('en-US');
 
 const accentOf = (key) => TRIP.cities[key]?.accent || 'var(--terracotta)';
 
+/* Where to send someone who wants to see what a place really looks like.
+   The artwork on the cards and banners is original illustration — deliberately,
+   see CLAUDE.md — so the photographs live one click away rather than in the
+   document: hotel photography is somebody's copyright, and this page is
+   published. A Maps place page carries the property's own shots and guests'
+   together, which is more honest than a marketing gallery alone. */
+const photosUrl = (ht) => {
+  // Prefer the street address: `city` is a display label, so it carries
+  // "Tuscany" (a region, not a place) and "Rome (finale)" (a slot in the
+  // itinerary, not somewhere you can search for).
+  const where = ht.address || `${ht.city.replace(/\s*\(.*\)\s*$/, '')}, Italy`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${ht.name}, ${where}`)}`;
+};
+
 /* ── masthead ───────────────────────────────────────────────────────────── */
 
 function renderMast() {
@@ -118,11 +132,16 @@ function renderDays() {
       d.transfer ? h('span', { class: 'badge newleg' }, 'Travel day') : null,
     );
 
-    const banner = art ? h('div', { class: 'day-art' },
+    const banner = art ? h('a', {
+      class: 'day-art', href: photosUrl(stayHotel),
+      target: '_blank', rel: 'noopener noreferrer',
+      title: `See photographs of ${stayHotel.name}`,
+    },
       h('img', { src: art, alt: `Illustration of ${TRIP.cities[d.city].name}`, loading: 'lazy' }),
       h('div', { class: 'day-art-cap' },
         h('span', { class: 'art-tag' }, 'Illustration'),
-        h('b', {}, 'Checking in — ', d.hotel)),
+        h('b', {}, 'Checking in — ', d.hotel),
+        h('span', { class: 'art-more' }, 'See real photos')),
     ) : null;
 
     const head = h('div', { class: 'day-head' },
@@ -289,10 +308,15 @@ function renderHotels() {
   TRIP.hotels.forEach((ht, i) => {
     const art = IMAGES[ht.img];
     host.append(h('div', { class: 'card hotel reveal', style: { '--c': accentOf(ht.cityKey) } },
-      art ? h('div', { class: 'card-art' },
+      art ? h('a', {
+        class: 'card-art', href: photosUrl(ht),
+        target: '_blank', rel: 'noopener noreferrer',
+        title: `See photographs of ${ht.name}`,
+      },
         h('img', { src: art, alt: `Illustration of ${ht.city}`, loading: i > 1 ? 'lazy' : null }),
         h('span', { class: 'art-tag' }, 'Illustration'),
         h('span', { class: 'art-city' }, ht.city),
+        h('span', { class: 'art-more' }, 'See real photos'),
       ) : null,
       h('div', { class: 'card-body' },
         h('h4', {}, ht.name),
@@ -305,7 +329,8 @@ function renderHotels() {
         h('div', { class: 'foot' },
           h('div', { class: 'price tnum' }, money(ht.total), ' ', h('small', {}, `· ${money(ht.nightly)}/night`)),
           h('div', { class: 'foot-links' },
-            h('a', { class: 'lk', href: ht.link, target: '_blank', rel: 'noopener noreferrer' }, 'Photos & book'))),
+            h('a', { class: 'lk', href: photosUrl(ht), target: '_blank', rel: 'noopener noreferrer' }, 'Photos'),
+            h('a', { class: 'lk', href: ht.link, target: '_blank', rel: 'noopener noreferrer' }, 'Book'))),
       ),
     ));
   });

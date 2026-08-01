@@ -161,11 +161,30 @@ body { padding-bottom: 4rem; }
 }
 .day > * { position: relative; z-index: 1; }
 
+/* The banner is a link to the property's photographs — the artwork itself is
+   illustration, so this is where the real thing lives. */
 .day-art {
+  display: block; text-decoration: none; color: inherit;
   position: relative; margin-bottom: 1.4rem;
   border-radius: var(--radius); overflow: hidden;
   aspect-ratio: 21 / 6; box-shadow: var(--shadow-1);
 }
+.day-art img, .card-art img { transition: transform .5s cubic-bezier(.2,.7,.3,1); }
+@media (hover: hover) {
+  .day-art:hover img { transform: scale(1.03); }
+  .day-art:hover .art-more, .card-art:hover .art-more { background: var(--c, var(--terracotta)); }
+}
+/* The affordance: without it the banner reads as decoration, not a door. */
+.art-more {
+  margin-left: auto; flex: 0 0 auto;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: .22rem .5rem; border-radius: 100px;
+  background: rgba(255, 255, 255, .22); color: #F6EFE2;
+  backdrop-filter: blur(4px);
+  transition: background .2s;
+}
+.art-more::after { content: " ↗"; }
+.card-art .art-more { position: absolute; right: .5rem; bottom: .5rem; z-index: 1; margin: 0; }
 @media (max-width: 620px) { .day-art { aspect-ratio: 16 / 8; } }
 .day-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .day-art-cap {
@@ -609,7 +628,10 @@ body { padding-bottom: 4rem; }
   padding: 0; overflow: hidden;
   transition: transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s, border-color .3s;
 }
-.card-art { position: relative; aspect-ratio: 3 / 2; overflow: hidden; }
+.card-art {
+  display: block; text-decoration: none;
+  position: relative; aspect-ratio: 3 / 2; overflow: hidden;
+}
 .card-art img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform .5s cubic-bezier(.2,.7,.3,1);
