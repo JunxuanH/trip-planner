@@ -150,6 +150,21 @@ if (new Set(workNights.map((d) => d.hotel)).size !== 1) {
   fail('the Aug 31 – Sep 5 stretch is split across more than one hotel');
 }
 
+/* Back at the hotel by ~7pm on every coast night. The proxy is the last travel
+   leg of the day: nothing that moves you between towns may start after 5pm,
+   which leaves the ~1h30 Ravello drive room to land before seven. */
+const minutesOf = (t) => {
+  const m = /^(\d{1,2}):(\d{2})(am|pm)$/.exec(t.trim());
+  if (!m) return null;
+  return ((Number(m[1]) % 12) + (m[3] === 'pm' ? 12 : 0)) * 60 + Number(m[2]);
+};
+workNights.forEach((day) => {
+  const lastLeg = day.items.filter((it) => it.kind === 'transport').at(-1);
+  if (lastLeg && minutesOf(lastLeg.time) > 17 * 60) {
+    fail(`day ${day.n} (${day.date}) still has you travelling at ${lastLeg.time} ("${lastLeg.title}") — coast days must be home by ~7pm`);
+  }
+});
+
 /* ---------- links are well-formed ---------- */
 
 const walkLinks = (obj, path = '') => {

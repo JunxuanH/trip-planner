@@ -173,8 +173,8 @@
         { "time": "2:15pm", "title": "Driver around the bay to Sorrento", "detail": "About 1h15 past Vesuvius and along the peninsula — the coast road tightens the whole way", "how": "Private driver, ~1h15", "coord": [40.7300, 14.3400], "kind": "transport" },
         { "time": "3:40pm", "title": "Check in — Grand Hotel Excelsior Vittoria", "detail": "Piazza Tasso, on the cliff over Marina Piccola. Five acres of citrus garden behind it and a private lift straight down to the water.", "how": "Arrive", "coord": [40.6272, 14.3745], "kind": "hotel", "link": "https://excelsiorvittoria.com/en/", "linkLabel": "Hotel site" },
         { "time": "5:30pm", "title": "The citrus gardens, then the lift to the sea", "detail": "Unpack properly — this is home for five nights", "how": "At the hotel", "coord": [40.6280, 14.3735], "kind": "rest" },
-        { "time": "7:30pm", "title": "Aperitivo on the terrace over the bay", "detail": "Vesuvius on the far shore, and it goes pink at sunset", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "meal" },
-        { "time": "8:45pm", "title": "Dinner — Terrazza Bosquet", "detail": "The hotel's Michelin-starred room, on the terrace. Worth booking for the first night rather than the last.", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "meal", "link": "https://www.google.com/search?q=Terrazza+Bosquet+Sorrento+reservation", "linkLabel": "Reserve" }
+        { "time": "6:45pm", "title": "Aperitivo on the terrace over the bay", "detail": "Vesuvius on the far shore, and it goes pink at sunset", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "meal" },
+        { "time": "7:45pm", "title": "Dinner — Terrazza Bosquet", "detail": "The hotel's Michelin-starred room, on the terrace. Worth booking for the first night rather than the last.", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "meal", "link": "https://www.google.com/search?q=Terrazza+Bosquet+Sorrento+reservation", "linkLabel": "Reserve" }
       ]
     },
     {
@@ -184,15 +184,15 @@
       "hotel": "Grand Hotel Excelsior Vittoria",
       "changed": true,
       "changeNote": "New. Built around the work-from-home week — mornings are the trip, afternoons from about 2:30pm are held open for the desk.",
-      "note": "Every coast day is shaped the same way: the outing happens in the morning and early afternoon, and you're back at the hotel before US business hours start. If you're working European hours instead, flip the blocks — nothing else has to move.",
+      "note": "Every coast day is shaped the same way: the outing happens in the morning and early afternoon, you're back at the hotel by 7pm at the latest, and dinner is at the hotel or a few minutes' walk from it. That holds for all five nights — the Ravello day on Sep 4 is the only one where it's tight. If you're working European hours rather than US ones, flip the desk block to the morning; nothing else has to move.",
       "items": [
         { "time": "8:30am", "title": "Breakfast in the garden", "detail": "Under the lemon and orange trees, which is the whole reason people book this hotel", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "meal" },
         { "time": "9:30am", "title": "Sorrento on foot", "detail": "Piazza Tasso, the shopfronts of Via San Cesareo, and the Vallone dei Mulini — a ruined mill at the bottom of a gorge, swallowed by ferns, right in the middle of town", "how": "Walk from the door", "coord": [40.6263, 14.3757], "kind": "sight" },
         { "time": "11:00am", "title": "I Giardini di Cataldo", "detail": "A working lemon and orange grove in the centre of Sorrento, free to walk through, with limoncello made on site at the end of it", "how": "Walk, ~8 min", "coord": [40.6270, 14.3790], "kind": "sight", "link": "https://www.google.com/search?q=I+Giardini+di+Cataldo+Sorrento+lemon+grove", "linkLabel": "Info" },
         { "time": "12:30pm", "title": "Lunch at Marina Grande — Bagni Delfino", "detail": "A wooden deck out over the water in the old fishing village below town. Fritto misto and a carafe of white.", "how": "Walk down, ~15 min", "coord": [40.6310, 14.3670], "kind": "meal", "link": "https://www.google.com/search?q=Bagni+Delfino+Sorrento+reservation", "linkLabel": "Reserve" },
         { "time": "2:30pm", "title": "Desk hours", "detail": "Back up for the working afternoon. Fibre in the rooms, and the garden terrace is the quiet spot if the room feels small by day three.", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "work" },
-        { "time": "7:30pm", "title": "Swim, or the pool on the cliff", "detail": "The private lift drops you at Marina Piccola if you want salt water instead", "how": "At the hotel", "coord": [40.6280, 14.3730], "kind": "rest" },
-        { "time": "9:00pm", "title": "Dinner — O'Parrucchiano La Favorita", "detail": "Tables set among the lemon trees of a 19th-century greenhouse. Cannelloni was invented in this kitchen, so order it.", "how": "Walk, ~6 min", "coord": [40.6266, 14.3752], "kind": "meal", "link": "https://www.google.com/search?q=O+Parrucchiano+La+Favorita+Sorrento+reservation", "linkLabel": "Reserve" }
+        { "time": "6:00pm", "title": "Swim, or the pool on the cliff", "detail": "The private lift drops you at Marina Piccola if you want salt water instead", "how": "At the hotel", "coord": [40.6280, 14.3730], "kind": "rest" },
+        { "time": "7:30pm", "title": "Dinner — O'Parrucchiano La Favorita", "detail": "Tables set among the lemon trees of a 19th-century greenhouse. Cannelloni was invented in this kitchen, so order it. Six minutes from the hotel door.", "how": "Walk, ~6 min", "coord": [40.6266, 14.3752], "kind": "meal", "link": "https://www.google.com/search?q=O+Parrucchiano+La+Favorita+Sorrento+reservation", "linkLabel": "Reserve" }
       ]
     },
     {
@@ -211,7 +211,7 @@
         { "time": "2:30pm", "title": "The Piazzetta and the Gardens of Augustus", "detail": "Gelato on the terrace above Via Krupp, looking straight down at the Faraglioni", "how": "On foot", "coord": [40.5476, 14.2401], "kind": "sight", "link": "https://www.google.com/search?q=Gardens+of+Augustus+Capri+Via+Krupp", "linkLabel": "Info" },
         { "time": "4:15pm", "title": "Ferry back to Sorrento", "detail": "Check the final sailing when you land in the morning — missing the last boat means a night on the island", "how": "Fast ferry, ~25 min", "coord": [40.5556, 14.2400], "kind": "transport" },
         { "time": "5:15pm", "title": "Desk hours", "detail": "Back at the hotel with the US afternoon still ahead", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "work" },
-        { "time": "8:45pm", "title": "Dinner — Il Buco", "detail": "Michelin-starred, in the wine cellar of an old monastery just off Piazza Tasso", "how": "Walk, ~7 min", "coord": [40.6268, 14.3762], "kind": "meal", "link": "https://www.google.com/search?q=Il+Buco+Sorrento+restaurant+reservation", "linkLabel": "Reserve" }
+        { "time": "7:45pm", "title": "Dinner — Il Buco", "detail": "Michelin-starred, in the wine cellar of an old monastery just off Piazza Tasso", "how": "Walk, ~7 min", "coord": [40.6268, 14.3762], "kind": "meal", "link": "https://www.google.com/search?q=Il+Buco+Sorrento+restaurant+reservation", "linkLabel": "Reserve" }
       ]
     },
     {
@@ -230,8 +230,8 @@
         { "time": "2:00pm", "title": "Via Pasitea and the boutiques", "detail": "Linen and sandals made to measure while you wait — Positano's actual local industry", "how": "Uphill on foot", "coord": [40.6290, 14.4860], "kind": "sight" },
         { "time": "3:00pm", "title": "Ferry back to Sorrento", "detail": "", "how": "Ferry, ~35 min", "coord": [40.6270, 14.4840], "kind": "transport" },
         { "time": "4:00pm", "title": "Desk hours", "detail": "", "how": "At the hotel", "coord": [40.6272, 14.3745], "kind": "work" },
-        { "time": "7:45pm", "title": "Sunset from the Villa Comunale terrace", "detail": "A public balcony on the cliff edge, two minutes from the hotel, straight out over the Bay of Naples", "how": "Walk, ~3 min", "coord": [40.6270, 14.3730], "kind": "photo" },
-        { "time": "9:00pm", "title": "Dinner — Da Emilia, Marina Grande", "detail": "Sixty years old, plastic chairs on the harbour, and the best simple fish in Sorrento", "how": "Walk down, ~15 min", "coord": [40.6310, 14.3670], "kind": "meal", "link": "https://www.google.com/search?q=Da+Emilia+Sorrento+Marina+Grande", "linkLabel": "Find" }
+        { "time": "6:30pm", "title": "Golden hour on the Villa Comunale terrace", "detail": "A public balcony on the cliff edge, three minutes from the hotel, straight out over the Bay of Naples. The light goes gold about an hour before the sun drops behind Ischia.", "how": "Walk, ~3 min", "coord": [40.6270, 14.3730], "kind": "photo" },
+        { "time": "7:30pm", "title": "Dinner — Ristorante Museo Caruso", "detail": "A block off Piazza Tasso, walls covered in Caruso memorabilia, and the seafood is better than the theme suggests", "how": "Walk, ~7 min", "coord": [40.6265, 14.3748], "kind": "meal", "link": "https://www.google.com/search?q=Ristorante+Museo+Caruso+Sorrento+reservation", "linkLabel": "Reserve" }
       ]
     },
     {
@@ -241,7 +241,7 @@
       "hotel": "Grand Hotel Excelsior Vittoria",
       "changed": true,
       "changeNote": "Amalfi and Ravello are now a single day trip from the Sorrento base rather than a two-night stay — which is what makes the five-night work week possible.",
-      "note": "The Ravello Festival runs to Sep 5, so tonight is inside the window. A concert in the Villa Rufolo gardens is the one thing worth breaking the schedule for — but it means a 1h30 drive back to Sorrento near midnight, so decide before you book.",
+      "note": "The longest day out of the five, and the one that has to be watched: leave Ravello by 5pm and you're back at the hotel around 6:30pm. The Ravello Festival runs to Sep 5, so a concert in the Villa Rufolo gardens is available tonight — it's the one thing worth breaking the 7pm rule for, but it means a 1h30 drive back near midnight.",
       "items": [
         { "time": "8:15am", "title": "Down to Marina Piccola", "detail": "", "how": "Hotel lift", "coord": [40.6300, 14.3720], "kind": "transport" },
         { "time": "8:45am", "title": "Ferry to Amalfi, via Positano", "detail": "About 40 minutes direct, a little over an hour with the Positano call. Seasonal — mid-April to mid-October.", "how": "Ferry, ~1h15", "coord": [40.6300, 14.3720], "kind": "transport", "link": "https://www.ravello.com/ferry-schedule/", "linkLabel": "Timetable" },
@@ -250,9 +250,9 @@
         { "time": "12:45pm", "title": "Lunch — Da Gemma", "detail": "Just off Piazza Duomo, a terrace above the street, and the best table in Amalfi town", "how": "Walk", "coord": [40.6340, 14.6030], "kind": "meal", "link": "https://www.google.com/search?q=Da+Gemma+Amalfi+reservation", "linkLabel": "Reserve" },
         { "time": "2:15pm", "title": "Private driver up to Ravello", "detail": "Thirty minutes of switchbacks, a thousand feet straight up from the coast", "how": "Private driver", "coord": [40.6494, 14.6116], "kind": "transport" },
         { "time": "2:45pm", "title": "Villa Cimbrone", "detail": "The Terrace of Infinity — a marble balustrade lined with busts, and a thousand-foot drop to the sea behind them", "how": "On foot; Ravello is car-free", "coord": [40.6461, 14.6118], "kind": "sight", "link": "https://villacimbrone.com/en/", "linkLabel": "Tickets" },
-        { "time": "4:15pm", "title": "Villa Rufolo's gardens", "detail": "Wagner's Klingsor garden, and the festival stage cantilevered out over the drop", "how": "Walk", "coord": [40.6494, 14.6122], "kind": "sight", "link": "https://www.villarufolo.com/en/", "linkLabel": "Tickets" },
-        { "time": "5:45pm", "title": "Driver back to Sorrento", "detail": "Over the pass rather than around the coast — about an hour and a half either way", "how": "Private driver, ~1h30", "coord": [40.6494, 14.6116], "kind": "transport" },
-        { "time": "8:30pm", "title": "Dinner — L'Antica Trattoria", "detail": "Under a pergola in the old town, and the last proper dinner on the coast", "how": "Walk, ~8 min", "coord": [40.6272, 14.3765], "kind": "meal", "link": "https://www.google.com/search?q=L+Antica+Trattoria+Sorrento+reservation", "linkLabel": "Reserve" }
+        { "time": "3:50pm", "title": "Villa Rufolo's gardens", "detail": "Wagner's Klingsor garden, and the festival stage cantilevered out over the drop", "how": "Walk", "coord": [40.6494, 14.6122], "kind": "sight", "link": "https://www.villarufolo.com/en/", "linkLabel": "Tickets" },
+        { "time": "5:00pm", "title": "Driver back to Sorrento", "detail": "Over the pass rather than around the coast — about an hour and a half either way. Leaving Ravello at five puts you back at the hotel around 6:30pm.", "how": "Private driver, ~1h30", "coord": [40.6494, 14.6116], "kind": "transport" },
+        { "time": "7:45pm", "title": "Dinner — L'Antica Trattoria", "detail": "Under a pergola in the old town, and the last proper dinner on the coast", "how": "Walk, ~8 min", "coord": [40.6272, 14.3765], "kind": "meal", "link": "https://www.google.com/search?q=L+Antica+Trattoria+Sorrento+reservation", "linkLabel": "Reserve" }
       ]
     },
     {

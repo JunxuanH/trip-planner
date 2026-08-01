@@ -173,7 +173,9 @@ function renderDays() {
       h('button', { type: 'button', title: 'Zoom out', 'aria-label': 'Zoom out', onClick: () => ensureMap(d.n)?.zoomOut() }, '−'),
       h('button', { type: 'button', title: 'Reset view', 'aria-label': 'Reset view', onClick: () => { ensureMap(d.n)?.reset(); clearStop(d.n); } }, '⟲'),
     );
-    const hint = h('div', { class: 'map-hint' }, 'Drag to pan · scroll to zoom');
+    const coarse = matchMedia('(pointer: coarse)').matches;
+    const hint = h('div', { class: 'map-hint' },
+      coarse ? 'Two fingers to pan and zoom' : 'Drag to pan · scroll to zoom');
     frame.append(cap, tools, hint, info);
 
     const kinds = [...new Set(d.items.map((i) => i.kind))];
@@ -248,8 +250,16 @@ function focusStop(dayN, stopIdx, itemIdx, scroll = true) {
   info.classList.add('is-on');
 
   if (scroll) {
-    const row = sec.querySelector(`.tl[data-i="${itemIdx}"]`);
-    if (row && !isInView(row)) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // On a phone the map sits below the whole timeline, so tapping a stop flies
+    // a map you can't see. Bring the map up instead; on the two-column desktop
+    // layout it's already beside you, so keep the row centred there.
+    const stacked = matchMedia('(max-width: 900px)').matches;
+    const target = stacked
+      ? sec.querySelector('.map-frame')
+      : sec.querySelector(`.tl[data-i="${itemIdx}"]`);
+    if (target && !isInView(target)) {
+      target.scrollIntoView({ behavior: 'smooth', block: stacked ? 'nearest' : 'center' });
+    }
   }
 }
 

@@ -60,6 +60,28 @@
   --shadow-2: 0 2px 6px rgba(0,0,0,.45), 0 12px 32px rgba(0,0,0,.4);
 }
 
+/* Shared map chrome. A one-finger drag on a touch map deliberately does
+   nothing — the page keeps that gesture — so say why, briefly. mapengine sets
+   this class on the map's frame for ~1.6s; it works in both documents. */
+.wants-two-fingers::after {
+  content: "Use two fingers to move the map";
+  position: absolute; inset: 0; z-index: 2;
+  display: grid; place-items: center; text-align: center;
+  padding: 1rem;
+  font-family: var(--sans); font-size: .82rem; font-weight: 600;
+  color: var(--ink);
+  background: color-mix(in oklab, var(--paper) 62%, transparent);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+  animation: two-finger-fade 1.6s ease forwards;
+}
+@keyframes two-finger-fade {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 * { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }

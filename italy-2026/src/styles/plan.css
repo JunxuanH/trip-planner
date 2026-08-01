@@ -1,5 +1,10 @@
 /* ── Italy 2026 · the plan document ────────────────────────────────────── */
 
+/* `clip` rather than `hidden`: it contains the oversized ghost numeral that
+   hangs past the right edge of each day without turning the page into a scroll
+   container, which would break the sticky rail and the sticky map column. */
+html { overflow-x: clip; }
+
 body { padding-bottom: 4rem; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
@@ -67,7 +72,6 @@ body { padding-bottom: 4rem; }
   width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform .5s cubic-bezier(.2,.7,.3,1);
 }
-.mast-art figure:hover img { transform: scale(1.06); }
 .mast-art figcaption {
   position: absolute; left: 0; right: 0; bottom: 0;
   padding: 1.6rem .6rem .45rem;
@@ -288,6 +292,9 @@ body { padding-bottom: 4rem; }
   overflow: hidden;
 }
 @media (max-width: 900px) { .map-frame { max-height: 78vh; } }
+/* On a phone a 78vh map is the whole screen and nothing else. Cap it lower so
+   the timeline above and the next day below stay in peripheral view. */
+@media (max-width: 620px) { .map-frame { max-height: 58svh; } }
 
 .map-scale {
   position: absolute; left: .7rem; bottom: 1.75rem;
@@ -306,6 +313,11 @@ body { padding-bottom: 4rem; }
 
 .map-svg { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 .map-svg.is-dragging { cursor: grabbing; }
+/* On a touch screen the page owns vertical swipes and the map only responds to
+   two fingers, so a full-bleed map can never trap the scroll. */
+@media (pointer: coarse) {
+  .map-svg { touch-action: pan-y; cursor: default; }
+}
 
 /* ── pin popup (click a pin for details + Google Maps / booking link) ──── */
 
@@ -323,6 +335,21 @@ body { padding-bottom: 4rem; }
 }
 .pin-popup:not(.is-below)::after { bottom: -6px; border-top: none; border-left: none; }
 .pin-popup.is-below::after { top: -6px; border-bottom: none; border-right: none; }
+
+/* A 17rem card anchored to a pin overflows a phone the moment the pin is near
+   an edge. Below this width it becomes a sheet pinned to the bottom instead —
+   `!important` because the anchor position is written as an inline style. */
+@media (max-width: 560px) {
+  .pin-popup {
+    left: .6rem !important; right: .6rem;
+    top: auto !important; bottom: .6rem;
+    max-width: none; transform: none !important;
+  }
+  .pin-popup::after { display: none; }
+  .pin-popup-body { max-height: 40svh; }
+  .pin-popup-close { width: 2.2rem; height: 2.2rem; font-size: 1.2rem; }
+  .pin-popup-links a { padding: .4rem .75rem; }
+}
 
 .pin-popup-close {
   position: absolute; top: .3rem; right: .3rem; z-index: 1;
@@ -452,6 +479,7 @@ body { padding-bottom: 4rem; }
 .map-hint {
   position: absolute; left: .7rem; bottom: .6rem;
   font-size: 10px; color: var(--ink-3); opacity: .75; pointer-events: none;
+  transition: opacity .2s, background .2s, color .2s;
 }
 
 .map-info {
@@ -491,17 +519,11 @@ body { padding-bottom: 4rem; }
   padding: 0; overflow: hidden;
   transition: transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s, border-color .3s;
 }
-.card.hotel:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-2);
-  border-color: color-mix(in oklab, var(--c) 45%, var(--rule));
-}
 .card-art { position: relative; aspect-ratio: 3 / 2; overflow: hidden; }
 .card-art img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform .5s cubic-bezier(.2,.7,.3,1);
 }
-.card.hotel:hover .card-art img { transform: scale(1.05); }
 .card-art .art-tag { position: absolute; right: .5rem; top: .5rem; }
 .card-art .art-city {
   position: absolute; left: .7rem; bottom: .5rem;
@@ -623,6 +645,25 @@ td .sub { font-size: .78rem; color: var(--ink-3); }
   .theme-btn { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
   .map-tools { gap: .35rem; }
   .map-tools button { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; }
+  /* The day chips are the primary navigation on a phone — the rail is all
+     that's left once the jump links are hidden. */
+  .chip { min-height: 2.75rem; min-width: 3.3rem; justify-content: center; }
+  .rail-scroll { gap: .4rem; }
+  /* A timeline row is a tap target that flies the map, not just text. */
+  .tl { padding: .6rem 0; }
+  .portals a { padding: .55rem .9rem; }
+}
+
+/* Hover states that move things are a desktop affordance. On touch they latch
+   after a tap and read as a stuck card, so they only apply to real pointers. */
+@media (hover: hover) {
+  .mast-art figure:hover img { transform: scale(1.06); }
+  .card.hotel:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-2);
+    border-color: color-mix(in oklab, var(--c) 45%, var(--rule));
+  }
+  .card.hotel:hover .card-art img { transform: scale(1.05); }
 }
 
 /* ── entrance animation ─────────────────────────────────────────────────── */

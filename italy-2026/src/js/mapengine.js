@@ -729,6 +729,10 @@ export function createMap(host, opts) {
   let drag = null;
   svg.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.pin')) return;
+    // On touch, a single finger belongs to the page, not the map: a full-width
+    // map is otherwise a scroll trap you can't swipe past. Two fingers pan and
+    // zoom it instead — see the touch handlers below.
+    if (e.pointerType === 'touch') return;
     drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
     svg.setPointerCapture(e.pointerId);
     svg.classList.add('is-dragging');
@@ -752,25 +756,70 @@ export function createMap(host, opts) {
   svg.addEventListener('pointerup', endDrag);
   svg.addEventListener('pointercancel', endDrag);
 
-  let pinchDist = 0;
+
+  /* Two-finger gesture: pans by the midpoint and zooms by the spread, so the
+     map is fully drivable on a phone without ever eating a page scroll. */
+  const spread = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const midpoint = (t) => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
+
+  let pinch = null;
+  let tap = null; // a single finger that hasn't wandered — see touchend
   svg.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      tap = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+    } else {
+      tap = null;
+    }
     if (e.touches.length === 2) {
-      pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY);
+      const [mx, my] = midpoint(e.touches);
+      pinch = { d: spread(e.touches), mx, my };
+      svg.classList.add('is-dragging');
+      hint(false);
     }
   }, { passive: true });
+
+  // Only explain the two-finger rule once the finger has actually travelled —
+  // a plain tap on a pin shouldn't be answered with an instruction.
+  const hint = (on) => {
+    const frame = svg.parentElement;
+    if (!frame) return;
+    clearTimeout(frame._hintT);
+    frame.classList.toggle('wants-two-fingers', on);
+    if (on) frame._hintT = setTimeout(() => frame.classList.remove('wants-two-fingers'), 1600);
+  };
+
   svg.addEventListener('touchmove', (e) => {
-    if (e.touches.length !== 2 || !pinchDist) return;
+    if (e.touches.length === 1 && tap) {
+      if (Math.hypot(e.touches[0].clientX - tap.x, e.touches[0].clientY - tap.y) > 12) {
+        tap = null;
+        hint(true);
+      }
+      return;
+    }
+    if (e.touches.length !== 2 || !pinch) return;
     e.preventDefault();
-    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY);
-    const [cx, cy] = toUser(
-      (e.touches[0].clientX + e.touches[1].clientX) / 2,
-      (e.touches[0].clientY + e.touches[1].clientY) / 2);
-    zoomAt(pinchDist / d, cx, cy);
-    pinchDist = d;
+    const d = spread(e.touches);
+    const [mx, my] = midpoint(e.touches);
+    const r = svg.getBoundingClientRect();
+    view.x -= ((mx - pinch.mx) / r.width) * view.w;
+    view.y -= ((my - pinch.my) / r.height) * view.h;
+    const [cx, cy] = toUser(mx, my);
+    zoomAt(pinch.d / d, cx, cy); // applies the pan too
+    pinch = { d, mx, my };
   }, { passive: false });
-  svg.addEventListener('touchend', () => { pinchDist = 0; }, { passive: true });
+
+  const endPinch = (e) => {
+    if (e.touches.length < 2) { pinch = null; svg.classList.remove('is-dragging'); }
+    // A clean tap on empty map closes the popup — the job endDrag does for a
+    // mouse, which touch never reaches now that one finger belongs to the page.
+    if (tap && Date.now() - tap.t < 500 && !e.target?.closest?.('.pin')) {
+      onPick?.(null);
+      hidePopup();
+    }
+    if (e.touches.length === 0) tap = null;
+  };
+  svg.addEventListener('touchend', endPinch, { passive: true });
+  svg.addEventListener('touchcancel', endPinch, { passive: true });
 
   /* — public API — */
   const api = {

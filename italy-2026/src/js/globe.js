@@ -35,10 +35,15 @@ export function createGlobe(canvas, opts) {
   };
 
   /* ── renderer / scene ─────────────────────────────────────────────────── */
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  /* Phones run this hero on a 3× screen with a fraction of the GPU. Rendering
+     the full device ratio with MSAA and soft shadows drops the opening slide to
+     a crawl, and the extra samples are invisible at that pixel density anyway —
+     so a coarse pointer gets 1.5× and the cheaper shadow filter. */
+  const handheld = matchMedia('(pointer: coarse)').matches;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !handheld, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, handheld ? 1.5 : 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = handheld ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(PALETTE.sea, 26, 62);

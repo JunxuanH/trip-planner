@@ -255,6 +255,11 @@ body {
 
 /* map internals reuse the engine's classnames */
 .map-svg { width: 100%; height: 100%; display: block; touch-action: none; }
+/* Slides are scroll-snapped, so a map that swallows one-finger swipes strands
+   you on whatever slide you happened to touch. Two fingers drive the map. */
+@media (pointer: coarse) {
+  .map-svg { touch-action: pan-y; }
+}
 .geo-grid line { stroke: color-mix(in oklab, var(--ink-3) 26%, transparent); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 2 6; }
 .geo-land { fill: var(--land); stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .geo-coast-halo { fill: none; stroke: color-mix(in oklab, var(--sea) 20%, transparent); stroke-width: 9; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
@@ -331,10 +336,14 @@ body {
 }
 .is-live .chain-card { animation: card-in .6s cubic-bezier(.2,.7,.3,1) backwards; animation-delay: calc(var(--i) * 70ms); }
 @keyframes card-in { from { opacity: 0; transform: translateY(16px); } }
-.chain-card:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--c) 55%, var(--rule)); }
+@media (hover: hover) {
+  .chain-card:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--c) 55%, var(--rule)); }
+}
 .chain-art { position: relative; aspect-ratio: 3 / 2; overflow: hidden; }
 .chain-art img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.7,.3,1); }
-.chain-card:hover .chain-art img { transform: scale(1.06); }
+@media (hover: hover) {
+  .chain-card:hover .chain-art img { transform: scale(1.06); }
+}
 .chain-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(8,11,12,.72)); }
 .chain-body { padding: .85rem 1rem 1rem; display: flex; flex-direction: column; gap: .25rem; flex: 1; }
 .chain-card .c {
@@ -408,6 +417,9 @@ body {
   background: rgba(255,255,255,.07);
 }
 .deck-bar i { display: block; height: 100%; width: 0; background: var(--terracotta); transition: width .3s ease; }
+/* With the dots hidden below 640px this bar is the only position indicator
+   left, so give it enough height to actually register. */
+@media (max-width: 640px) { .deck-bar { height: 3px; } }
 
 .corner {
   position: fixed; z-index: 5; font-size: 10px; letter-spacing: .16em;
