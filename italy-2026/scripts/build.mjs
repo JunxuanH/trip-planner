@@ -18,6 +18,35 @@ const PAGES = [
   { out: 'presentation.html', tpl: 'src/presentation.template.html', entry: 'src/js/deck.js', css: ['src/styles/base.css', 'src/styles/deck.css'] },
 ];
 
+/* ── typefaces, inlined ───────────────────────────────────────────────────
+   The CSS is concatenated as-is rather than run through esbuild, so it can't
+   import a .woff2 the way src/js/images.js imports artwork. Instead the faces
+   are base64'd here and substituted into base.css's __FONTS__ placeholder.
+   A data: URL keeps the self-containment rule below satisfied.
+
+   Archivo carries both a weight and a width axis in one file, which is what
+   lets the display role be genuinely Expanded rather than faked with
+   letter-spacing. Latin only, upright only — no italic is used anywhere in
+   the design, and shipping one would cost more than the mono faces combined.
+   All three are SIL OFL 1.1. */
+const FONTS = [
+  { family: 'Archivo', weight: '100 900', stretch: '62% 125%',
+    file: 'node_modules/@fontsource-variable/archivo/files/archivo-latin-standard-normal.woff2' },
+  { family: 'Martian Mono', weight: '400', stretch: '100%',
+    file: 'node_modules/@fontsource/martian-mono/files/martian-mono-latin-400-normal.woff2' },
+  { family: 'Martian Mono', weight: '700', stretch: '100%',
+    file: 'node_modules/@fontsource/martian-mono/files/martian-mono-latin-700-normal.woff2' },
+];
+
+const fontFaces = FONTS.map(({ family, weight, stretch, file }) => {
+  const p = r(file);
+  if (!existsSync(p)) throw new Error(`missing typeface ${file} — run npm install`);
+  const b64 = readFileSync(p).toString('base64');
+  return `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};`
+    + `font-stretch:${stretch};font-display:swap;`
+    + `src:url(data:font/woff2;charset=utf-8;base64,${b64}) format("woff2");}`;
+}).join('\n');
+
 /** A literal `</script` inside bundled JS or CSS would close the host tag early. */
 const safe = (s) => s.replace(/<\/(script|style)/gi, '<\\/$1');
 
@@ -31,7 +60,12 @@ for (const page of PAGES) {
     continue;
   }
 
-  const css = page.css.map((f) => readFileSync(r(f), 'utf8')).join('\n');
+  const css = page.css
+    .map((f) => readFileSync(r(f), 'utf8'))
+    .join('\n')
+    .replace('__FONTS__', () => fontFaces);
+
+  if (css.includes('__FONTS__')) throw new Error(`${page.out}: __FONTS__ was not substituted`);
 
   const result = await esbuild.build({
     entryPoints: [r(page.entry)],

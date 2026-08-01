@@ -1,85 +1,138 @@
 /* ── Italy 2026 · shared design tokens ─────────────────────────────────────
-   Palette taken from the materials of the trip: travertine, terracotta roof
-   tile, olive leaf, Tyrrhenian blue, and the gold of a Brunello label.
+   "Orario" — the document is a timetable, so it's built from the vernacular of
+   Italian transit information design: the departures board, the platform sign,
+   the Olivetti/Vignelli grid. This trip is rail and ferry almost end to end —
+   two driving days in fourteen — so the schedule is the subject, not scenery.
+
+   Warm throughout: amber on a warm near-black is what a real split-flap board
+   looks like, and the paper is ivory rather than the cold grey a Swiss reading
+   of this would reach for. One cool note (petrol) keeps it off monochrome.
    ------------------------------------------------------------------------ */
 
+__FONTS__
+
 :root {
-  --paper:        #FAF6EF;
-  --paper-2:      #F3ECE0;
-  --paper-3:      #E8DECD;
-  --ink:          #241F1A;
-  --ink-2:        #4A4139;
-  --ink-3:        #7A6E62;
-  --rule:         #DDD1BE;
+  /* ── surfaces ── warm paper, warm board ── */
+  --paper:        #F5F0E6;
+  --paper-2:      #EBE4D6;
+  --paper-3:      #DCD2BE;
+  --board:        #171310;   /* the departure board itself */
+  --board-2:      #241D18;
 
-  --terracotta:   #C25A3A;
-  --terracotta-d: #9E4529;
-  --olive:        #6E7F4A;
-  --tyrrhenian:   #2E7A8C;
-  --gold:         #B08D43;
-  --plum:         #7A4A6E;
+  --ink:          #171310;
+  --ink-2:        #574B40;
+  --ink-3:        #8A7C6D;
+  --rule:         #171310;   /* rules are bars now, so they carry ink weight */
+  --rule-soft:    #CFC4AF;
 
-  --sea:          #2E7A8C;
-  --land:         #EFE6D6;
+  /* ── signals ── */
+  --ambra:        #F0A400;   /* the signature: board amber */
+  --rosso:        #C8102E;   /* urgency, primary links */
+  --petrolio:     #0F3B47;   /* the one cool note — sea, data */
+  --verde:        #4E6B2F;   /* confirmed, settled */
+  --uva:          #7A3B5C;
 
-  --accent:       var(--terracotta);
+  --sea:          #0F3B47;
+  --land:         #E6DCC6;
 
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
-           Georgia, "Times New Roman", serif;
-  --sans:  ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-           "Helvetica Neue", Arial, sans-serif;
-  --mono:  ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --accent:       var(--rosso);
 
-  --shadow-1: 0 1px 2px rgba(36, 31, 26, .06), 0 2px 8px rgba(36, 31, 26, .05);
-  --shadow-2: 0 2px 6px rgba(36, 31, 26, .08), 0 12px 32px rgba(36, 31, 26, .10);
+  /* ── type ──
+     One superfamily at two widths does the work a display/body pairing usually
+     does, which keeps the page disciplined; the mono is the data voice. There
+     is deliberately no serif — dropping it is what moves this furthest from
+     where the document started. */
+  --display: "Archivo", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  --sans:    "Archivo", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  --mono:    "Martian Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --maxw: 1180px;
-  --radius: 3px;
+  /* Width axis, used as named roles rather than raw numbers at each call site. */
+  --wide:   125%;
+  --normal: 100%;
+
+  /* ── fluid scale ──
+     One ratio, one system. Every size on the page comes from this ladder, so
+     nothing is hand-tuned into a near-miss of something else. */
+  --step--2: clamp(0.65rem, 0.63rem + 0.10vw, 0.71rem);
+  --step--1: clamp(0.78rem, 0.75rem + 0.14vw, 0.86rem);
+  --step-0:  clamp(0.94rem, 0.90rem + 0.19vw, 1.05rem);
+  --step-1:  clamp(1.13rem, 1.07rem + 0.29vw, 1.31rem);
+  --step-2:  clamp(1.35rem, 1.26rem + 0.44vw, 1.64rem);
+  --step-3:  clamp(1.62rem, 1.48rem + 0.66vw, 2.05rem);
+  --step-4:  clamp(1.94rem, 1.73rem + 0.97vw, 2.56rem);
+  --step-5:  clamp(2.33rem, 2.02rem + 1.42vw, 3.20rem);
+  --step-6:  clamp(2.80rem, 2.34rem + 2.06vw, 4.00rem);
+  --step-7:  clamp(3.36rem, 2.70rem + 2.95vw, 5.00rem);
+
+  --space-1: clamp(0.25rem, 0.24rem + 0.07vw, 0.31rem);
+  --space-2: clamp(0.50rem, 0.47rem + 0.14vw, 0.63rem);
+  --space-3: clamp(0.75rem, 0.71rem + 0.21vw, 0.94rem);
+  --space-4: clamp(1.00rem, 0.94rem + 0.28vw, 1.25rem);
+  --space-5: clamp(1.50rem, 1.41rem + 0.42vw, 1.88rem);
+  --space-6: clamp(2.00rem, 1.88rem + 0.56vw, 2.50rem);
+  --space-7: clamp(3.00rem, 2.81rem + 0.83vw, 3.75rem);
+  --space-8: clamp(4.00rem, 3.75rem + 1.11vw, 5.00rem);
+
+  /* ── motion ──
+     Structural surfaces are square and interactive ones are pills; the contrast
+     is the point. A single overshoot curve gives the whole page one gait. */
+  --radius: 0px;
+  --radius-pill: 100px;
+
+  --ease-spring: linear(
+    0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%,
+    0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%,
+    1.001 82.8%, 1
+  );
+  --ease-out: cubic-bezier(.2, .7, .3, 1);
+
+  --shadow-1: 0 1px 0 rgba(23, 19, 16, .10), 0 2px 10px rgba(23, 19, 16, .06);
+  --shadow-2: 0 2px 0 rgba(23, 19, 16, .12), 0 14px 36px rgba(23, 19, 16, .14);
+
+  --maxw: 1240px;
+
+  /* Compatibility aliases. plan.css, deck.css and the per-city accents in
+     itinerary.json still name the old palette in a few hundred places; these
+     keep every one of them resolving to the new system while the structural
+     CSS is converted, rather than leaving half the page on undefined vars. */
+  --terracotta:   var(--rosso);
+  --terracotta-d: color-mix(in oklab, var(--rosso) 78%, var(--board));
+  --olive:        var(--verde);
+  --tyrrhenian:   var(--petrolio);
+  --gold:         var(--ambra);
+  --plum:         var(--uva);
+  --serif:        var(--display);
 }
 
-/* Light is the default regardless of system preference — dark is opt-in
-   only via the theme toggle, which sets data-theme="dark" explicitly. */
+/* Light is the default regardless of system preference — dark is opt-in only
+   via the theme toggle, which sets data-theme="dark" explicitly. */
 
 :root[data-theme="dark"] {
-  --paper:   #14120F;
-  --paper-2: #1D1A16;
-  --paper-3: #262119;
-  --ink:     #F2EADC;
-  --ink-2:   #C7BAA6;
-  --ink-3:   #9B8D7C;
-  --rule:    #362F26;
-  --terracotta: #E0785A;
-  --terracotta-d: #C25A3A;
-  --olive:      #9DAE76;
-  --tyrrhenian: #5AA9BC;
-  --gold:       #D6B166;
-  --plum:       #B27FA3;
-  --sea:  #3E7E90;
-  --land: #221E18;
-  --shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.3);
-  --shadow-2: 0 2px 6px rgba(0,0,0,.45), 0 12px 32px rgba(0,0,0,.4);
-}
+  --paper:     #14100D;
+  --paper-2:   #1E1813;
+  --paper-3:   #2A231B;
+  --board:     #0C0908;
+  --board-2:   #171310;
 
-/* Shared map chrome. A one-finger drag on a touch map deliberately does
-   nothing — the page keeps that gesture — so say why, briefly. mapengine sets
-   this class on the map's frame for ~1.6s; it works in both documents. */
-.wants-two-fingers::after {
-  content: "Use two fingers to move the map";
-  position: absolute; inset: 0; z-index: 2;
-  display: grid; place-items: center; text-align: center;
-  padding: 1rem;
-  font-family: var(--sans); font-size: .82rem; font-weight: 600;
-  color: var(--ink);
-  background: color-mix(in oklab, var(--paper) 62%, transparent);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-  animation: two-finger-fade 1.6s ease forwards;
-}
-@keyframes two-finger-fade {
-  0%   { opacity: 0; }
-  12%  { opacity: 1; }
-  70%  { opacity: 1; }
-  100% { opacity: 0; }
+  --ink:       #F5EFE2;
+  --ink-2:     #C4B7A4;
+  --ink-3:     #8F8271;
+  --rule:      #F5EFE2;
+  --rule-soft: #3A3127;
+
+  --ambra:     #FFB829;
+  --rosso:     #F0574E;
+  --petrolio:  #6BAEC0;
+  --verde:     #9BB86A;
+  --uva:       #C48FAC;
+
+  --sea:       #14343D;
+  --land:      #221C15;
+
+  --shadow-1: 0 1px 0 rgba(0,0,0,.5), 0 2px 10px rgba(0,0,0,.35);
+  --shadow-2: 0 2px 0 rgba(0,0,0,.55), 0 14px 36px rgba(0,0,0,.45);
+
+  --terracotta-d: color-mix(in oklab, var(--rosso) 72%, #000);
 }
 
 * { box-sizing: border-box; }
@@ -91,25 +144,34 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: var(--step-0);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15; margin: 0; }
+/* Headings run wide and tight — platform-sign proportions. */
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  font-stretch: var(--wide);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  margin: 0;
+}
 
 a { color: inherit; }
 
-/* A hairline that survives zoom on any display. */
-.rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+/* A structural bar, not a hairline. */
+.rule { height: 2px; background: var(--rule); border: 0; margin: 0; }
 
-/* Small caps label used throughout both documents. */
+/* The platform label: wide, small, spaced, and used to name things. */
 .eyebrow {
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 650;
-  letter-spacing: .14em;
+  font-family: var(--display);
+  font-stretch: var(--wide);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -117,9 +179,69 @@ a { color: inherit; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--rosso);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 0;
+}
+
+/* ── the signature: a departures board ──────────────────────────────────────
+   Amber on warm black, the digits set in the mono. Used for the day headers in
+   the plan and the day slides in the deck, so both documents open a day the
+   same way. */
+
+.board {
+  background: var(--board);
+  color: var(--ambra);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.board .lit { color: var(--ambra); }
+.board .dim { color: color-mix(in oklab, var(--ambra) 42%, var(--board)); }
+.board .name {
+  font-family: var(--display);
+  font-stretch: var(--wide);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #F5EFE2;
+}
+
+/* Digits settle like a split-flap when the day scrolls in. Each character is
+   its own span so they land in sequence rather than as a block. */
+.flap { display: inline-block; }
+.flap > i {
+  display: inline-block; font-style: normal;
+  animation: flap-settle .5s var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+@keyframes flap-settle {
+  0%   { transform: rotateX(-90deg); opacity: 0; }
+  60%  { transform: rotateX(12deg);  opacity: 1; }
+  100% { transform: none; }
+}
+
+/* ── shared map chrome ────────────────────────────────────────────────────
+   A one-finger drag on a touch map deliberately does nothing — the page keeps
+   that gesture — so say why, briefly. mapengine sets this class on the map's
+   frame for ~1.6s; it works in both documents. */
+.wants-two-fingers::after {
+  content: "Use two fingers to move the map";
+  position: absolute; inset: 0; z-index: 2;
+  display: grid; place-items: center; text-align: center;
+  padding: var(--space-4);
+  font-family: var(--display); font-stretch: var(--wide);
+  font-size: var(--step--1); font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ambra);
+  background: color-mix(in oklab, var(--board) 82%, transparent);
+  pointer-events: none;
+  animation: two-finger-fade 1.6s ease forwards;
+}
+@keyframes two-finger-fade {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
