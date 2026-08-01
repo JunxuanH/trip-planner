@@ -20,8 +20,11 @@
   --gold:       #D6B166;
   --plum:       #C08FB2;
 
-  --sea:  #6FB6C9;
-  --land: #202A2E;
+  --sea:      #6FB6C9;
+  /* The deck is always dark, so it needs its own water rather than inheriting
+     base.css's daylight tone. */
+  --sea-fill: #0E1D23;
+  --land:     #202A2E;
 }
 
 html, body { height: 100%; }
@@ -261,6 +264,7 @@ body {
   .map-svg { touch-action: pan-y; }
 }
 .geo-grid line { stroke: color-mix(in oklab, var(--ink-3) 26%, transparent); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 2 6; }
+.geo-sea { fill: var(--sea-fill); }
 .geo-land { fill: var(--land); stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .geo-coast-halo { fill: none; stroke: color-mix(in oklab, var(--sea) 20%, transparent); stroke-width: 9; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .geo-coast { fill: none; stroke: color-mix(in oklab, var(--sea) 70%, transparent); stroke-width: 1.4; vector-effect: non-scaling-stroke; stroke-linejoin: round; }

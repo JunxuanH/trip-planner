@@ -104,6 +104,7 @@ function prepStreets(streets) {
     const [w, s, e, n] = a.bbox;
     STREETS[id] = {
       box: [w, projY(n), e, projY(s)],
+      coarse: !!a.coarse,
       roads: a.roads.map(([cls, line, name]) => ({ cls, name, ...withBox(conv(line)) })),
       buildings: (a.buildings || []).map((p) => withBox(conv(p))),
       green: (a.green || []).map((p) => withBox(conv(p))),
@@ -214,16 +215,29 @@ export function createMap(host, opts) {
     const level = levelFor(span);
     const areas = level ? areasForView() : [];
 
-    if (!areas.length) {
-      // No street data here (or we're zoomed way out): country outline + coast.
-      if (span > 0.5) {
-        for (const { pts, box } of G.land) {
-          if (!boxesOverlap(box, vbPad)) continue;
-          gBase.append(el('path', { d: toPath(pts, true), class: 'geo-land' }));
-        }
-      } else {
-        drawCoastAndRivers(vbPad);
+    /* Sea first, then land over it — at any scale wider than the street data.
+       Previously land was only filled past 0.5°, so a coastal day like Amalfi
+       (0.35°, ~29 km) drew a bare coastline with the *same* tone on both sides
+       of it: on a peninsula that is unreadable, and it was why the frame looked
+       empty. Below this threshold the street areas paint their own ground and
+       the 1:50m outline is too coarse to sit under them. */
+    const LAND_FILL_MIN = 0.05;
+    if (span > LAND_FILL_MIN) {
+      gBase.append(el('rect', {
+        x: vbPad[0], y: vbPad[1],
+        width: vbPad[2] - vbPad[0], height: vbPad[3] - vbPad[1],
+        class: 'geo-sea',
+      }));
+      for (const { pts, box } of G.land) {
+        if (!boxesOverlap(box, vbPad)) continue;
+        gBase.append(el('path', { d: toPath(pts, true), class: 'geo-land' }));
       }
+    }
+
+    if (!areas.length) {
+      // No street data here. The land/sea fill above already ran; at closer
+      // range all that is left to place is the coast and river detail.
+      if (span <= 0.5) drawCoastAndRivers(vbPad);
       drawnFor = { ...view };
       return;
     }
@@ -247,13 +261,20 @@ export function createMap(host, opts) {
 
     /* land tint under everything, so streets read as carved out of a block —
        one rect per area, so the (possibly empty) gap between two areas stays
-       untinted instead of one giant rect implying coverage that isn't there */
-    for (const area of areas) {
-      gBase.append(el('rect', {
-        x: area.box[0], y: area.box[1],
-        width: area.box[2] - area.box[0], height: area.box[3] - area.box[1],
-        class: 'st-ground',
-      }));
+       untinted instead of one giant rect implying coverage that isn't there.
+
+       Skipped once the land fill is doing that job: at a coastal scale these
+       are three small rectangles floating on an already-tinted peninsula, and
+       they read as unexplained patches rather than as ground. */
+    if (span <= LAND_FILL_MIN) {
+      for (const area of areas) {
+        if (area.coarse) continue; // a corridor: through-roads, not ground
+        gBase.append(el('rect', {
+          x: area.box[0], y: area.box[1],
+          width: area.box[2] - area.box[0], height: area.box[3] - area.box[1],
+          class: 'st-ground',
+        }));
+      }
     }
 
     batch(areas.flatMap((a) => a.green), 'st-green');

@@ -86,12 +86,27 @@ Both pages build their maps lazily (14 SVG maps at once is wasteful). On
 
 `src/geo/italy.json` is the Natural Earth 1:50m country outline (public domain).
 `src/geo/streets.json` is OSM data (© OpenStreetMap contributors, ODbL) fetched via
-Overpass and simplified with Douglas–Peucker, stored as areas `a0…a18` with
-quantised integer coordinates relative to each area's `origin`. `fetch-streets.mjs`
-clusters the itinerary's stops into those areas, picks a detail level from the
-cluster's span, queries one area at a time and checkpoints after each — so it is
-safe to interrupt and re-run, and it skips areas it already has. Building footprints
-are deliberately never fetched: in a dense centre they outweigh every other layer.
+Overpass and simplified with Douglas–Peucker, stored with quantised integer
+coordinates relative to each area's `origin`. `fetch-streets.mjs` queries one area
+at a time and checkpoints after each — so it is safe to interrupt and re-run, and it
+skips areas it already has. Building footprints are deliberately never fetched: in a
+dense centre they outweigh every other layer.
+
+There are two kinds of area:
+
+- **town areas** (`a0…aN`) — clusters of stops within 4 km of each other, fetched at
+  full detail down to footways and steps.
+- **corridors** (`c0…cN`) — the gap between two consecutive stops in a day that are
+  4–45 km apart. Without these a day like Sorrento → Positano → Amalfi was three
+  islands of streets with 25 km of blank between them. They carry motorway/primary/
+  secondary only, marked `coarse: true`, and no green/water/squares: `SCALE` in
+  mapengine never draws past class 2 at a span wide enough to hold a corridor, and
+  the polygons alone tripled the file. The renderer must not paint `st-ground` from
+  a `coarse` area — a 40 km slab would claim coverage it doesn't have.
+
+Below ~0.05° the street areas supply the ground; above it mapengine fills sea then
+land from `italy.json`. Both are needed: a coastal day at 0.35° drew a bare
+coastline with the same tone either side of it before the land fill existed.
 
 **The resume cache is keyed by area index, and the indices come from clustering the
 *current* stops.** So "skips areas it already has" is only correct while the stops

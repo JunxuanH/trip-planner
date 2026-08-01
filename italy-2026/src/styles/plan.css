@@ -427,6 +427,9 @@ body { padding-bottom: 4rem; }
   stroke: color-mix(in oklab, var(--ink-3) 32%, transparent);
   stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 2 6;
 }
+/* The sea has to be visibly not-land. --land (#EFE6D6) sat a shade off the
+   frame's own paper, so a coastline separated two identical tones. */
+.geo-sea { fill: var(--sea-fill); }
 .geo-land { fill: var(--land); stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .geo-coast-halo { fill: none; stroke: color-mix(in oklab, var(--sea) 22%, transparent); stroke-width: 9; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .geo-coast { fill: none; stroke: color-mix(in oklab, var(--sea) 75%, transparent); stroke-width: 1.4; vector-effect: non-scaling-stroke; stroke-linejoin: round; }

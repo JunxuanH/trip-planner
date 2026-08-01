@@ -80,7 +80,47 @@ const areas = clusters.map((pts, i) => {
   return { id: `a${i}`, bbox: [s, w, n, e], widthKm, heightKm, count: pts.length };
 });
 
-console.log(`${coords.length} stops → ${areas.length} areas`);
+/* ── 1b · corridors between towns ────────────────────────────────────────────
+   The town clusters above are islands: a day that runs Sorrento → Positano →
+   Amalfi fetched three small patches with ~25 km of nothing between them, so
+   at any zoom wide enough to hold the day the map had no road on it at all.
+
+   For each consecutive pair of stops *within a day* that is further apart than
+   the join radius but still short enough to be one drive or sailing, add a box
+   covering the pair. These are large, so the detail rule below drops them to
+   through-roads only — which is the right layer anyway: what's wanted here is
+   the coast road connecting the towns, not the alleys at either end. */
+const CORRIDOR_MAX_KM = 45;
+const corridors = [];
+const seen = new Set();
+for (const d of trip.days) {
+  for (let i = 1; i < d.items.length; i++) {
+    const a = d.items[i - 1].coord, b = d.items[i].coord;
+    const km = kmBetween(a, b);
+    if (km <= JOIN_KM || km > CORRIDOR_MAX_KM) continue;
+    let s = Math.min(a[0], b[0]), n = Math.max(a[0], b[0]);
+    let w = Math.min(a[1], b[1]), e = Math.max(a[1], b[1]);
+    // A straight line between two points has no width; give the box enough
+    // margin that a road curving away from the direct line still lands in it.
+    const padLat = Math.max((n - s) * 0.25, 0.02);
+    const padLng = Math.max((e - w) * 0.25, 0.025);
+    s -= padLat; n += padLat; w -= padLng; e += padLng;
+    const key = [s, w, n, e].map((v) => v.toFixed(2)).join(',');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    corridors.push({
+      corridor: true,
+      bbox: [s, w, n, e],
+      widthKm: kmBetween([s, w], [s, e]),
+      heightKm: kmBetween([s, w], [n, w]),
+      count: 2,
+    });
+  }
+}
+corridors.forEach((c, i) => { c.id = `c${i}`; });
+areas.push(...corridors);
+
+console.log(`${coords.length} stops → ${areas.length - corridors.length} town areas + ${corridors.length} corridors`);
 areas.forEach((a) => console.log(
   `  ${a.id}: ${a.widthKm.toFixed(1)} × ${a.heightKm.toFixed(1)} km, ${a.count} stops`));
 
@@ -182,10 +222,23 @@ for (const area of areas) {
 
   const [s, w, n, e] = area.bbox;
   const bb = `${s},${w},${n},${e}`;
-  const big = area.widthKm > 18 || area.heightKm > 18;
+  /* Corridors are through-roads by intent, whatever their size: the point of
+     one is the road that connects two towns, and a full-detail sweep of the
+     16 km between Castelfalfi and San Gimignano would pull every farm track in
+     240 km² to draw a road you already get from the tertiary layer. */
+  const big = area.corridor || area.widthKm > 18 || area.heightKm > 18;
 
-  // Rural sweeps get through-roads only; city centres get everything.
-  const highwayFilter = big
+  /* Rural sweeps get through-roads only; city centres get everything.
+
+     Corridors stop one class earlier still. mapengine's SCALE table draws at
+     most classes 0-2 (motorway, primary, secondary) at any span wide enough to
+     hold a corridor in frame — tertiary only appears below 0.07°, by which
+     point you are inside a town area that carries its own full detail. So
+     tertiary on a corridor is weight that is never drawn: it was most of the
+     8,298 ways the Rome-FCO box came back with. */
+  const highwayFilter = area.corridor
+    ? '["highway"~"^(motorway|trunk|primary|secondary)(_link)?$"]'
+    : big
     ? '["highway"~"^(motorway|trunk|primary|secondary|tertiary)(_link)?$"]'
     : '["highway"~"^(motorway|trunk|primary|secondary|tertiary|residential|unclassified|living_street|pedestrian|footway|path|steps)(_link)?$"]';
 
@@ -230,7 +283,8 @@ for (const area of areas) {
   const roads = [], green = [], water = [], squares = [];
 
   // Tolerances scale with the area so a wide rural map isn't stored at 3 m.
-  const tolRoad = big ? 0.0004 : 0.00004;
+  // Corridors are only ever seen at a scale where 30 m of wiggle is invisible.
+  const tolRoad = area.corridor ? 0.0012 : big ? 0.0004 : 0.00004;
   const tolPoly = big ? 0.0005 : 0.00005;
 
   for (const el of data.elements) {
@@ -251,6 +305,13 @@ for (const area of areas) {
       roads.push(rec);
       continue;
     }
+    /* A corridor exists to carry the road between two towns. Its parks,
+       ponds and piazze are never looked at — you are either zoomed out far
+       enough that they are specks, or zoomed into a town area that has its
+       own. Keeping them tripled the file: one 40 km corridor alone brought
+       back 3,925 green polygons. */
+    if (area.corridor) continue;
+
     if (t.place === 'square') {
       const poly = simplify(pts, tolPoly);
       if (poly.length >= 4) squares.push([enc(poly), t.name || '']);
@@ -268,6 +329,10 @@ for (const area of areas) {
   out[area.id] = {
     origin: [r5(w), r5(s)],
     bbox: [r5(w), r5(s), r5(e), r5(n)],
+    // Through-roads only over a wide box. The renderer must not paint its
+    // ground tint from one of these — a 40 km slab would cover a whole city
+    // frame and claim a coverage it doesn't have.
+    ...(big ? { coarse: true } : {}),
     roads, green, water, squares,
   };
   console.log(`  kept: roads ${roads.length} · green ${green.length} · water ${water.length} · squares ${squares.length}`);
