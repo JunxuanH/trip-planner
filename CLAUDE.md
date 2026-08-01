@@ -56,12 +56,28 @@ resolves `import TRIP from '../../data/itinerary.json'` and the `.webp` imports 
 `src/js/images.js`, the itinerary, the map geometry, three.js and the artwork all
 end up inlined in a single file.
 
-**The self-contained constraint is load-bearing and enforced.** Both documents must
-open from `file://`, work offline, and survive being emailed. `build.mjs` greps its
+**The single-file constraint is load-bearing and enforced.** Both documents are one
+HTML file that opens from `file://` and survives being emailed. `build.mjs` greps its
 own output for external `<script src>`, stylesheet `<link>`, `@import`, remote
 `url()`/`<img>`, runtime `fetch()`, WebSocket and `<iframe>`, and fails the build if
-any appear. Do not add a CDN dependency, a web font, or a runtime request — the
-multi-megabyte `dist/` files are the deliberate cost of that rule.
+any appear. Do not add a CDN dependency or a web font — the multi-megabyte `dist/`
+files are the deliberate cost of that rule.
+
+**There is exactly one runtime network request, and it is allowlisted by host.**
+`plan.html` loads map tiles from `basemaps.cartocdn.com` (CARTO Positron). Leaflet
+itself is bundled, so the page is still one file; only the tile images come from
+outside. `build.mjs` asserts this positively — `plan.html` *must* reference that host
+and `presentation.html` *must not* — so the exception cannot silently widen to a
+second provider or an analytics beacon. `presentation.html` stays fully offline,
+because a deck is shown full-screen and a grey grid mid-presentation is a bad
+failure mode.
+
+`src/js/tilemap.js` picks the engine per frame: it builds the Leaflet map, then
+watches whether a tile actually arrives, and hands the frame to `mapengine.js`
+if none has within ~3.5s or three error first. So `plan.html` still works on a
+plane — that is why `streets.json` is still carried and still worth its size.
+`navigator.onLine` is only a fast path; it lies on captive portals and says
+nothing about whether CARTO in particular is reachable.
 
 ### The two pages
 

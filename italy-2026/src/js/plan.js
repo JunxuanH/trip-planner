@@ -3,7 +3,8 @@
 import TRIP from '../../data/itinerary.json';
 import GEO from '../geo/italy.json';
 import STREETS from '../geo/streets.json';
-import { createMap, groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
+import { groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
+import { mapFor } from './tilemap.js';
 import { IMAGES } from './images.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
@@ -192,7 +193,7 @@ function renderDays() {
        first time its day comes near the viewport (or is asked for). */
     frame.style.setProperty('--c', c);
     mapInfo.set(d.n, { info, stops });
-    pendingMaps.set(d.n, () => createMap(frame, {
+    pendingMaps.set(d.n, () => mapFor(frame, {
       stops, geo: GEO, streets: STREETS, alt: `Map of day ${d.n}: ${d.title}`,
       onPick: (i) => {
         if (i == null) return clearStop(d.n);

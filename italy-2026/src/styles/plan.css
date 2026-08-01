@@ -380,6 +380,72 @@ body { padding-bottom: 4rem; }
 }
 .pin-popup-zoom:hover { background: color-mix(in oklab, var(--terracotta) 12%, var(--paper-2)); }
 
+/* ── tiled map (Leaflet) ────────────────────────────────────────────────────
+   Used when the network is up; the SVG engine below takes the frame when it
+   isn't. Everything here is scoped to .is-tiled so the two never interfere. */
+
+.map-frame.is-tiled { background: var(--paper-2); }
+.map-frame.is-tiled .leaflet-container {
+  width: 100%; height: 100%;
+  background: var(--paper-2);
+  font-family: var(--sans);
+  outline: none;
+}
+/* The frame's own chrome is written for the SVG engine: Leaflet draws its own
+   scale-free basemap and carries attribution, and the pan/zoom wording differs. */
+.map-frame.is-tiled .map-scale { display: none; }
+.map-frame.is-tiled .map-cap { z-index: 500; text-shadow: 0 1px 3px var(--paper); }
+.map-frame.is-tiled .map-hint { display: none; }
+.map-frame.is-tiled .map-tools { z-index: 500; }
+.map-frame.is-tiled .map-info { z-index: 500; }
+
+.map-frame.is-tiled .leaflet-control-attribution {
+  background: color-mix(in oklab, var(--paper) 82%, transparent);
+  color: var(--ink-3); font-size: 9.5px; font-family: var(--sans);
+  padding: .1rem .35rem;
+}
+.map-frame.is-tiled .leaflet-control-attribution a { color: var(--ink-2); }
+
+/* Numbered pins, same colour language as the SVG engine's. */
+.tm-pin { background: none; border: 0; }
+.tm-pin i {
+  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--pin); color: #fff;
+  border: 2.5px solid var(--paper);
+  box-shadow: 0 1px 4px rgba(20, 16, 12, .45);
+  font-family: var(--sans); font-size: 12px; font-weight: 700; font-style: normal;
+  letter-spacing: -.02em;
+  transition: transform .18s var(--ease-out, cubic-bezier(.2,.7,.3,1));
+}
+/* A merged marker: dashed ring signals "several stops here, zoom to split". */
+.tm-pin i[data-many] { border-style: dashed; font-size: 10.5px; }
+.tm-pin.is-active i { transform: scale(1.25); box-shadow: 0 2px 10px rgba(20, 16, 12, .55); }
+
+.tm-route { stroke-linecap: round; }
+
+/* Popups, matched to the SVG engine's pin popup. */
+.tm-pop .leaflet-popup-content-wrapper {
+  background: var(--paper); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+}
+.tm-pop .leaflet-popup-content { margin: .8rem .9rem .7rem; font-size: .84rem; line-height: 1.45; }
+.tm-pop .leaflet-popup-tip { background: var(--paper); border: 1px solid var(--rule); }
+.tm-pop-item + .tm-pop-item { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--rule); }
+.tm-pop-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.tm-pop-time { font-family: var(--mono); font-size: .72rem; color: var(--ink-3); }
+.tm-pop-kind { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.tm-pop-title { font-weight: 650; font-size: .92rem; margin-top: .2rem; }
+.tm-pop-detail { font-size: .82rem; color: var(--ink-2); margin-top: .2rem; }
+.tm-pop-links { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.tm-pop-links a {
+  font-size: 11px; font-weight: 600; padding: .22rem .55rem; border-radius: 100px;
+  background: var(--paper-3); color: var(--ink-2); text-decoration: none;
+}
+@media (hover: hover) { .tm-pop-links a:hover { background: var(--terracotta); color: #fff; } }
+@media (pointer: coarse) { .tm-pop-links a { padding: .4rem .75rem; } }
+
 /* ── OSM street layers ──────────────────────────────────────────────────── */
 
 :root {
