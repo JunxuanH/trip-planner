@@ -404,7 +404,10 @@ export function createMap(host, opts) {
     const frac = km / kmAcross;
     scaleEl.querySelector('i').style.width = `${(frac * 100).toFixed(1)}%`;
     scaleEl.querySelector('b').textContent = km < 1 ? `${Math.round(km * 1000)} m` : `${km} km`;
-    scaleEl.style.opacity = frac > 0.85 ? '0' : '1';
+    // A class, not an inline opacity: the frame also hides the scale while the
+    // info strip is up, and an inline style would out-rank that rule and leave
+    // the bar reading straight through the panel.
+    scaleEl.classList.toggle('is-oversized', frac > 0.85);
   }
 
   /* — route — */
@@ -573,6 +576,9 @@ export function createMap(host, opts) {
     }
 
     popupEl.hidden = false;
+    // The popup already carries the time, title and detail, so the frame's own
+    // info strip would repeat it word for word. Let the frame suppress it.
+    host.classList.add('popup-open');
     positionPopup(c);
   }
 
@@ -580,6 +586,7 @@ export function createMap(host, opts) {
     openStopIdx = null;
     openClusterKey = null;
     popupEl.hidden = true;
+    host.classList.remove('popup-open');
   }
 
   function positionPopup(c) {

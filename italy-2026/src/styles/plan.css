@@ -301,6 +301,8 @@ body { padding-bottom: 4rem; }
   width: 42%; max-width: 9rem; pointer-events: none;
   transition: opacity .2s;
 }
+/* The bar would span most of the frame — meaningless as a scale. */
+.map-scale.is-oversized { opacity: 0; }
 .map-scale i {
   display: block; height: 5px; border-left: 1px solid var(--ink-3);
   border-right: 1px solid var(--ink-3); border-bottom: 1px solid var(--ink-3);
@@ -482,17 +484,30 @@ body { padding-bottom: 4rem; }
   transition: opacity .2s, background .2s, color .2s;
 }
 
+/* The info strip shares the bottom of the frame with the scale bar (bottom
+   left) and the zoom tools (bottom right). Left unmanaged all three occupy the
+   same band: the scale reads straight through the strip's 94%-opaque backing
+   and the strip runs underneath the buttons. So it stops short of the tools,
+   and the scale and hint stand down while it's up. */
 .map-info {
-  position: absolute; left: .7rem; right: .7rem; bottom: .7rem;
+  position: absolute; left: .7rem; right: 3rem; bottom: .7rem;
   padding: .6rem .75rem; border-radius: var(--radius);
-  background: color-mix(in oklab, var(--paper) 94%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--paper);
   border: 1px solid var(--rule); box-shadow: var(--shadow-1);
   font-size: .84rem; line-height: 1.45;
   opacity: 0; transform: translateY(6px); pointer-events: none;
   transition: opacity .18s, transform .18s;
 }
 .map-info.is-on { opacity: 1; transform: none; }
+
+.map-frame.info-on .map-scale,
+.map-frame.info-on .map-hint { opacity: 0; }
+
+/* Fingertip-sized tools need more clearance than a cursor's. */
+@media (pointer: coarse) { .map-info { right: 3.7rem; } }
+
+/* When a pin popup is open it says the same thing, in the same words. */
+.map-frame.popup-open .map-info { opacity: 0; }
 .map-info b { display: block; font-size: .9rem; }
 .map-info span { color: var(--ink-3); font-size: .78rem; font-family: var(--mono); }
 

@@ -248,6 +248,8 @@ function focusStop(dayN, stopIdx, itemIdx, scroll = true) {
     ...(s.items[0].detail ? [h('div', {}, s.items[0].detail)] : []),
   );
   info.classList.add('is-on');
+  // The strip covers the scale bar and the drag hint while it's up.
+  info.closest('.map-frame')?.classList.add('info-on');
 
   if (scroll) {
     // On a phone the map sits below the whole timeline, so tapping a stop flies
@@ -268,7 +270,9 @@ function clearStop(dayN) {
   maps.get(dayN)?.select(-1);
   const sec = document.getElementById(`day-${dayN}`);
   sec?.querySelectorAll('.tl').forEach((r) => r.classList.remove('is-active'));
-  mapInfo.get(dayN)?.info.classList.remove('is-on');
+  const info = mapInfo.get(dayN)?.info;
+  info?.classList.remove('is-on');
+  info?.closest('.map-frame')?.classList.remove('info-on');
 }
 
 const isInView = (el) => {
