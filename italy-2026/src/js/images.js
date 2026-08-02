@@ -6,12 +6,12 @@ import romeTrame from '../img/rome-trame.webp';
 import florenceHoxton from '../img/florence-hoxton.webp';
 import tuscanyCastelfalfi from '../img/tuscany-castelfalfi.webp';
 import sorrentoVittoria from '../img/sorrento-vittoria.webp';
-import romeIntercon from '../img/rome-intercon.webp';
+import romeNomos from '../img/rome-nomos.webp';
 
 export const IMAGES = {
   'rome-trame': romeTrame,
   'florence-hoxton': florenceHoxton,
   'tuscany-castelfalfi': tuscanyCastelfalfi,
   'sorrento-vittoria': sorrentoVittoria,
-  'rome-intercon': romeIntercon,
+  'rome-nomos': romeNomos,
 };
