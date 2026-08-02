@@ -152,13 +152,19 @@ if (new Set(workNights.map((d) => d.hotel)).size !== 1) {
 
 /* Back at the hotel by ~7pm on every coast night. The proxy is the last travel
    leg of the day: nothing that moves you between towns may start after 5pm,
-   which leaves the ~1h30 Ravello drive room to land before seven. */
+   which leaves the ~1h30 Ravello drive room to land before seven.
+
+   Days carrying a `transfer` are exempt. The rule is about excursions — going
+   out from the base and getting back — and a day that moves you into or out of
+   the base is not one of those: Aug 31 arrives from Florence on a booked train
+   and simply cannot land earlier. Without this the rule would quietly forbid
+   any arrival after five, which is not what it is for. */
 const minutesOf = (t) => {
   const m = /^(\d{1,2}):(\d{2})(am|pm)$/.exec(t.trim());
   if (!m) return null;
   return ((Number(m[1]) % 12) + (m[3] === 'pm' ? 12 : 0)) * 60 + Number(m[2]);
 };
-workNights.forEach((day) => {
+workNights.filter((d) => !d.transfer).forEach((day) => {
   const lastLeg = day.items.filter((it) => it.kind === 'transport').at(-1);
   if (lastLeg && minutesOf(lastLeg.time) > 17 * 60) {
     fail(`day ${day.n} (${day.date}) still has you travelling at ${lastLeg.time} ("${lastLeg.title}") — coast days must be home by ~7pm`);
