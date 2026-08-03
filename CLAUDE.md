@@ -63,12 +63,18 @@ own output for external `<script src>`, stylesheet `<link>`, `@import`, remote
 any appear. Do not add a CDN dependency or a web font — the multi-megabyte `dist/`
 files are the deliberate cost of that rule.
 
-**There is exactly one runtime network request, and it is allowlisted by host.**
-`plan.html` loads map tiles from `basemaps.cartocdn.com` (CARTO Positron). Leaflet
-itself is bundled, so the page is still one file; only the tile images come from
-outside. `build.mjs` asserts this positively — `plan.html` *must* reference that host
-and `presentation.html` *must not* — so the exception cannot silently widen to a
-second provider or an analytics beacon. `presentation.html` stays fully offline,
+**`plan.html` may reach exactly two hosts, and both are allowlisted.** They are
+listed in `PAGE_HOSTS` in `build.mjs`:
+
+- `basemaps.cartocdn.com` — map tiles (CARTO Positron). Leaflet itself is bundled,
+  so the page is still one file; only the tile images come from outside.
+- `trip-planner-api.vercel.app` — the editing endpoints (see *Editing on the site*).
+
+`build.mjs` asserts this **positively in both directions**: `plan.html` must
+reference both hosts, `presentation.html` must reference neither, and any `fetch()`
+to a literal URL outside the page's allowlist fails the build. So the exception
+cannot silently widen to a second provider or an analytics beacon, and a page that
+*stops* requesting one gets caught too. `presentation.html` stays fully offline,
 because a deck is shown full-screen and a grey grid mid-presentation is a bad
 failure mode.
 
@@ -130,6 +136,51 @@ stay put. After a route change, `a7` no longer covers the ground the stored `a7`
 does, and re-running is a silent no-op that leaves every map drawing the old city's
 streets. Whenever stops move between towns, `rm src/geo/streets.json` first and let
 it fetch the whole set — several minutes, but it's the only way to get real geometry.
+
+## Editing on the site
+
+`api/` is a **second deployment from the same repo** — Vercel serves it; Pages keeps
+serving `italy-2026/dist`. It exists because the plan is used by two people while
+travelling, and one of them does not hold the repo. Root `package.json`,
+`tsconfig.json` and `vercel.json` belong to that deployment only; `italy-2026/` has
+its own and is unaffected.
+
+**Three layers, rendered as `base ⊕ applied ⊕ draft`.** `itinerary.json` is still the
+source of truth and is never mutated in the browser:
+
+- **applied** — the shared overlay, in Upstash Redis, synced through `/api/overlay`.
+  A per-path last-write-wins register map, so two people merge without locking.
+- **draft** — local only, never sent until Apply. Both edit paths, typing in a field
+  and asking Claude, land here. This is what makes the Claude path safe to use
+  casually: the model proposes into the same tray a person does and has no
+  privileged route to the shared document.
+
+Comments are a **separate append-only structure**, merged by union of ids. That is
+deliberate — LWW is right for a time field and is data loss for a thread, and
+appends commute, so two people commenting offline on the same stop both keep their
+comments with no conflict policy at all. Comments post immediately; edits do not.
+
+**`api/_lib/schema.ts` is the security boundary.** Every path — from Claude or from a
+hand-made HTTP request — goes through `validatePatch` before it is stored. Only item
+`time`/`title`/`detail`/`how` and `day.N.note` are editable; coordinates, dates,
+hotels and prices are not, because `verify.mjs` invariants depend on them and it
+would never see a browser overlay. The server stamps `at`/`by` itself so authorship
+cannot be forged. `/api/edit` sends **one day** to the model (~1–2k tokens), not the
+whole file, and returns a proposal — it writes nothing.
+
+Client side: `src/js/overlay.js` (state, persistence, sync), `edit-ui.js` (inline
+fields, review tray, ask box), `comments.js` (anchors, panel). They decorate what
+`plan.js` already rendered, keyed off `data-path` / `data-anchor` attributes, rather
+than owning the render — so the document still works in full with Vercel down.
+
+**Overlays and comments live in Redis, not in git.** `dist/` is committed; anything
+typed on the site is not. Fold accepted edits back into `itinerary.json` through
+chat periodically, or the two sources drift.
+
+Secrets are set in the Vercel dashboard and **never written to the repo** (it is
+public, and GitHub auto-revokes Anthropic keys pushed to public repos):
+`ANTHROPIC_API_KEY`, `EDIT_PASSPHRASE`, `TOKEN_SECRET` (optional; falls back to the
+passphrase), `ALLOWED_ORIGIN` (defaults to the Pages origin), plus the Upstash vars.
 
 ## Conventions
 

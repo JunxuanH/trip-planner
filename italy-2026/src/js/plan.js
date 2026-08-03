@@ -6,6 +6,9 @@ import STREETS from '../geo/streets.json';
 import { groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
 import { mapFor } from './tilemap.js';
 import { IMAGES } from './images.js';
+import { startSync } from './overlay.js';
+import { mountEditing } from './edit-ui.js';
+import { mountComments, anchorTo } from './comments.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -149,7 +152,10 @@ function renderDays() {
       idx,
       h('h3', {}, d.title),
       h('div', { class: 'kicker' }, d.kicker),
-      d.note ? h('p', { class: 'note' }, d.note) : null,
+      // Rendered even when empty: the overlay paints into these nodes, so a
+      // note added on the site needs somewhere to land. CSS hides an empty one
+      // outside edit mode.
+      h('p', { class: 'note', 'data-path': `day.${d.n}.note` }, d.note || ''),
       d.warn ? h('div', { class: 'callout warn' },
         h('span', { class: 'ic' }, '⚠'), h('div', {}, h('b', {}, 'Watch this. '), d.warn)) : null,
     );
@@ -165,11 +171,15 @@ function renderDays() {
         onMouseenter: () => ensureMap(d.n)?.select(stopIdx),
         onMouseleave: () => ensureMap(d.n)?.select(activeStop.get(d.n) ?? -1),
       },
-        h('div', { class: 'tl-time tnum' }, it.time),
+        h('div', { class: 'tl-time tnum', 'data-path': `day.${d.n}.items.${i}.time` }, it.time),
         h('div', { class: 'tl-main' },
-          h('div', { class: 'tl-title' }, h('span', { class: 'idx' }, i + 1), it.title),
-          it.detail ? h('div', { class: 'tl-detail' }, it.detail) : null,
-          it.how ? h('div', { class: 'tl-how' }, it.how) : null,
+          // The stop number stays outside the editable span — it is the join to
+          // the map's pin, not text anyone should be able to retype.
+          h('div', { class: 'tl-title' },
+            h('span', { class: 'idx' }, i + 1),
+            h('span', { class: 't', 'data-path': `day.${d.n}.items.${i}.title` }, it.title)),
+          h('div', { class: 'tl-detail', 'data-path': `day.${d.n}.items.${i}.detail` }, it.detail || ''),
+          h('div', { class: 'tl-how', 'data-path': `day.${d.n}.items.${i}.how` }, it.how || ''),
           h('div', { class: 'tl-tags' },
             it.optional ? h('span', { class: 'mini opt' }, 'Optional') : null,
             it.link ? h('a', {
@@ -179,6 +189,7 @@ function renderDays() {
           ),
         ),
       );
+      anchorTo(row, `day.${d.n}.items.${i}`, `Day ${d.n} · ${it.title}`);
       tl.append(row);
     });
 
@@ -205,6 +216,7 @@ function renderDays() {
 
     const mapWrap = h('div', { class: 'map-wrap' }, frame, legend);
 
+    anchorTo(idx, `day.${d.n}`, `Day ${d.n} · ${d.title}`);
     sec.append(head, h('div', { class: 'day-body' }, tl, mapWrap));
     host.append(sec);
 
@@ -307,7 +319,7 @@ function renderHotels() {
   const host = $('#hotels');
   TRIP.hotels.forEach((ht, i) => {
     const art = IMAGES[ht.img];
-    host.append(h('div', { class: 'card hotel reveal', style: { '--c': accentOf(ht.cityKey) } },
+    const card = h('div', { class: 'card hotel reveal', style: { '--c': accentOf(ht.cityKey) } },
       art ? h('a', {
         class: 'card-art', href: photosUrl(ht),
         target: '_blank', rel: 'noopener noreferrer',
@@ -332,7 +344,9 @@ function renderHotels() {
             h('a', { class: 'lk', href: photosUrl(ht), target: '_blank', rel: 'noopener noreferrer' }, 'Photos'),
             h('a', { class: 'lk', href: ht.link, target: '_blank', rel: 'noopener noreferrer' }, 'Book'))),
       ),
-    ));
+    );
+    anchorTo(card, `hotel.${i}`, ht.name);
+    host.append(card);
   });
 
   const total = TRIP.hotels.reduce((s, x) => s + x.total, 0);
@@ -361,14 +375,17 @@ const U_LABEL = { now: 'Do now', week: 'This week', soon: 'Before you go' };
 
 function renderBookings() {
   const host = $('#bookings');
-  TRIP.bookings.forEach((b) => {
-    host.append(h('div', { class: `book-item u-${b.urgency} reveal` },
+  TRIP.bookings.forEach((b, i) => {
+    // "Did you actually pay this?" belongs next to the row it is about.
+    const row = h('div', { class: `book-item u-${b.urgency} reveal` },
       h('div', { class: 'pri tnum' }, String(b.priority).padStart(2, '0')),
       h('div', {},
         h('h4', {}, b.item, h('span', { class: 'u-flag' }, U_LABEL[b.urgency])),
         h('p', {}, b.detail)),
       b.link ? h('a', { class: 'lk', href: b.link, target: '_blank', rel: 'noopener noreferrer' }, 'Open') : null,
-    ));
+    );
+    anchorTo(row, `booking.${i}`, b.item);
+    host.append(row);
   });
 
   $('#ruled-out').append(...TRIP.bookingsRuledOut.map((r) =>
@@ -476,5 +493,12 @@ renderPortals();
 initTheme();
 initSpy();
 initReveal();
+
+// Editing is mounted last: it decorates what the renderers above produced
+// rather than owning any of it, so the document still renders in full if the
+// network — or the whole Vercel side — is gone.
+mountComments();
+mountEditing();
+startSync();
 
 $('#revised').textContent = fmt(TRIP.meta.revised, { day: 'numeric', month: 'long', year: 'numeric' });

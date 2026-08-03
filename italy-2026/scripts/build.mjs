@@ -18,7 +18,7 @@ const r = (...p) => join(root, ...p);
    only its CSS has to be spliced in here, the same way the page's own is. */
 const PAGES = [
   { out: 'plan.html',         tpl: 'src/plan.template.html',         entry: 'src/js/plan.js',
-    css: ['node_modules/leaflet/dist/leaflet.css', 'src/styles/base.css', 'src/styles/plan.css'] },
+    css: ['node_modules/leaflet/dist/leaflet.css', 'src/styles/base.css', 'src/styles/plan.css', 'src/styles/edit.css'] },
   { out: 'presentation.html', tpl: 'src/presentation.template.html', entry: 'src/js/deck.js',
     css: ['src/styles/base.css', 'src/styles/deck.css'] },
 ];
@@ -65,15 +65,31 @@ for (const page of PAGES) {
 
 /* ── self-check: what may reach the network ───────────────────────────────
    Both pages are still ONE file — no external script, stylesheet or iframe,
-   nothing loaded at parse time. plan.html additionally asks for map tiles at
-   runtime, which is a deliberate, reviewed exception: it buys a real basemap,
-   and tilemap.js falls back to the bundled SVG engine when the tiles cannot be
-   reached, so the document still opens and works from a USB stick on a plane.
+   nothing loaded at parse time. plan.html additionally makes two kinds of
+   runtime request, each a deliberate, reviewed exception:
 
-   The exception is allowlisted by host so it stays exactly that wide. Anything
-   else remote — a font, an analytics beacon, a second tile provider — fails the
-   build the way it always did. */
+     basemaps.cartocdn.com     map tiles. Buys a real basemap; tilemap.js falls
+                               back to the bundled SVG engine when they can't
+                               be reached.
+     trip-planner-api.vercel.app  the editing endpoints. Every edit is kept in
+                               localStorage first, so the document still opens,
+                               renders and accepts changes with no network.
+
+   Both are allowlisted by host so the exceptions stay exactly that wide, and
+   both are asserted positively — a page that stops requesting them fails too,
+   which is how a silently-broken tile layer or a moved API host gets noticed.
+   Anything else remote — a font, an analytics beacon, a second provider —
+   fails the build the way it always did.
+
+   presentation.html imports neither module and stays fully offline. */
 const TILE_HOST = 'basemaps.cartocdn.com';
+const API_HOST = 'trip-planner-api.vercel.app';
+
+/** Hosts each page is allowed — and required — to talk to at runtime. */
+const PAGE_HOSTS = {
+  'plan.html': [TILE_HOST, API_HOST],
+  'presentation.html': [],
+};
 
 /* Structural checks — these catch anything the browser would load while
    parsing the file, which is what "one file" means. An https:// inside an
@@ -85,41 +101,49 @@ const OFFENDERS = [
   [/@import\s+(url\()?["']?https?:/i,     'CSS @import over http'],
   [/url\(\s*["']?https?:\/\//i,           'CSS url() over http'],
   [/<img[^>]+\bsrc\s*=\s*["']https?:/i,   'remote <img>'],
-  [/\bfetch\s*\(\s*["']https?:/i,         'runtime fetch()'],
   [/new\s+WebSocket\s*\(/i,               'WebSocket'],
   [/<iframe/i,                            '<iframe>'],
 ];
 
-/* The one relaxation, asserted rather than assumed: plan.html must request
-   tiles from exactly this host, and presentation.html must not request any. */
-const TILE_RULES = {
-  'plan.html': true,
-  'presentation.html': false,
-};
+/* A literal URL passed to fetch() — the one runtime-request shape that gets
+   past the structural checks above, since nothing about it is visible to the
+   parser. Caught here and matched against the page's allowlist. */
+const FETCH_LITERAL = /\bfetch\s*\(\s*["']https?:\/\/([^/"'`\s]+)/gi;
 
 let bad = 0;
 for (const page of PAGES) {
   const p = r('dist', page.out);
   if (!existsSync(p)) continue;
   const html = readFileSync(p, 'utf8');
+  const allowed = PAGE_HOSTS[page.out] ?? [];
 
   for (const [re, label] of OFFENDERS) {
     if (re.test(html)) { console.error(`  ✗ ${page.out}: contains ${label}`); bad++; }
   }
 
-  const wantsTiles = TILE_RULES[page.out];
-  const hasTiles = html.includes(TILE_HOST);
-  if (wantsTiles && !hasTiles) {
-    console.error(`  ✗ ${page.out}: expected the ${TILE_HOST} tile layer, found none`);
-    bad++;
-  }
-  if (wantsTiles === false && hasTiles) {
-    console.error(`  ✗ ${page.out}: must stay fully offline, but references ${TILE_HOST}`);
+  for (const m of html.matchAll(FETCH_LITERAL)) {
+    if (allowed.includes(m[1])) continue;
+    console.error(`  ✗ ${page.out}: runtime fetch() to ${m[1]}, which is not allowlisted`);
     bad++;
   }
 
-  const note = wantsTiles
-    ? `one file; tiles from ${TILE_HOST}, SVG engine when offline`
+  // Every allowed host must actually appear, and no page may reference a host
+  // allowed only for the other one.
+  for (const host of allowed) {
+    if (!html.includes(host)) {
+      console.error(`  ✗ ${page.out}: expected to reference ${host}, found none`);
+      bad++;
+    }
+  }
+  for (const host of [TILE_HOST, API_HOST]) {
+    if (!allowed.includes(host) && html.includes(host)) {
+      console.error(`  ✗ ${page.out}: must stay fully offline, but references ${host}`);
+      bad++;
+    }
+  }
+
+  const note = allowed.length
+    ? `one file; reaches ${allowed.join(' and ')}, and works without either`
     : 'self-contained';
   console.log(`  ✓ ${page.out} is ${note} (${(statSync(p).size / 1024).toFixed(0)} KB on disk)`);
 }
