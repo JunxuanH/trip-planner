@@ -17,10 +17,20 @@ import type { Overlay, Comment } from './schema.js';
 const KEY_OVERLAY = 'italy2026:overlay';
 const KEY_COMMENTS = 'italy2026:comments';
 
+/**
+ * The Vercel/Upstash integration injects `KV_REST_API_URL` and
+ * `KV_REST_API_TOKEN`, not the `UPSTASH_REDIS_REST_*` pair `Redis.fromEnv()`
+ * looks for first — it currently falls back to the KV names, but that fallback
+ * is the SDK's choice, not a contract. Reading them explicitly means a rename
+ * on either side fails here with a sentence instead of somewhere further in.
+ */
 let client: Redis | null = null;
 function redis(): Redis {
-  if (!client) client = Redis.fromEnv();
-  return client;
+  if (client) return client;
+  const url = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) throw new Error('no Redis credentials in the environment');
+  return (client = new Redis({ url, token }));
 }
 
 /* ── overlay ─────────────────────────────────────────────────────────────── */

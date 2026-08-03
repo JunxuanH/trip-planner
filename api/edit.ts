@@ -52,8 +52,10 @@ Rules:
 - If the instruction is ambiguous, make the smaller change and say what you
   assumed.
 
-The summary is one or two sentences for the traveller, describing what you
-changed and why. Write it to be read, not parsed.`;
+Write the summary first, before the edits: say in one or two full sentences what
+you are about to change and why, naming the stops you touch. It is what the
+traveller reads to decide whether to accept the change, so a placeholder or a
+single word is useless to them. Write it to be read, not parsed.`;
 
 /**
  * A list, not a map. Structured outputs want closed schemas with named
@@ -63,6 +65,15 @@ changed and why. Write it to be read, not parsed.`;
 const SCHEMA = {
   type: 'object',
   properties: {
+    // `summary` is generated first because structured outputs emit properties in
+    // schema order, and a model asked for it last writes it as an afterthought —
+    // one live call came back with a nine-field patch summarised as "x". Stating
+    // the intent before making the edits fixes that and reads better besides.
+    summary: {
+      type: 'string',
+      description:
+        'One or two full sentences for the traveller: what you are changing and why.',
+    },
     edits: {
       type: 'array',
       items: {
@@ -75,9 +86,8 @@ const SCHEMA = {
         additionalProperties: false,
       },
     },
-    summary: { type: 'string' },
   },
-  required: ['edits', 'summary'],
+  required: ['summary', 'edits'],
   additionalProperties: false,
 };
 
