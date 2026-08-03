@@ -1,0 +1,11 @@
+# Only api/ deploys here. The functions import italy-2026/data/itinerary.json
+# and nothing else from that directory, so the built documents, the artwork and
+# the map geometry — several megabytes of it — stay out of the upload.
+italy-2026/dist
+italy-2026/src
+italy-2026/scripts
+italy-2026/node_modules
+italy-2026/data/*.xlsx
+.github
+.agents
+.claude

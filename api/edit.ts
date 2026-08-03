@@ -21,7 +21,11 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { cors, requireAuth } from './_lib/auth.js';
 import { dayContext, validatePatch, ITEM_TEXT_FIELDS } from './_lib/schema.js';
 
-const client = new Anthropic();
+/* Constructed per request, not at module load: `new Anthropic()` throws when
+   the key is missing, and at module scope that crashes the whole function on a
+   cold start — a 500 with no body instead of a sentence saying what is wrong. */
+let client: Anthropic | null = null;
+const anthropic = () => (client ??= new Anthropic());
 
 const SYSTEM = `You edit one day of a travel itinerary.
 
@@ -91,8 +95,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!ask) return res.status(400).json({ error: 'say what to change' });
   if (ask.length > 600) return res.status(400).json({ error: 'keep the instruction shorter' });
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(503).json({ error: 'the Claude endpoint is not configured yet' });
+  }
+
   try {
-    const message = await client.messages.create({
+    const message = await anthropic().messages.create({
       model: 'claude-opus-5',
       max_tokens: 4096,
       system: SYSTEM,

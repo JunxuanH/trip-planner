@@ -21,7 +21,7 @@ import TRIP from '../../data/itinerary.json';
 /* The Vercel deployment holding the endpoints. GitHub Pages serves this
    document; it cannot run server code, so sync and Claude live elsewhere.
    Changing the Vercel project name means changing this line. */
-export const API = 'https://trip-planner-api.vercel.app';
+export const API = 'https://trip-planner-api-mu.vercel.app';
 
 const LS = {
   applied: 'italy26-applied',

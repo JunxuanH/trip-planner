@@ -13,7 +13,10 @@
  * reconciling with the budget — and a value edited in a browser overlay would
  * never be seen by it. Structural changes stay a rebuild.
  */
-import TRIP from '../../italy-2026/data/itinerary.json';
+// The attribute is required: Vercel runs these as real ESM on Node rather than
+// bundling them, and Node refuses a JSON import without it. esbuild bundles the
+// browser side, which is why plan.js can import the same file bare.
+import TRIP from '../../italy-2026/data/itinerary.json' with { type: 'json' };
 
 /** Text fields on a timeline item that a traveller may reword or re-time. */
 export const ITEM_TEXT_FIELDS = ['time', 'title', 'detail', 'how'] as const;

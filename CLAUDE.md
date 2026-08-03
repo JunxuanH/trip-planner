@@ -68,7 +68,7 @@ listed in `PAGE_HOSTS` in `build.mjs`:
 
 - `basemaps.cartocdn.com` — map tiles (CARTO Positron). Leaflet itself is bundled,
   so the page is still one file; only the tile images come from outside.
-- `trip-planner-api.vercel.app` — the editing endpoints (see *Editing on the site*).
+- `trip-planner-api-mu.vercel.app` — the editing endpoints (see *Editing on the site*).
 
 `build.mjs` asserts this **positively in both directions**: `plan.html` must
 reference both hosts, `presentation.html` must reference neither, and any `fetch()`

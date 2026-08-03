@@ -71,7 +71,7 @@ for (const page of PAGES) {
      basemaps.cartocdn.com     map tiles. Buys a real basemap; tilemap.js falls
                                back to the bundled SVG engine when they can't
                                be reached.
-     trip-planner-api.vercel.app  the editing endpoints. Every edit is kept in
+     trip-planner-api-mu.vercel.app  the editing endpoints. Every edit is kept in
                                localStorage first, so the document still opens,
                                renders and accepts changes with no network.
 
@@ -83,7 +83,7 @@ for (const page of PAGES) {
 
    presentation.html imports neither module and stays fully offline. */
 const TILE_HOST = 'basemaps.cartocdn.com';
-const API_HOST = 'trip-planner-api.vercel.app';
+const API_HOST = 'trip-planner-api-mu.vercel.app';
 
 /** Hosts each page is allowed — and required — to talk to at runtime. */
 const PAGE_HOSTS = {
