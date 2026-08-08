@@ -1558,6 +1558,7 @@ td .sub { font-size: .78rem; color: var(--ink-3); }
   border: 1px solid var(--rule); background: var(--paper-2); color: var(--ink-2);
   width: 1.9rem; height: 1.9rem; border-radius: var(--radius); cursor: pointer;
   display: grid; place-items: center; font-size: .85rem; flex: 0 0 auto;
+  text-decoration: none; /* .theme-btn is now also worn by the shopping <a> */
 }
 .theme-btn:hover { border-color: var(--ink-3); color: var(--ink); }
 /* The rule above sets display, which beats the UA's [hidden]{display:none} — so
@@ -2026,8 +2027,12 @@ body.editing .ask { display: block; }
       <a href="#s-logistics">Logistics</a>
       <a href="#s-bookings">Bookings</a>
       <a href="#s-budget">Budget</a>
-      <a href="shopping.html" target="_blank" rel="noopener">Shopping ↗</a>
     </div>
+    <!-- Outside .jump on purpose: that block is display:none under 860px
+         (rail.plan.css), and this is the only way off the plan onto the
+         shopping page, so it has to survive on a phone. Styled with the same
+         class as #theme/#login-btn/#tickets-btn, which already do. -->
+    <a class="theme-btn" id="shop-link" href="shopping.html" target="_blank" rel="noopener" aria-label="What to buy" title="What to buy">🛍️</a>
     <button class="theme-btn" id="theme" type="button" aria-label="Toggle theme">☾</button>
   </div>
 </nav>
