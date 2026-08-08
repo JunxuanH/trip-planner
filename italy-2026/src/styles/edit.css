@@ -189,6 +189,15 @@ body.editing .ask { display: block; }
   opacity: 0;
   transition: opacity .15s ease;
 }
+/* The visual pill above is 22px — deliberately small so it doesn't compete
+   with the timeline. But 22px is roughly half of Apple's and Material's own
+   44px minimum, on the one control this whole plan's collaboration runs
+   through. ::after expands the actual hit area without touching how it looks:
+   an invisible 44px square, centred on the same point as the visible pill. */
+.cm-mark::after {
+  content: ""; position: absolute; inset: 50% auto auto 50%;
+  width: 2.75rem; height: 2.75rem; transform: translate(-50%, -50%);
+}
 .cm-mark::before { content: "💬"; font-size: .7rem; margin-right: .1rem; filter: grayscale(1); }
 .has-cm:hover .cm-mark, .cm-mark:focus-visible { opacity: 1; }
 .cm-mark.has-thread {
