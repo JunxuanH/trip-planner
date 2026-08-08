@@ -14,6 +14,7 @@ import { mountTickets } from './tickets.js';
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
 const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const h = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {

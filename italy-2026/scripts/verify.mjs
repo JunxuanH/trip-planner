@@ -173,11 +173,19 @@ workNights.filter((d) => !d.transfer).forEach((day) => {
 
 /* ---------- links are well-formed ---------- */
 
+/** The other documents build.mjs emits into dist/, linkable by bare filename. */
+const SIBLING_PAGES = ['plan.html', 'presentation.html', 'shopping.html'];
+
 const walkLinks = (obj, path = '') => {
   if (Array.isArray(obj)) return obj.forEach((v, i) => walkLinks(v, `${path}[${i}]`));
   if (obj && typeof obj === 'object') {
     for (const [k, v] of Object.entries(obj)) {
       if ((k === 'link' || k === 'url' || k === 'xhsLink') && typeof v === 'string') {
+        // dist/ now holds three pages that link to each other, so a bare
+        // sibling filename is legitimate — and has to stay relative, or the
+        // link breaks when the file is opened from disk rather than Pages.
+        // Anything else still has to be an absolute https URL.
+        if (SIBLING_PAGES.includes(v)) continue;
         try {
           if (!/^https:\/\//.test(v)) fail(`${path}.${k} is not https`);
           new URL(v);

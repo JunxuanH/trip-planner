@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Italy 2026 — What to buy</title>
+<meta name="description" content="Where to shop in Rome: the Tridente and Monti in three dimensions, what each place sells, and how the VAT refund works.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+<style>__CSS__</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Italy 2026 · <a class="back-lk" href="plan.html">back to the plan</a></div>
+    <h1>What to buy, and where</h1>
+    <div class="sub" id="shop-note"></div>
+  </div>
+</header>
+
+<main>
+  <section class="section wrap" id="s-shopping">
+    <div class="section-head">
+      <h2>Rome, on foot</h2>
+      <span class="n"><span id="shop-count"></span></span>
+    </div>
+    <div class="shop-grid">
+      <div class="shop-stage">
+        <canvas id="shop-canvas" aria-label="The Tridente and Monti, with each shop marked"></canvas>
+        <div class="shop-legend" id="shop-legend"></div>
+        <p class="shop-hint" id="shop-hint">Drag to turn · scroll to zoom · click a marker</p>
+      </div>
+      <aside class="shop-side">
+        <div class="shop-card" id="shop-card"></div>
+        <div class="shop-list" id="shop-list"></div>
+      </aside>
+    </div>
+    <div class="shop-vat" id="shop-vat"></div>
+    <div class="shop-else" id="shop-else"></div>
+
+    <div class="colophon">
+      <p><strong>Why this is its own page.</strong> The 3D view carries three.js, which the plan itself has no use for. Keeping it here leaves <a href="plan.html">plan.html</a> as small as it was and still able to travel by email on its own.</p>
+      <p>Streets are drawn from OpenStreetMap geometry embedded in this file (© OpenStreetMap contributors, ODbL); there are no buildings because footprints are deliberately never fetched. Positions are true to the ground. Prices are indicative, in euros, and change.</p>
+    </div>
+  </section>
+</main>
+
+<script type="module">__JS__</script>
+</body>
+</html>
