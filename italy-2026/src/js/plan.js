@@ -104,6 +104,17 @@ function renderRail() {
       title: `${dayLabel(d.date)} — ${d.title}`,
     }, h('b', {}, d.n), h('span', {}, TRIP.cities[d.city].short.slice(0, 5))));
   });
+  initRailFade(box);
+}
+
+/* Only a phone actually hides days behind a swipe — a wide screen shows all
+   14 chips at once. Checked on load and on resize rather than on scroll: the
+   set of chips never changes, so whether it overflows only changes when the
+   viewport does. */
+function initRailFade(box) {
+  const check = () => box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+  addEventListener('resize', check);
+  check();
 }
 
 /* ── days ───────────────────────────────────────────────────────────────── */

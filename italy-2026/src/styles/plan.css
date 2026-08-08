@@ -105,6 +105,16 @@ body { padding-bottom: 4rem; }
 }
 .rail-scroll::-webkit-scrollbar { height: 4px; }
 .rail-scroll::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+/* iOS Safari ignores the ::-webkit-scrollbar rules above entirely, so on the
+   device this plan is actually read on there was no hint at all that 14 days
+   sit behind a swipe — confirmed empirically: days 6-8 only appear after
+   scrolling the rail, with nothing on screen suggesting they exist. Set once
+   by initRailFade() in plan.js when the content actually overflows, so a
+   phone wide enough to show every day gets no pointless fade. */
+.rail-scroll.is-scrollable {
+  mask-image: linear-gradient(to right, transparent, black 18px, black calc(100% - 18px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 18px, black calc(100% - 18px), transparent);
+}
 
 .chip {
   flex: 0 0 auto; scroll-snap-align: center;
@@ -804,12 +814,20 @@ td .sub { font-size: .78rem; color: var(--ink-3); }
 .shop-grid { display: grid; gap: 1.1rem; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; }
 @media (max-width: 860px) { .shop-grid { grid-template-columns: 1fr; } }
 
-/* Sticky, so the district stays in view while you read down the list — the
-   list is the taller column and the stage would otherwise scroll away. */
 .shop-stage {
-  position: sticky; top: 1rem; height: clamp(380px, 52vh, 540px);
+  height: clamp(380px, 52vh, 540px);
   border: 1px solid var(--rule); border-radius: var(--radius);
   background: var(--paper-2); overflow: hidden;
+}
+/* Sticky only where the grid is actually two columns (>860px, matching
+   .shop-grid below). Below that, stage and list stack in the same column, so
+   a sticky map stuck to the top for the full height of a much taller list —
+   confirmed by measuring its boundingClientRect while scrolling: it pinned to
+   top:1rem for roughly 1000px of scroll, more than double its own height,
+   before releasing. On a phone that eats half the screen for most of the
+   read and then jumps, which reads as broken rather than helpful. */
+@media (min-width: 861px) {
+  .shop-stage { position: sticky; top: 1rem; }
 }
 #shop-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 #shop-canvas:active { cursor: grabbing; }
