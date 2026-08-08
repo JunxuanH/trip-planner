@@ -21,6 +21,8 @@ const PAGES = [
     css: ['node_modules/leaflet/dist/leaflet.css', 'src/styles/base.css', 'src/styles/plan.css', 'src/styles/edit.css'] },
   { out: 'presentation.html', tpl: 'src/presentation.template.html', entry: 'src/js/deck.js',
     css: ['src/styles/base.css', 'src/styles/deck.css'] },
+  { out: 'shopping.html',     tpl: 'src/shopping.template.html',     entry: 'src/js/shopping.js',
+    css: ['src/styles/base.css', 'src/styles/plan.css'] },
 ];
 
 /** A literal `</script` inside bundled JS or CSS would close the host tag early. */
@@ -89,6 +91,9 @@ const API_HOST = 'trip-planner-api-mu.vercel.app';
 const PAGE_HOSTS = {
   'plan.html': [TILE_HOST, API_HOST],
   'presentation.html': [],
+  // The shopping page carries three.js and its own copy of the street
+  // geometry, and asks the network for nothing at all.
+  'shopping.html': [],
 };
 
 /* Structural checks — these catch anything the browser would load while
