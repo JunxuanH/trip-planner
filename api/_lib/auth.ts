@@ -36,20 +36,39 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(ab, bb);
 }
 
-export function issueToken(by: string): string {
-  const payload = `${by}.${Date.now() + TOKEN_TTL_MS}`;
+/**
+ * Two scopes, and the difference matters.
+ *
+ *   edit     the passphrase alone. Enough to read comments and change the plan,
+ *            which is annoying to lose but not damaging.
+ *   tickets  passphrase *and* a Google account on the allowlist. Gates the
+ *            booking documents, which carry order numbers and a PIN — enough
+ *            for a stranger to cancel the trip.
+ *
+ * A scope is a space-separated set so this can grow without another format
+ * change. It lives inside the signed payload, so it cannot be edited by the
+ * holder without invalidating the signature.
+ */
+export type Scope = 'edit' | 'tickets';
+
+export function issueToken(by: string, scopes: Scope[] = ['edit']): string {
+  // Scopes are joined with '+' rather than a space: the payload is split on
+  // '.', and keeping every field free of separators avoids a parsing surprise.
+  const payload = `${by}.${scopes.join('+')}.${Date.now() + TOKEN_TTL_MS}`;
   return `${payload}.${sign(payload)}`;
 }
 
-export function verifyToken(token: string | undefined): { by: string } | null {
+export type Session = { by: string; scopes: Scope[] };
+
+export function verifyToken(token: string | undefined): Session | null {
   if (!token) return null;
   const i = token.lastIndexOf('.');
   if (i < 0) return null;
   const payload = token.slice(0, i);
   if (!safeEqual(token.slice(i + 1), sign(payload))) return null;
-  const [by, expiry] = payload.split('.');
-  if (!by || !expiry || Number(expiry) < Date.now()) return null;
-  return { by };
+  const [by, scopes, expiry] = payload.split('.');
+  if (!by || !scopes || !expiry || Number(expiry) < Date.now()) return null;
+  return { by, scopes: scopes.split('+') as Scope[] };
 }
 
 /* In-memory rate limit. Serverless instances are ephemeral and not shared, so
@@ -89,11 +108,25 @@ export function bearer(req: VercelRequest): string | undefined {
   return h?.startsWith('Bearer ') ? h.slice(7) : undefined;
 }
 
-/** Guard for every endpoint that touches trip data. */
-export function requireAuth(req: VercelRequest, res: VercelResponse): { by: string } | null {
+/**
+ * Guard for every endpoint that touches trip data.
+ *
+ * `need` is the scope the endpoint requires. Missing it is a 403, not a 401:
+ * the caller is authenticated, they simply have not cleared the second factor,
+ * and telling them to sign in again would send them round the same loop.
+ */
+export function requireAuth(
+  req: VercelRequest,
+  res: VercelResponse,
+  need: Scope = 'edit',
+): Session | null {
   const session = verifyToken(bearer(req));
   if (!session) {
     res.status(401).json({ error: 'sign in to edit' });
+    return null;
+  }
+  if (!session.scopes.includes(need)) {
+    res.status(403).json({ error: 'verify with Google to see the tickets', need });
     return null;
   }
   return session;

@@ -5,7 +5,8 @@
   "description": "Serverless endpoints for on-site editing. The plan itself is built in italy-2026/ and served from GitHub Pages; only api/ deploys here.",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.75.0",
-    "@upstash/redis": "^1.35.0"
+    "@upstash/redis": "^1.35.0",
+    "@vercel/blob": "^0.27.0"
   },
   "devDependencies": {
     "@vercel/node": "^5.3.0",

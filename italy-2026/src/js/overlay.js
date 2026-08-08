@@ -31,7 +31,17 @@ const LS = {
   token: 'italy26-token',
   by: 'italy26-by',
   seen: 'italy26-seen',
+  scopes: 'italy26-scopes',
+  oauth: 'italy26-oauth-state',
+  clientId: 'italy26-google-client',
 };
+
+/* Google sign-in, without Google's JavaScript.
+   The browser is *navigated* to the consent page and comes back with a code,
+   which /api/auth/google exchanges server-side. Loading Google's SDK would be
+   an external <script src>, and build.mjs fails the build on those — so the
+   redirect dance is not a preference, it is the only shape that fits. */
+const GOOGLE_AUTH = 'https://accounts.google.com/o/oauth2/v2/auth';
 
 const read = (k, fallback) => {
   try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; }
@@ -45,6 +55,8 @@ export const state = {
   queue: read(LS.queue, []),          // comments posted while offline
   token: sessionStorage.getItem(LS.token) || null,
   by: localStorage.getItem(LS.by) || null,
+  /** What the current token is good for: ['edit'] or ['edit','tickets']. */
+  scopes: read(LS.scopes, []),
   /** null until the first request settles — 'up' | 'down' | null */
   link: null,
 };
@@ -232,19 +244,83 @@ export async function resolveComment(anchor, id, resolved) {
 export async function signIn(passphrase, by) {
   const r = await api('/api/session', { method: 'POST', body: { passphrase, by }, auth: false });
   if (!r.ok) return r;
-  state.token = r.data.token;
-  state.by = r.data.by;
-  sessionStorage.setItem(LS.token, state.token);
-  localStorage.setItem(LS.by, state.by);
-  emit('auth');
+  keep(r.data.token, r.data.by, r.data.scopes ?? ['edit']);
+  if (r.data.googleClientId) sessionStorage.setItem(LS.clientId, r.data.googleClientId);
   sync();
   return r;
 }
 
+/** The Google client id, handed over by /api/session after the passphrase. */
+export const googleClientId = () => sessionStorage.getItem(LS.clientId);
+
+function keep(token, by, scopes) {
+  state.token = token;
+  state.scopes = scopes;
+  sessionStorage.setItem(LS.token, token);
+  write(LS.scopes, scopes);
+  if (by) { state.by = by; localStorage.setItem(LS.by, by); }
+  emit('auth');
+}
+
+export const can = (scope) => state.scopes.includes(scope);
+
 export function signOut() {
   state.token = null;
+  state.scopes = [];
   sessionStorage.removeItem(LS.token);
+  write(LS.scopes, []);
   emit('auth');
+}
+
+/* ── the second factor ───────────────────────────────────────────────────── */
+
+/** Where Google sends the browser back to — this page, minus any query. */
+const redirectUri = () => location.origin + location.pathname;
+
+/**
+ * Hand the browser to Google. Returns nothing useful: the page is leaving.
+ *
+ * `state` is a nonce parked in sessionStorage and checked on the way back, so a
+ * code pasted in from elsewhere cannot complete someone else's sign-in.
+ */
+export function startGoogle(clientId) {
+  const nonce = crypto.randomUUID();
+  sessionStorage.setItem(LS.oauth, nonce);
+  const q = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri(),
+    response_type: 'code',
+    scope: 'openid email',
+    state: nonce,
+    prompt: 'select_account',
+    include_granted_scopes: 'true',
+  });
+  location.assign(`${GOOGLE_AUTH}?${q}`);
+}
+
+/**
+ * Called on load. If Google has just sent us back, finish the exchange.
+ *
+ * The query string is scrubbed with replaceState either way — an authorization
+ * code is single-use, and leaving it in the URL means a refresh fails loudly
+ * for no reason and the code sits in history.
+ */
+export async function completeGoogle() {
+  const q = new URLSearchParams(location.search);
+  const code = q.get('code');
+  const returned = q.get('state');
+  if (!code && !q.get('error')) return null;
+
+  const expected = sessionStorage.getItem(LS.oauth);
+  sessionStorage.removeItem(LS.oauth);
+  history.replaceState(null, '', redirectUri());
+
+  if (q.get('error')) return { ok: false, data: { error: 'Google sign-in was cancelled' } };
+  if (!expected || returned !== expected) return { ok: false, data: { error: 'sign-in state did not match — try again' } };
+
+  const r = await api('/api/auth/google', { method: 'POST', body: { code, redirectUri: redirectUri() } });
+  if (r.ok) keep(r.data.token, null, r.data.scopes ?? ['edit', 'tickets']);
+  return r;
 }
 
 /* ── the wire ────────────────────────────────────────────────────────────── */
