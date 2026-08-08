@@ -16,10 +16,15 @@ import { put, list, del } from '@vercel/blob';
 
 const PREFIX = 'italy2026/tickets/';
 
+/** The ids api/_lib/tickets.ts knows how to label. Order matters below. */
+const IDS = ['vatican-voucher', 'borghese-reservation', 'duomo-pass-junxuan', 'duomo-pass-hanji'];
+
 /**
- * Filename fragment → ticket id. Matching on a fragment rather than the whole
- * name means the provider's own download names (Ticket_receipt87NEJS2LB…) can
- * be dropped in unrenamed.
+ * Filename fragment → ticket id, for the providers' own download names, so the
+ * files can be dropped in exactly as they arrive by email.
+ *
+ * The two Duomo receipts differ only in a trailing digit — 59465436 is
+ * Junxuan's, 59465437 is Hanji's — which is the whole reason this table exists.
  */
 const MATCH = [
   ['voucher', 'vatican-voucher'],
@@ -28,7 +33,13 @@ const MATCH = [
   ['59465437', 'duomo-pass-hanji'],
 ];
 
-const idFor = (name) => MATCH.find(([frag]) => name.includes(frag))?.[1];
+/**
+ * A file already named after its id wins outright. Without this, renaming
+ * something to the obvious `borghese-reservation.pdf` would match nothing and
+ * be silently skipped — the opposite of what anyone tidying up would expect.
+ */
+const idFor = (name) =>
+  IDS.find((id) => name.includes(id)) ?? MATCH.find(([frag]) => name.includes(frag))?.[1];
 
 const dir = process.argv[2];
 if (!dir) {
