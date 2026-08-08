@@ -8,6 +8,38 @@ not configured, and editing works exactly as it did.
 Nothing here needs a code change. If you find yourself editing `api/` or
 `italy-2026/src/`, stop — something has gone wrong with the assumptions.
 
+## Status (2026-08-08)
+
+Steps 1–3 are **done and verified live**. Only Step 4 — uploading the actual PDFs
+— is outstanding, because they aren't obtainable by an agent: they're email
+attachments a human has to pull down.
+
+- ✅ **Step 1 — Google OAuth.** Consent screen created (External, Testing),
+  `junxuanhe@gmail.com` and `nicholezhou1214@gmail.com` added as test users. Web
+  application OAuth client created with the redirect URI below. Client secret was
+  shown once at creation and is not recorded here — see Vercel.
+- ✅ **Step 2 — Vercel env vars.** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+  `ALLOWED_EMAILS` (`junxuanhe@gmail.com,nicholezhou1214@gmail.com`) all set on
+  `trip-planner-api` production via `vercel env add`.
+- ✅ **Step 3 — Vercel Blob.** Store `trip-planner-tickets` (public access, region
+  `iad1`) created via `vercel blob create-store` and connected to the project;
+  `BLOB_READ_WRITE_TOKEN` is injected automatically.
+- Along the way: the API project turned out to have **no GitHub → Vercel
+  auto-deploy** — every prior deployment was a manual `vercel deploy` from a
+  previous agent session, and production was still serving code from Aug 3 (before
+  even the "Log in" button). Re-deployed from a clean `main` checkout twice — once
+  to ship the current code, once after the env vars landed — and confirmed via
+  `POST /api/session` that `googleClientId` now comes back populated instead of
+  `null`. If auto-deploy still isn't wired up, future `api/` changes need an
+  explicit `vercel deploy --prod` after merge, same as this one did.
+- ⬜ **Step 4 — upload the PDFs.** Still needs a human/agent with the actual four
+  files (from Junxuan's email) staged in a local `tickets-in/`, then
+  `BLOB_READ_WRITE_TOKEN=… node scripts/upload-tickets.mjs ./tickets-in`. Whoever
+  does this should also run through *Verification* below afterward.
+- **Known effect already in force:** this redeploy signed everyone out — tokens
+  from before today no longer verify (the payload gained a scope field). Tell
+  Hanji/Nicole to expect a fresh "Log in," not a bug.
+
 ## What was built
 
 A **Log in** button on `plan.html` replacing the old pencil. Two factors:
