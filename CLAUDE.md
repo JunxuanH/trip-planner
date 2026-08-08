@@ -180,7 +180,42 @@ chat periodically, or the two sources drift.
 Secrets are set in the Vercel dashboard and **never written to the repo** (it is
 public, and GitHub auto-revokes Anthropic keys pushed to public repos):
 `ANTHROPIC_API_KEY`, `EDIT_PASSPHRASE`, `TOKEN_SECRET` (optional; falls back to the
-passphrase), `ALLOWED_ORIGIN` (defaults to the Pages origin), plus the Upstash vars.
+passphrase), `ALLOWED_ORIGIN` (defaults to the Pages origin), `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`, `ALLOWED_EMAILS` and `BLOB_READ_WRITE_TOKEN` (see below),
+plus the Upstash vars.
+
+### Auth scopes and the ticket vault
+
+Signing in (`/api/session`, passphrase only) grants the `edit` scope — comments and
+inline edits. A second factor upgrades that token to also carry `tickets`:
+`/api/auth/google.ts` requires an existing `edit` token, exchanges an OAuth code for
+a Google id token server-side (no Google SDK in the bundle — that would fail the
+single-file build gate), and re-issues the token with `tickets` added only if the
+verified email is on the `ALLOWED_EMAILS` allowlist. `requireAuth(req, res, need)` in
+`api/_lib/auth.ts` is the gate every endpoint calls; missing the required scope is a
+**403** (authenticated, just not upgraded), missing a token entirely is **401**.
+
+The `tickets` scope guards `api/tickets.ts`, which streams booking PDFs (order
+numbers, a GetYourGuide PIN, a Vatican voucher code — enough to cancel the trip) out
+of Vercel Blob. The PDFs are **never in git** — `.gitignore` blocks `tickets-in/`
+and `*.pdf` — and never inlined into `dist/`; they're the one part of the plan that
+isn't self-contained, because they can't be. `api/tickets.ts` proxies the bytes
+rather than redirecting to the blob URL, so `plan.html` still only ever talks to its
+two allowlisted hosts. Labels/day-ordering live in `LABELS` in `api/_lib/tickets.ts`,
+keyed by an id embedded in the blob pathname; `scripts/upload-tickets.mjs` maps a
+provider's own downloaded filename to that id (see the table in
+`TICKET-VAULT-SETUP.md`) and is idempotent — re-running replaces a ticket by id
+rather than duplicating it.
+
+Client side, `src/js/tickets.js` caches each opened PDF in IndexedDB so the drawer
+keeps working offline after a first open on wifi — the ticket vault is otherwise the
+only network-dependent part of the plan.
+
+`TICKET-VAULT-SETUP.md` is the one-time infra runbook (Google OAuth consent screen,
+the four Vercel env vars, connecting Blob storage, uploading the PDFs) — it's
+console/CLI work, not a code change, and says as much: if you find yourself editing
+`api/` or `italy-2026/src/` to make the vault "work," stop, the feature is already
+built.
 
 ## Conventions
 
@@ -197,3 +232,6 @@ passphrase), `ALLOWED_ORIGIN` (defaults to the Pages origin), plus the Upstash v
 - Hotel-card artwork is original illustration, not photography, and is labelled
   *Illustration* wherever it appears; each card links to the real gallery. Keep that
   distinction if you touch those cards.
+- Booking PDFs never go in git. `.gitignore` blocks `tickets-in/` and `*.pdf`; they
+  go to Vercel Blob via `scripts/upload-tickets.mjs` instead (see *Auth scopes and
+  the ticket vault*).
