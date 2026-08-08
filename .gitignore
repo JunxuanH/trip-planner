@@ -8,3 +8,9 @@ next-env.d.ts
 Thumbs.db
 .vercel
 .env*
+
+# Booking PDFs staged for scripts/upload-tickets.mjs. This repo is public and
+# these carry order numbers, a GetYourGuide PIN and a Vatican voucher code —
+# they go to Vercel Blob and nowhere near git.
+tickets-in/
+*.pdf

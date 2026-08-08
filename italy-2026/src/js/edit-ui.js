@@ -17,6 +17,7 @@ import { h, $, $$, pathLabel } from './dom.js';
 import {
   state, effective, baseValue, setDraft, setDrafts, discardDraft, draftPaths,
   applyDraft, revertApplied, signIn, onChange, proposeEdit, sync,
+  can, startGoogle, completeGoogle, googleClientId, signOut,
 } from './overlay.js';
 
 let editing = false;
@@ -168,6 +169,13 @@ function askBox(dayN) {
 
 /* ── sign-in ─────────────────────────────────────────────────────────────── */
 
+/**
+ * Step one of two: the shared passphrase.
+ *
+ * This alone unlocks the plan — comments and editing. The tickets need step
+ * two, because the passphrase is shared and short and those documents can
+ * cancel the trip.
+ */
 function signInDialog() {
   const pass = h('input', { type: 'password', placeholder: 'Passphrase', autocomplete: 'current-password' });
   const who = h('input', { type: 'text', placeholder: 'Initials', maxlength: '2', value: state.by || '' });
@@ -178,19 +186,62 @@ function signInDialog() {
       onSubmit: async (e) => {
         e.preventDefault();
         const r = await signIn(pass.value, who.value);
-        if (r.ok) { dlg.close(); setEditing(true); }
-        else err.textContent = r.data.error || 'Could not sign in.';
+        if (!r.ok) { err.textContent = r.data.error || 'Could not sign in.'; return; }
+        dlg.close();
+        googleStep();
       },
     },
-      h('h4', {}, 'Edit this plan'),
-      h('p', {}, 'Changes are shared between the two of you. Nothing applies until you review it.'),
+      h('h4', {}, 'Log in'),
+      h('p', {}, 'Unlocks comments and editing. Tickets need a Google check as well.'),
       who, pass, err,
       h('div', { class: 'dlg-acts' },
         h('button', { type: 'button', class: 'mini-btn ghost', onClick: () => dlg.close() }, 'Cancel'),
-        h('button', { type: 'submit', class: 'mini-btn solid' }, 'Start editing')),
+        h('button', { type: 'submit', class: 'mini-btn solid' }, 'Continue')),
     ),
   );
   document.body.append(dlg);
+  dlg.addEventListener('close', () => dlg.remove());
+  dlg.showModal();
+}
+
+/**
+ * Step two: Google, restricted to the two accounts on the trip.
+ *
+ * Optional by design — skipping it leaves you able to edit but not to see the
+ * tickets, which is the right trade for someone who just wants to fix a time.
+ * Choosing it navigates away, so nothing after this line runs.
+ */
+function googleStep() {
+  const clientId = googleClientId();
+  const dlg = h('dialog', { class: 'dlg' },
+    h('h4', {}, 'See the tickets too?'),
+    h('p', {}, clientId
+      ? 'The booking PDFs are behind a Google check, so a stray passphrase cannot reach them. Only the two accounts on this trip are accepted.'
+      : 'Google sign-in is not configured on the server yet, so tickets are unavailable. Editing works.'),
+    h('div', { class: 'dlg-acts' },
+      h('button', { type: 'button', class: 'mini-btn ghost', onClick: () => { dlg.close(); setEditing(true); } },
+        clientId ? 'Not now' : 'OK'),
+      clientId
+        ? h('button', { type: 'button', class: 'mini-btn solid', onClick: () => startGoogle(clientId) }, 'Continue with Google')
+        : null),
+  );
+  document.body.append(dlg);
+  dlg.addEventListener('close', () => dlg.remove());
+  dlg.showModal();
+}
+
+/** Told the outcome after Google has bounced the browser back to us. */
+function reportGoogle(r) {
+  const dlg = h('dialog', { class: 'dlg' },
+    h('h4', {}, r.ok ? 'Tickets unlocked' : 'Not unlocked'),
+    h('p', {}, r.ok
+      ? 'Your booking PDFs are in the ticket drawer. Open each one once while you have wifi and it stays available offline.'
+      : (r.data?.error || 'Google sign-in failed.')),
+    h('div', { class: 'dlg-acts' },
+      h('button', { type: 'button', class: 'mini-btn solid', onClick: () => dlg.close() }, 'OK')),
+  );
+  document.body.append(dlg);
+  dlg.addEventListener('close', () => dlg.remove());
   dlg.showModal();
 }
 
@@ -199,15 +250,35 @@ function signInDialog() {
 export function mountEditing() {
   // The toggle lives beside the theme button, in the rail that is already
   // sticky on every screen size.
+  // Two controls, not one. The old pencil did double duty as a sign-in, which
+  // hid the fact that reading comments needs a token at all — a signed-out
+  // reader saw "No comments yet" on threads that were merely unfetched.
+  const login = h('button', {
+    class: 'theme-btn', id: 'login-btn', type: 'button',
+    'aria-label': 'Log in', title: 'Log in',
+    onClick: () => (state.token ? signOut() : signInDialog()),
+  }, '⇥');
   const toggle = h('button', {
     class: 'theme-btn', id: 'edit-toggle', type: 'button',
-    'aria-pressed': 'false', 'aria-label': 'Edit the plan', title: 'Edit the plan',
-    onClick: () => {
-      if (!state.token) return signInDialog();
-      setEditing(!editing);
-    },
+    'aria-pressed': 'false', 'aria-label': 'Edit the plan', title: 'Edit the plan', hidden: 'hidden',
+    onClick: () => setEditing(!editing),
   }, '✎');
+  $('#theme').before(login);
   $('#theme').before(toggle);
+
+  const reflect = () => {
+    const on = Boolean(state.token);
+    toggle.hidden = !on;
+    login.textContent = on ? '⇤' : '⇥';
+    login.title = login.ariaLabel = on ? (can('tickets') ? 'Signed in — log out' : 'Signed in (no tickets) — log out') : 'Log in';
+    if (!on && editing) setEditing(false);
+  };
+  onChange((what) => { if (what === 'auth' || what === 'all') reflect(); });
+  reflect();
+
+  // If Google has just bounced us back, finish the exchange before anything
+  // else touches the URL.
+  completeGoogle().then((r) => { if (r) { reflect(); reportGoogle(r); if (r.ok) sync(); } });
 
   const link = h('div', { class: 'link-state', id: 'link-state' });
   document.body.append(h('div', { class: 'tray', id: 'tray' }), link);

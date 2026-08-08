@@ -9,6 +9,7 @@ import { IMAGES } from './images.js';
 import { startSync } from './overlay.js';
 import { mountEditing } from './edit-ui.js';
 import { mountComments, anchorTo } from './comments.js';
+import { mountTickets } from './tickets.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -498,6 +499,7 @@ initReveal();
 // rather than owning any of it, so the document still renders in full if the
 // network — or the whole Vercel side — is gone.
 mountComments();
+mountTickets();
 mountEditing();
 startSync();
 

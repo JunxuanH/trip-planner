@@ -16,6 +16,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'that passphrase is not right' });
   }
 
+  // The passphrase alone buys 'edit'. Tickets need a Google account on the
+  // allowlist as well — see api/auth/google.ts.
+  //
+  // The Google client id rides along here rather than from its own public
+  // endpoint. It is not a secret — it ends up in a URL the browser visits — but
+  // handing it out only after the passphrase keeps the unauthenticated surface
+  // of this API at exactly one route.
   const initial = (by ?? '?').trim().slice(0, 2).toUpperCase() || '?';
-  return res.status(200).json({ token: issueToken(initial), by: initial });
+  return res.status(200).json({
+    token: issueToken(initial, ['edit']),
+    by: initial,
+    scopes: ['edit'],
+    googleClientId: process.env.GOOGLE_CLIENT_ID ?? null,
+  });
 }
