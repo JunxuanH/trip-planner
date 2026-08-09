@@ -472,6 +472,32 @@ body { padding-bottom: 4rem; }
 }
 .mini.opt { background: var(--paper-3); color: var(--ink-3); }
 
+/* ── subitems: a lightweight aside nested under a stop ─────────────────────
+   No dot marker keyed off --k here, unlike .tl-main::before — a subitem has
+   no kind/coord of its own to color one by, and giving it one would visually
+   imply a map pin that doesn't exist. The dashed left border alone reads as
+   "attached to, not a peer of" the parent row, borrowed from .bullets'
+   indentation without its prose-list glyph vocabulary (–/◦), which is for
+   text lists, not timeline rows. */
+.tl-subs { list-style: none; margin: .5rem 0 0; padding: 0; }
+.tl-sub {
+  display: grid; grid-template-columns: 1.1rem 3.3rem 1fr; gap: 0 .6rem;
+  align-items: baseline; position: relative;
+  padding: .18rem 0 .18rem .7rem; margin-left: .1rem;
+  border-left: 1px dashed var(--rule);
+}
+.tl-sub-toggle {
+  border: 0; background: transparent; cursor: pointer; color: var(--ink-3);
+  font-size: .65rem; padding: 0; line-height: 1.6; transition: transform .12s;
+}
+.tl-sub-toggle::before { content: "⌄"; }
+.tl-sub.is-collapsed .tl-sub-toggle { transform: rotate(-90deg); }
+.tl-sub-time { font-family: var(--mono); font-size: .68rem; color: var(--ink-3); text-align: right; }
+.tl-sub-title { font: 500 .82rem/1.4 var(--sans); color: var(--ink-2); }
+.tl-sub-detail { font-size: .78rem; color: var(--ink-3); margin-top: .05rem; white-space: pre-line; }
+.tl-sub.is-collapsed .tl-sub-detail { display: none; }
+.tl-sub-del { display: none; } /* shown only in edit.css, under body.editing */
+
 /* ── map ────────────────────────────────────────────────────────────────── */
 
 .map-wrap { position: sticky; top: 4.6rem; }

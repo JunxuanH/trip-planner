@@ -177,6 +177,23 @@ than owning the render — so the document still works in full with Vercel down.
 typed on the site is not. Fold accepted edits back into `itinerary.json` through
 chat periodically, or the two sources drift.
 
+**A stop's subitems live the same open-path way, with no fixed array slot.**
+A subitem is a lightweight, timestamped aside nested under a stop — no
+coord/kind/how/link of its own, since it shares its parent's map pin and
+never gets one. Created live via a "+ Add subitem" button in edit mode, not a
+rebuild: `day.N.items.I.subitems.<id>.{time,title,detail,deleted}` overlay
+paths, `<id>` a client-minted string rather than an array index, discovered by
+scanning path keys (`subitemsFor()` in `overlay.js`) rather than bounded by a
+count the way item indices are. `deleted` is a tombstone flag, same mechanism
+as an item's `done`/`skipped` — nothing is ever really removed from Redis.
+The per-item cap (`MAX_SUBITEMS_PER_ITEM`, `api/_lib/schema.ts`) is enforced
+in `api/overlay.ts` rather than inside `validatePatch` itself, because that
+function is pure and has no view of the store. Folding one back into
+`itinerary.json` means adding it to that item's optional `subitems` array
+(`{id, time, title, detail?}`) — preserve the `s_...` id it was created with
+if you can, though every read site tolerates a hand-written entry that
+forgot to (falling back to a position-derived id).
+
 Secrets are set in the Vercel dashboard and **never written to the repo** (it is
 public, and GitHub auto-revokes Anthropic keys pushed to public repos):
 `ANTHROPIC_API_KEY`, `EDIT_PASSPHRASE`, `TOKEN_SECRET` (optional; falls back to the
