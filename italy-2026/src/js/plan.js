@@ -235,19 +235,25 @@ function renderDays() {
       // Always in the DOM, gated to edit mode by CSS — same pattern as
       // tl-sub-del and the ask-box. Confirmed, unlike a subitem's delete:
       // this hides time/title/detail/subitems together, a bigger thing to
-      // undo by accident than one aside.
+      // undo by accident than one aside. Reads the title span's live text
+      // rather than closing over `it.title` — a title edited on the site
+      // before the delete would otherwise show the stale base value here.
       const delBtn = h('button', {
-        type: 'button', class: 'tl-del', title: 'Remove stop', 'aria-label': `Remove ${it.title}`,
+        type: 'button', class: 'tl-del', title: 'Remove stop', 'aria-label': 'Remove stop',
         onClick: (e) => {
           e.stopPropagation();
-          if (confirm(`Remove "${it.title}" from the timeline?`)) deleteItem(d.n, i);
+          const live = e.currentTarget.closest('.tl')?.querySelector('.tl-title .t')?.textContent || it.title;
+          if (confirm(`Remove "${live}" from the timeline?`)) deleteItem(d.n, i);
         },
       }, '×');
 
       // Shown instead of `body` while the item is skipped and edit mode is on;
       // hidden outright (with the rest of the row) otherwise — see
       // .tl.is-skipped in edit.css. Undo is a plain draft write, so it's
-      // instant, same as fixing any other field.
+      // instant, same as fixing any other field. The <b> starts on the base
+      // title as a sane default before edit-ui.js's syncItemVisibility() has
+      // run even once; that function keeps it current off the live title
+      // for as long as the row stays skipped.
       const ghost = h('div', { class: 'tl-ghost' },
         h('span', {}, 'Removed — ', h('b', {}, it.title)),
         h('button', {

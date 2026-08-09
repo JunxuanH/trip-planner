@@ -154,7 +154,12 @@ body.editing .tl-sub-del {
   border: 0; background: transparent; color: var(--ink-3); cursor: pointer;
   opacity: 0; transition: opacity .15s;
 }
-.tl-sub:hover .tl-sub-del, .tl-sub-del:focus-visible { opacity: 1; }
+/* body.editing prefixed on both sides: body.editing .tl-sub-del above is
+   (0,2,1) — .tl-sub-del:focus-visible alone is only (0,2,0) and silently
+   loses, so Tab-focusing the button never showed it. Confirmed with a real
+   keyboard-focus test, not just :hover, which happened to have enough
+   classes of its own to win. */
+body.editing .tl-sub:hover .tl-sub-del, body.editing .tl-sub-del:focus-visible { opacity: 1; }
 @media (pointer: coarse) { body.editing .tl-sub-del { opacity: .45; } }
 
 body.editing .tl-sub-title:empty::before { content: "What happened"; color: var(--ink-3); opacity: .55; }
@@ -184,7 +189,10 @@ body.editing .tl-del {
   border: 0; background: transparent; color: var(--ink-3); cursor: pointer;
   opacity: 0; transition: opacity .15s;
 }
-.tl:hover .tl-del, .tl-del:focus-visible { opacity: 1; }
+/* body.editing prefixed on both sides here too, for the same reason as
+   .tl-sub-del just above — otherwise :focus-visible alone never outweighs
+   the body.editing .tl-del rule that sets opacity:0. */
+body.editing .tl:hover .tl-del, body.editing .tl-del:focus-visible { opacity: 1; }
 @media (pointer: coarse) { body.editing .tl-del { opacity: .45; } }
 
 /* ── link state ──────────────────────────────────────────────────────────── */
