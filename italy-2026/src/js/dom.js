@@ -2,6 +2,15 @@
    copy rather than adding a third — the pages keep theirs because they are
    independent entry points; these are not. */
 
+// A deliberate, narrow exception to this file having no dependents that
+// import back into it (overlay.js, edit-ui.js and comments.js all import
+// *from* here, never the reverse — that must stay true, since comments.js
+// owns anchorTo() and already imports this module). renderSubRow() below
+// needs exactly one write action — deleting a subitem — not overlay.js's
+// whole read/paint surface. Safe: overlay.js's only import is itinerary.json,
+// so this direction alone doesn't create a cycle.
+import { deleteSubitem } from './overlay.js';
+
 export const h = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -29,6 +38,8 @@ export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 export function pathLabel(path) {
   let m = /^day\.(\d+)\.note$/.exec(path);
   if (m) return `Day ${m[1]} · note`;
+  m = /^day\.(\d+)\.items\.(\d+)\.subitems\.([a-z0-9_]+)\.([a-z]+)$/.exec(path);
+  if (m) return `Day ${m[1]} · stop ${+m[2] + 1} · subitem · ${m[4]}`;
   m = /^day\.(\d+)\.items\.(\d+)\.([a-z]+)$/.exec(path);
   if (m) return `Day ${m[1]} · stop ${+m[2] + 1} · ${m[3]}`;
   return path;
@@ -101,4 +112,39 @@ export function richNodes(text) {
   if (intro) nodes.push(document.createTextNode(intro + '\n'));
   nodes.push(parseBullets(lines.slice(first)));
   return nodes;
+}
+
+/* ── subitems: a lightweight, timestamped aside nested under a stop ───────
+ *
+ * Shared between plan.js (paints the base/folded-back set at first load) and
+ * edit-ui.js (reconciles in whatever's overlay-only, born live). One factory
+ * so the two never drift into slightly different row shapes.
+ *
+ * Deliberately doesn't wire the comment anchor itself — anchorTo() lives in
+ * comments.js, which imports this module, so this file cannot import it back
+ * without cycling. Each caller wires it on the row this returns, exactly like
+ * plan.js already does for `.tl` rows, hotel cards and booking rows. */
+
+/** One `.tl-sub` row. `s` is `{id, time, title, detail}`. */
+export function renderSubRow(dayN, itemIdx, s) {
+  const p = `day.${dayN}.items.${itemIdx}.subitems.${s.id}`;
+  return h('li', { class: 'tl-sub', 'data-sub-id': s.id },
+    h('button', {
+      type: 'button', class: 'tl-sub-toggle', 'aria-expanded': 'true', 'aria-label': 'Collapse',
+      onClick: (e) => {
+        e.stopPropagation();
+        const li = e.currentTarget.closest('.tl-sub');
+        const collapsed = li.classList.toggle('is-collapsed');
+        e.currentTarget.setAttribute('aria-expanded', String(!collapsed));
+      },
+    }),
+    h('div', { class: 'tl-sub-time tnum', 'data-path': `${p}.time` }, s.time || ''),
+    h('div', { class: 'tl-sub-main' },
+      h('span', { class: 'tl-sub-title', 'data-path': `${p}.title` }, s.title || ''),
+      h('div', { class: 'tl-sub-detail', 'data-path': `${p}.detail` }, ...richNodes(s.detail || ''))),
+    h('button', {
+      type: 'button', class: 'tl-sub-del', title: 'Remove', 'aria-label': 'Remove subitem',
+      onClick: (e) => { e.stopPropagation(); deleteSubitem(dayN, itemIdx, s.id); },
+    }, '×'),
+  );
 }

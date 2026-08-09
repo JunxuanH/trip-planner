@@ -73,6 +73,15 @@ export function emit(what = 'all') { subs.forEach((fn) => fn(what)); }
 export function baseValue(path) {
   let m = /^day\.(\d+)\.note$/.exec(path);
   if (m) return TRIP.days[+m[1] - 1]?.note ?? '';
+  m = /^day\.(\d+)\.items\.(\d+)\.subitems\.([a-z0-9_]+)\.([a-z]+)$/.exec(path);
+  if (m) {
+    const it = TRIP.days[+m[1] - 1]?.items[+m[2]];
+    // A hand-folded-back entry without its own id is still addressable, keyed
+    // by array position — matches subitemIdsFor()'s fallback server-side.
+    const s = it?.subitems?.find((x, i) => (x.id ?? `b_${i}`) === m[3]);
+    if (!s) return m[4] === 'deleted' ? false : '';
+    return s[m[4]] ?? (m[4] === 'deleted' ? false : '');
+  }
   m = /^day\.(\d+)\.items\.(\d+)\.([a-z]+)$/.exec(path);
   if (!m) return '';
   const it = TRIP.days[+m[1] - 1]?.items[+m[2]];
@@ -187,6 +196,74 @@ export async function revertApplied(paths) {
   emit('applied');
   const r = await api('/api/overlay', { method: 'PUT', body: { clear: paths } });
   if (r.ok) { state.applied = r.data.overlay; write(LS.applied, state.applied); emit('applied'); }
+}
+
+/* ── subitems ────────────────────────────────────────────────────────────
+ * A lightweight, timestamped aside nested under a stop — no coord/kind, it
+ * shares its parent's pin and never gets its own. Created live via a
+ * client-minted id, addressed the same open-path way as everything else in
+ * this overlay (day.N.items.I.subitems.<id>.field); the id has no fixed
+ * array slot to live in, so it's discovered by scanning path keys rather
+ * than an index bound. */
+
+const minutesOf = (t) => {
+  const m = /^(\d{1,2}):(\d{2})(am|pm)$/.exec(String(t ?? '').trim());
+  if (!m) return Infinity; // unset/unparseable sorts last, not first
+  return ((+m[1] % 12) + (m[3] === 'pm' ? 12 : 0)) * 60 + +m[2];
+};
+
+/** Which subitems exist under one item — base (folded into itinerary.json)
+ * union overlay-only (born live, not yet folded back). Excludes anything
+ * tombstoned `deleted`. Sorted by time, id as the tiebreak so a never-timed
+ * new row is stable rather than jumping around as fields land. */
+export function subitemsFor(dayN, itemIdx) {
+  const base = TRIP.days[dayN - 1]?.items[itemIdx]?.subitems ?? [];
+  const ids = new Set(base.map((s, i) => s.id ?? `b_${i}`));
+  const prefix = `day.${dayN}.items.${itemIdx}.subitems.`;
+  for (const src of [state.applied, state.draft]) {
+    for (const path of Object.keys(src)) {
+      if (path.startsWith(prefix)) ids.add(path.slice(prefix.length).split('.')[0]);
+    }
+  }
+  return [...ids]
+    .map((id) => ({
+      id,
+      time: effective(`${prefix}${id}.time`).value ?? '',
+      title: effective(`${prefix}${id}.title`).value ?? '',
+      detail: effective(`${prefix}${id}.detail`).value ?? '',
+      deleted: Boolean(effective(`${prefix}${id}.deleted`).value),
+    }))
+    .filter((s) => !s.deleted)
+    .sort((a, b) => minutesOf(a.time) - minutesOf(b.time) || a.id.localeCompare(b.id));
+}
+
+/**
+ * Mint a new subitem id, client-side — same "no round trip needed to name
+ * it" shape as postComment()'s local id, below. Writes directly into
+ * state.draft rather than through setDraft(): setDraft elides a write that
+ * equals the base value, and base for a brand-new id is '' — going through
+ * it would silently create nothing for subitemsFor() to ever discover.
+ */
+export function createSubitem(dayN, itemIdx) {
+  const id = `s_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  const path = `day.${dayN}.items.${itemIdx}.subitems.${id}.title`;
+  state.draft[path] = { value: '', at: Date.now() };
+  write(LS.draft, state.draft);
+  emit('draft');
+  return id;
+}
+
+/** Remove one. A subitem that was never applied has nothing to tombstone —
+ * discard its draft fields outright. One that's real (in state.applied or
+ * baked into itinerary.json) is marked deleted, same mechanism as
+ * ITEM_FLAG_FIELDS' done/skipped. */
+export function deleteSubitem(dayN, itemIdx, id) {
+  const prefix = `day.${dayN}.items.${itemIdx}.subitems.${id}.`;
+  const everApplied =
+    Object.keys(state.applied).some((p) => p.startsWith(prefix)) ||
+    (TRIP.days[dayN - 1]?.items[itemIdx]?.subitems ?? []).some((s, i) => (s.id ?? `b_${i}`) === id);
+  if (everApplied) setDraft(`${prefix}deleted`, true);
+  else discardDraft(Object.keys(state.draft).filter((p) => p.startsWith(prefix)));
 }
 
 /* ── comments ────────────────────────────────────────────────────────────── */

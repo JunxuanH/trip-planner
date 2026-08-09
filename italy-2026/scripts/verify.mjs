@@ -21,6 +21,15 @@ const toUTC = (iso) => {
 };
 const nightsBetween = (a, b) => (toUTC(b) - toUTC(a)) / DAY_MS;
 
+/** "4:00pm" → minutes since midnight, or null if unparseable. Shared by the
+ * item ordering check, the coast-day travel-time check, and the subitem
+ * checks below — previously duplicated inline in two of those three. */
+const minutesOf = (t) => {
+  const m = /^(\d{1,2}):(\d{2})(am|pm)$/.exec(String(t ?? '').trim());
+  if (!m) return null;
+  return ((Number(m[1]) % 12) + (m[3] === 'pm' ? 12 : 0)) * 60 + Number(m[2]);
+};
+
 /* ---------- days ---------- */
 
 if (trip.days.length !== 14) fail(`expected 14 days, found ${trip.days.length}`);
@@ -49,15 +58,39 @@ trip.days.forEach((day, i) => {
       fail(`day ${day.n} item ${j + 1} ("${item.title}") coord ${c} falls outside Italy`);
     }
     if (!item.time || !item.title) fail(`day ${day.n} item ${j + 1} is missing time or title`);
+
+    // Optional: a lightweight, timestamped aside nested under this stop —
+    // see CLAUDE.md's "Editing on the site" for how these fold back from the
+    // live overlay. No coord/kind of its own to check; it shares the parent's.
+    const subs = item.subitems ?? [];
+    const subIds = new Set();
+    subs.forEach((s, k) => {
+      if (!s.id || !/^[a-z0-9_]{1,40}$/.test(s.id)) fail(`day ${day.n} item ${j + 1} subitem ${k + 1} has a bad id`);
+      if (subIds.has(s.id)) fail(`day ${day.n} item ${j + 1} has a duplicate subitem id "${s.id}"`);
+      subIds.add(s.id);
+      if (!s.time || !s.title) fail(`day ${day.n} item ${j + 1} subitem ${k + 1} is missing time or title`);
+    });
+    if (subs.length) {
+      // Items only carry a start time, not an end — a 3-5pm span lives in
+      // free-text detail, not a field — so the honest bound is "between this
+      // stop's start and the next stop's start", not the literal end of a span.
+      const lo = minutesOf(item.time);
+      const hi = j + 1 < day.items.length ? minutesOf(day.items[j + 1].time) : 24 * 60;
+      subs.forEach((s) => {
+        const t = minutesOf(s.time);
+        if (t === null) fail(`day ${day.n} item ${j + 1} subitem "${s.title}": unparseable time "${s.time}"`);
+        else if (lo !== null && (t < lo || (hi !== null && t >= hi))) {
+          fail(`day ${day.n} item ${j + 1} subitem "${s.title}" (${s.time}) falls outside its parent's span`);
+        }
+      });
+    }
   });
 
   // Times must run forward within a day (all entries are same-day; none cross midnight).
   const mins = day.items.map((it) => {
-    const m = /^(\d{1,2}):(\d{2})(am|pm)$/.exec(it.time.trim());
-    if (!m) { fail(`day ${day.n}: unparseable time "${it.time}"`); return null; }
-    let h = Number(m[1]) % 12;
-    if (m[3] === 'pm') h += 12;
-    return h * 60 + Number(m[2]);
+    const t = minutesOf(it.time);
+    if (t === null) fail(`day ${day.n}: unparseable time "${it.time}"`);
+    return t;
   });
   for (let k = 1; k < mins.length; k++) {
     if (mins[k] !== null && mins[k - 1] !== null && mins[k] < mins[k - 1]) {
@@ -159,11 +192,6 @@ if (new Set(workNights.map((d) => d.hotel)).size !== 1) {
    the base is not one of those: Aug 31 arrives from Florence on a booked train
    and simply cannot land earlier. Without this the rule would quietly forbid
    any arrival after five, which is not what it is for. */
-const minutesOf = (t) => {
-  const m = /^(\d{1,2}):(\d{2})(am|pm)$/.exec(t.trim());
-  if (!m) return null;
-  return ((Number(m[1]) % 12) + (m[3] === 'pm' ? 12 : 0)) * 60 + Number(m[2]);
-};
 workNights.filter((d) => !d.transfer).forEach((day) => {
   const lastLeg = day.items.filter((it) => it.kind === 'transport').at(-1);
   if (lastLeg && minutesOf(lastLeg.time) > 17 * 60) {

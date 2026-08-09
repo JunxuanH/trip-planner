@@ -135,6 +135,31 @@ body.editing .ask { display: block; }
 .ask-count { margin: 0; color: var(--ink-3); font-size: .76rem; }
 .ask-rejected { margin: .3rem 0 0; color: var(--terracotta-d); font-size: .76rem; }
 
+/* ── subitems: add/delete chrome, edit-mode only ────────────────────────── */
+
+.tl-sub-add {
+  display: none;
+  margin: .4rem 0 0 .1rem;
+  font: 500 .74rem/1 var(--sans);
+  color: var(--ink-3); background: transparent; border: 1px dashed var(--rule);
+  border-radius: var(--radius); padding: .3rem .55rem; cursor: pointer;
+}
+body.editing .tl-sub-add { display: inline-flex; align-items: center; }
+.tl-sub-add:hover { border-color: var(--accent); color: var(--accent); }
+
+body.editing .tl-sub-del {
+  display: inline-flex; align-items: center; justify-content: center;
+  position: absolute; right: -.2rem; top: .1rem;
+  width: 1.2rem; height: 1.2rem; border-radius: 999px;
+  border: 0; background: transparent; color: var(--ink-3); cursor: pointer;
+  opacity: 0; transition: opacity .15s;
+}
+.tl-sub:hover .tl-sub-del, .tl-sub-del:focus-visible { opacity: 1; }
+@media (pointer: coarse) { body.editing .tl-sub-del { opacity: .45; } }
+
+body.editing .tl-sub-title:empty::before { content: "What happened"; color: var(--ink-3); opacity: .55; }
+body.editing .tl-sub-time:empty::before { content: "Time"; color: var(--ink-3); opacity: .55; }
+
 /* ── link state ──────────────────────────────────────────────────────────── */
 
 .link-state {
@@ -308,6 +333,7 @@ body.editing .ask { display: block; }
 .tk-size { flex: none; font-size: .76rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 
 @media print {
-  .tray, .cm-panel, .cm-mark, .ask, .link-state, #edit-toggle, #login-btn, #tickets-btn { display: none !important; }
+  .tray, .cm-panel, .cm-mark, .ask, .link-state, #edit-toggle, #login-btn, #tickets-btn,
+  .tl-sub-add, .tl-sub-del { display: none !important; }
   [data-path] { outline: 0 !important; box-shadow: none !important; background: none !important; }
 }

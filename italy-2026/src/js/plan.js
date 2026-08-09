@@ -6,11 +6,11 @@ import STREETS from '../geo/streets.json';
 import { groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
 import { mapFor } from './tilemap.js';
 import { IMAGES } from './images.js';
-import { startSync } from './overlay.js';
+import { startSync, createSubitem } from './overlay.js';
 import { mountEditing } from './edit-ui.js';
 import { mountComments, anchorTo } from './comments.js';
 import { mountTickets } from './tickets.js';
-import { richNodes } from './dom.js';
+import { richNodes, renderSubRow } from './dom.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -181,6 +181,30 @@ function renderDays() {
     d.items.forEach((it, i) => {
       const k = PIN_COLORS[it.kind] || 'var(--terracotta)';
       const stopIdx = stops.findIndex((s) => s.items.includes(it));
+
+      // Subitems: a lightweight, timestamped aside nested under this stop —
+      // no coord/kind of their own, they share this row's pin. This paints
+      // only the base/folded-back set from itinerary.json; anything born live
+      // on the site (overlay-only, no entry here) is reconciled in by
+      // edit-ui.js's syncSubitems() once editing mounts.
+      const subs = h('ol', { class: 'tl-subs', 'data-subs': `day.${d.n}.items.${i}` });
+      (it.subitems ?? []).forEach((raw, j) => {
+        const s = { ...raw, id: raw.id ?? `b_${j}` }; // fold-back may omit id; fall back to position
+        const li = renderSubRow(d.n, i, s);
+        anchorTo(li, `day.${d.n}.items.${i}.subitems.${s.id}`, `Day ${d.n} · ${s.title}`);
+        subs.append(li);
+      });
+      // Always in the DOM; edit.css gates visibility to edit mode, same
+      // pattern as the ask-box.
+      const addSubBtn = h('button', {
+        type: 'button', class: 'tl-sub-add',
+        onClick: (e) => {
+          e.stopPropagation();
+          const id = createSubitem(d.n, i);
+          requestAnimationFrame(() => $(`[data-path="day.${d.n}.items.${i}.subitems.${id}.title"]`)?.focus());
+        },
+      }, '+ Add subitem');
+
       const row = h('li', {
         class: 'tl', 'data-i': i, style: { '--k': k },
         onClick: () => focusStop(d.n, stopIdx, i),
@@ -203,6 +227,8 @@ function renderDays() {
               onClick: (e) => e.stopPropagation(),
             }, it.linkLabel || 'Open') : null,
           ),
+          subs,
+          addSubBtn,
         ),
       );
       anchorTo(row, `day.${d.n}.items.${i}`, `Day ${d.n} · ${it.title}`);

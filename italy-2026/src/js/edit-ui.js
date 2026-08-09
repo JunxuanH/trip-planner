@@ -13,12 +13,13 @@
  * diff and imagining it.
  */
 
-import { h, $, $$, pathLabel, richNodes } from './dom.js';
+import { h, $, $$, pathLabel, richNodes, renderSubRow } from './dom.js';
 import {
   state, effective, baseValue, setDraft, setDrafts, discardDraft, draftPaths,
   applyDraft, revertApplied, signIn, onChange, proposeEdit, sync,
-  can, startGoogle, completeGoogle, googleClientId, signOut,
+  can, startGoogle, completeGoogle, googleClientId, signOut, subitemsFor,
 } from './overlay.js';
+import { anchorTo } from './comments.js';
 
 let editing = false;
 
@@ -49,6 +50,48 @@ export function repaint() {
     el.classList.toggle('is-mine', source === 'applied' && by === state.by);
     el.title = source === 'applied' && by !== state.by ? `changed by ${by}` : '';
   });
+}
+
+/**
+ * Overlay-only subitems (born live, no entry in itinerary.json) have no
+ * initial DOM — plan.js only ever paints the base/folded-back set. This
+ * reconciles each item's `.tl-subs` list against subitemsFor()'s merged view:
+ * a new id gets a row, a gone one (deleted, or a discarded draft-only
+ * creation) gets removed, survivors get reordered if their time changed.
+ * Structural, so it must run before repaint()/renderTray() — a
+ * freshly-inserted row's [data-path] fields need to exist for repaint()'s
+ * sweep to paint them.
+ */
+function syncSubitems() {
+  $$('.tl-subs').forEach((ol) => {
+    const m = /^day\.(\d+)\.items\.(\d+)$/.exec(ol.dataset.subs);
+    if (!m) return;
+    const [dayN, itemIdx] = [+m[1], +m[2]];
+    const wanted = subitemsFor(dayN, itemIdx);
+    const have = new Map($$('.tl-sub', ol).map((li) => [li.dataset.subId, li]));
+
+    wanted.forEach((s, pos) => {
+      let li = have.get(s.id);
+      if (!li) {
+        li = renderSubRow(dayN, itemIdx, s);
+        anchorTo(li, `day.${dayN}.items.${itemIdx}.subitems.${s.id}`, `Day ${dayN} · ${s.title || 'subitem'}`);
+      }
+      have.delete(s.id);
+      const atPos = ol.children[pos];
+      if (atPos !== li) ol.insertBefore(li, atPos ?? null);
+    });
+    have.forEach((li) => li.remove());
+  });
+  // Newly inserted rows carry [data-path] but no bound listeners yet if we're
+  // already in edit mode — bindField() is only ever attached by setEditing()'s
+  // own sweep, so run the same sweep here for anything still unbound.
+  if (editing) {
+    $$('.tl-sub [data-path]:not([data-bound])').forEach((el) => {
+      el.contentEditable = 'plaintext-only';
+      el.dataset.bound = '1';
+      bindField(el);
+    });
+  }
 }
 
 /* ── inline editing ──────────────────────────────────────────────────────── */
@@ -362,9 +405,10 @@ export function mountEditing() {
       link.classList.toggle('is-on', state.link === 'down');
       return;
     }
-    if (what === 'draft' || what === 'applied' || what === 'all') { repaint(); renderTray(); }
+    if (what === 'draft' || what === 'applied' || what === 'all') { syncSubitems(); repaint(); renderTray(); }
   });
 
+  syncSubitems();
   repaint();
   renderTray();
   if (state.token) sync();

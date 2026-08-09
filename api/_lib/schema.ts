@@ -30,6 +30,20 @@ export const MAX_TEXT = { time: 12, title: 160, detail: 900, how: 80, note: 1200
 /** Same grammar verify.mjs parses; an unparseable time would break its ordering check. */
 const TIME_RE = /^\d{1,2}:\d{2}(am|pm)$/;
 
+/**
+ * A subitem is a lightweight, timestamped aside nested under a stop — e.g. a
+ * 4pm gelato break during a 3-5pm walk. Deliberately lighter than a full item:
+ * no coord/kind/how/link, because it shares its parent's pin and never gets
+ * its own. Created live (a "+ Add subitem" button), not by a rebuild, so it
+ * has no fixed array index — it is addressed by a client-minted id instead,
+ * same open-path-space trick as everything else in this overlay.
+ */
+export const SUBITEM_TEXT_FIELDS = ['time', 'title', 'detail'] as const;
+export type SubitemTextField = (typeof SUBITEM_TEXT_FIELDS)[number];
+export const SUBITEM_MAX_TEXT = { time: 12, title: 120, detail: 400 };
+/** A soft-ish cap — see subitemIdsFor()/api/overlay.ts for where it's enforced. */
+export const MAX_SUBITEMS_PER_ITEM = 8;
+
 export type Entry = { value: string | boolean; at: number; by: string };
 export type Overlay = Record<string, Entry>;
 
@@ -39,7 +53,9 @@ const ITEM_COUNT = TRIP.days.map((d: { items: unknown[] }) => d.items.length);
 export type PathKind =
   | { kind: 'item-text'; day: number; item: number; field: ItemTextField }
   | { kind: 'item-flag'; day: number; item: number; field: ItemFlagField }
-  | { kind: 'day-note'; day: number };
+  | { kind: 'day-note'; day: number }
+  | { kind: 'subitem-text'; day: number; item: number; id: string; field: SubitemTextField }
+  | { kind: 'subitem-flag'; day: number; item: number; id: string };
 
 /**
  * Parse an overlay path, rejecting anything outside the editable surface.
@@ -51,6 +67,25 @@ export function parsePath(path: string): PathKind | null {
   if (m) {
     const day = Number(m[1]);
     return day >= 1 && day <= DAY_COUNT ? { kind: 'day-note', day } : null;
+  }
+
+  // Checked before the generic item-field branch below: that branch's
+  // `[a-z]+$` can't match a `.subitems.<id>.<field>` tail (extra dots), so
+  // there's no collision either way — this just keeps the file's existing
+  // most-specific-first shape.
+  m = /^day\.(\d+)\.items\.(\d+)\.subitems\.([a-z0-9_]{1,40})\.([a-z]+)$/.exec(path);
+  if (m) {
+    const day = Number(m[1]);
+    const item = Number(m[2]);
+    const id = m[3];
+    const field = m[4];
+    if (day < 1 || day > DAY_COUNT) return null;
+    if (item < 0 || item >= ITEM_COUNT[day - 1]) return null;
+    if ((SUBITEM_TEXT_FIELDS as readonly string[]).includes(field)) {
+      return { kind: 'subitem-text', day, item, id, field: field as SubitemTextField };
+    }
+    if (field === 'deleted') return { kind: 'subitem-flag', day, item, id };
+    return null;
   }
 
   m = /^day\.(\d+)\.items\.(\d+)\.([a-z]+)$/.exec(path);
@@ -68,6 +103,29 @@ export function parsePath(path: string): PathKind | null {
     return { kind: 'item-flag', day, item, field: field as ItemFlagField };
   }
   return null;
+}
+
+/**
+ * Distinct subitem ids already under one item — base (folded into
+ * itinerary.json, where a hand-written entry that forgot to copy its id
+ * still counts, keyed by array position) union whatever the shared overlay
+ * already knows. Used only to cap creation of new ids; never gates an edit
+ * to an id that already exists — see api/overlay.ts.
+ */
+export function subitemIdsFor(day: number, item: number, overlay: Overlay): Set<string> {
+  const ids = new Set<string>();
+  const base = (TRIP.days[day - 1]?.items[item] as { subitems?: { id?: string }[] } | undefined)?.subitems ?? [];
+  base.forEach((s, i) => ids.add(s?.id ?? `b_${i}`));
+  const prefix = `day.${day}.items.${item}.subitems.`;
+  for (const path of Object.keys(overlay)) {
+    if (path.startsWith(prefix)) ids.add(path.slice(prefix.length).split('.')[0]);
+  }
+  // A tombstoned id doesn't count against the cap — deleting one is meant to
+  // free its slot back up, same as it disappears from subitemsFor() client-side.
+  for (const id of ids) {
+    if (overlay[`${prefix}${id}.deleted`]?.value === true) ids.delete(id);
+  }
+  return ids;
 }
 
 export type Rejection = { path: string; reason: string };
@@ -126,9 +184,10 @@ export function validatePatch(patch: unknown, by: string, now = Date.now()): Val
         ? (raw as { value: unknown }).value
         : raw;
 
-    if (parsed.kind === 'item-flag') {
+    if (parsed.kind === 'item-flag' || parsed.kind === 'subitem-flag') {
+      const flagField = parsed.kind === 'item-flag' ? parsed.field : 'deleted';
       if (typeof value !== 'boolean') {
-        rejected.push({ path, reason: `${parsed.field} must be true or false` });
+        rejected.push({ path, reason: `${flagField} must be true or false` });
         continue;
       }
       ok[path] = { value, at: now, by };
@@ -139,6 +198,22 @@ export function validatePatch(patch: unknown, by: string, now = Date.now()): Val
       rejected.push({ path, reason: 'value must be a string' });
       continue;
     }
+
+    if (parsed.kind === 'subitem-text') {
+      const text = parsed.field === 'detail' ? normalizeMultiline(value) : value.trim();
+      const cap = SUBITEM_MAX_TEXT[parsed.field];
+      if (text.length > cap) {
+        rejected.push({ path, reason: `${parsed.field} is longer than ${cap} characters` });
+        continue;
+      }
+      if (parsed.field === 'time' && text && !TIME_RE.test(text)) {
+        rejected.push({ path, reason: 'time must look like 9:30am or 12:05pm' });
+        continue;
+      }
+      ok[path] = { value: text, at: now, by };
+      continue;
+    }
+
     const field = parsed.kind === 'day-note' ? 'note' : parsed.field;
     const text = field === 'detail' || field === 'note' ? normalizeMultiline(value) : value.trim();
     const cap = MAX_TEXT[field as keyof typeof MAX_TEXT];
@@ -167,6 +242,14 @@ export function isValidAnchor(anchor: string): boolean {
   let m = /^day\.(\d+)$/.exec(anchor);
   if (m) return Number(m[1]) >= 1 && Number(m[1]) <= DAY_COUNT;
   m = /^day\.(\d+)\.items\.(\d+)$/.exec(anchor);
+  if (m) {
+    const day = Number(m[1]);
+    return day >= 1 && day <= DAY_COUNT && Number(m[2]) < ITEM_COUNT[day - 1];
+  }
+  // No server-side registry of valid subitem ids to check against (same
+  // laxness hotel.I/booking.I already have relative to their array bound) —
+  // day/item bounds only. A comment on a since-deleted subitem is harmless.
+  m = /^day\.(\d+)\.items\.(\d+)\.subitems\.([a-z0-9_]{1,40})$/.exec(anchor);
   if (m) {
     const day = Number(m[1]);
     return day >= 1 && day <= DAY_COUNT && Number(m[2]) < ITEM_COUNT[day - 1];
@@ -202,6 +285,14 @@ export function dayContext(dayN: number) {
       title: it.title,
       detail: it.detail ?? '',
       how: it.how ?? '',
+      // Read-only context for Claude — v1 never lets it create/edit one (see
+      // api/edit.ts's SYSTEM prompt, which deliberately omits subitem paths
+      // from what it may write).
+      subitems: ((it.subitems as Record<string, unknown>[] | undefined) ?? []).map((s, j) => ({
+        id: (s.id as string | undefined) ?? `b_${j}`,
+        time: s.time,
+        title: s.title,
+      })),
     })),
   };
 }
