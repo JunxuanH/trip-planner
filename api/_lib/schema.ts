@@ -74,6 +74,31 @@ export type Rejection = { path: string; reason: string };
 export type ValidationResult = { ok: Overlay; rejected: Rejection[] };
 
 /**
+ * `detail` and `note` may hold a short bullet list — see `richNodes()` in
+ * `src/js/dom.js` for the grammar this stores for. The client normalizes the
+ * same way before it ever sends a patch; this exists because this endpoint
+ * also receives Claude's proposed edits (`api/edit.ts`) and would accept a
+ * hand-built HTTP request just as readily, and `CLAUDE.md` is explicit that
+ * neither gets more trust than a person typing.
+ *
+ * Newlines are the one thing this must never collapse — that was the whole
+ * bug this feature fixes. Leading whitespace on a line survives untouched too:
+ * it is what tells a sub-bullet from a top-level one.
+ */
+function normalizeMultiline(text: string): string {
+  return text
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => {
+      const m = /^(\s*)(.*)$/.exec(line)!;
+      return m[1].replace(/\t/g, '  ') + m[2].replace(/[ \t]+/g, ' ').trimEnd();
+    })
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
  * Filter a proposed patch down to what is allowed. Never throws on bad input —
  * a caller gets the clean subset plus a list of what was dropped and why, so a
  * partly-wrong Claude patch degrades to its good half instead of failing whole.
@@ -114,8 +139,8 @@ export function validatePatch(patch: unknown, by: string, now = Date.now()): Val
       rejected.push({ path, reason: 'value must be a string' });
       continue;
     }
-    const text = value.trim();
     const field = parsed.kind === 'day-note' ? 'note' : parsed.field;
+    const text = field === 'detail' || field === 'note' ? normalizeMultiline(value) : value.trim();
     const cap = MAX_TEXT[field as keyof typeof MAX_TEXT];
     if (text.length > cap) {
       rejected.push({ path, reason: `${field} is longer than ${cap} characters` });

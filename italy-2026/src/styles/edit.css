@@ -85,6 +85,10 @@ body.editing [data-path]:focus {
 .tray-row:last-child { border-bottom: 0; }
 .tray-where { font: 500 .68rem/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
 .tray-diff { font: .82rem/1.45 var(--sans); }
+/* del/ins hold raw strings, not richNodes() — a bullet list reads here as its
+   markdown-lite source, "- like this", rather than a rendered list. pre-line
+   keeps the lines it was typed on instead of running them together. */
+.tray-diff del, .tray-diff ins { white-space: pre-line; }
 .tray-diff del { color: var(--ink-3); text-decoration-color: var(--terracotta); }
 .tray-diff ins { display: block; color: var(--ink); text-decoration: none; }
 .tray-diff ins::before { content: "→ "; color: var(--olive); }

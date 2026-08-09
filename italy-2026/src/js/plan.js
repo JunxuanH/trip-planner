@@ -10,6 +10,7 @@ import { startSync } from './overlay.js';
 import { mountEditing } from './edit-ui.js';
 import { mountComments, anchorTo } from './comments.js';
 import { mountTickets } from './tickets.js';
+import { richNodes } from './dom.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -168,7 +169,9 @@ function renderDays() {
       // Rendered even when empty: the overlay paints into these nodes, so a
       // note added on the site needs somewhere to land. CSS hides an empty one
       // outside edit mode.
-      h('p', { class: 'note', 'data-path': `day.${d.n}.note` }, d.note || ''),
+      // A div, not a p: a note with a bullet list needs to hold a <ul>, which
+      // a <p> cannot legally contain.
+      h('div', { class: 'note', 'data-path': `day.${d.n}.note` }, ...richNodes(d.note)),
       d.warn ? h('div', { class: 'callout warn' },
         h('span', { class: 'ic' }, '⚠'), h('div', {}, h('b', {}, 'Watch this. '), d.warn)) : null,
     );
@@ -191,7 +194,7 @@ function renderDays() {
           h('div', { class: 'tl-title' },
             h('span', { class: 'idx' }, i + 1),
             h('span', { class: 't', 'data-path': `day.${d.n}.items.${i}.title` }, it.title)),
-          h('div', { class: 'tl-detail', 'data-path': `day.${d.n}.items.${i}.detail` }, it.detail || ''),
+          h('div', { class: 'tl-detail', 'data-path': `day.${d.n}.items.${i}.detail` }, ...richNodes(it.detail)),
           h('div', { class: 'tl-how', 'data-path': `day.${d.n}.items.${i}.how` }, it.how || ''),
           h('div', { class: 'tl-tags' },
             it.optional ? h('span', { class: 'mini opt' }, 'Optional') : null,
