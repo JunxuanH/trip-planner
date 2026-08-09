@@ -40,6 +40,8 @@ export function pathLabel(path) {
   if (m) return `Day ${m[1]} · note`;
   m = /^day\.(\d+)\.items\.(\d+)\.subitems\.([a-z0-9_]+)\.([a-z]+)$/.exec(path);
   if (m) return `Day ${m[1]} · stop ${+m[2] + 1} · subitem · ${m[4]}`;
+  m = /^day\.(\d+)\.items\.(\d+)\.skipped$/.exec(path);
+  if (m) return `Day ${m[1]} · stop ${+m[2] + 1} · removed`;
   m = /^day\.(\d+)\.items\.(\d+)\.([a-z]+)$/.exec(path);
   if (m) return `Day ${m[1]} · stop ${+m[2] + 1} · ${m[3]}`;
   return path;
