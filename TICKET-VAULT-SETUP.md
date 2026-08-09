@@ -8,6 +8,20 @@ not configured, and editing works exactly as it did.
 Nothing here needs a code change. If you find yourself editing `api/` or
 `italy-2026/src/`, stop — something has gone wrong with the assumptions.
 
+## Status update (2026-08-09)
+
+Two more tickets landed — the Galleria dell'Accademia entries for Aug 27,
+2:30pm (Junxuan and Hanji) — and `api/_lib/tickets.ts` / `scripts/
+upload-tickets.mjs` now know their ids (`accademia-junxuan`,
+`accademia-hanji`; see the table below). The split, correctly-named PDFs are
+staged in a local `tickets-in/` (gitignored, this machine only). **Uploading
+them still needs `BLOB_READ_WRITE_TOKEN`, which this session does not have**
+— run the Step 4 command below with it, from a machine or session that does.
+The `api/` code change also needs the same manual `vercel deploy --prod` any
+`api/` change has needed since auto-deploy turned out not to be wired up (see
+the entry below) — the label won't show in the drawer until that redeploy
+happens, even once the blob itself is uploaded.
+
 ## Status (2026-08-08)
 
 Steps 1–3 are **done and verified live**. Only Step 4 — uploading the actual PDFs
@@ -53,8 +67,9 @@ A **Log in** button on `plan.html` replacing the old pencil. Two factors:
 with **403** (not 401 — the caller is authenticated, they just have not cleared
 the second factor).
 
-Four PDFs go in the vault: the Vatican Gardens & Museums voucher, the
-GetYourGuide Borghese reservation, and the two Brunelleschi Passes.
+Six PDFs go in the vault: the Vatican Gardens & Museums voucher, the
+GetYourGuide Borghese reservation, the two Brunelleschi Passes, and the two
+Galleria dell'Accademia tickets.
 
 ## Step 1 — Google OAuth client (console only)
 
@@ -112,10 +127,10 @@ deployment.
 
 **The PDFs are not in this repo and never will be.** `.gitignore` blocks
 `tickets-in/` and `*.pdf`. Get them from Junxuan's email; they are the
-confirmation attachments from Musei Vaticani, GetYourGuide and Opera di Santa
-Maria del Fiore.
+confirmation attachments from Musei Vaticani, GetYourGuide, Opera di Santa
+Maria del Fiore and the Galleria dell'Accademia (ticketDirect/GAMB).
 
-Put all four in a local `tickets-in/`, then:
+Put all six in a local `tickets-in/`, then:
 
 ```bash
 npm install                                    # repo root, for @vercel/blob
@@ -131,10 +146,23 @@ unrenamed — and so does a file already named after its id:
 | Borghese reservation | `booking_is_reserved` | `borghese-reservation` |
 | Brunelleschi Pass — Junxuan | `59465436` | `duomo-pass-junxuan` |
 | Brunelleschi Pass — Hanji | `59465437` | `duomo-pass-hanji` |
+| Accademia — Junxuan | *(named by id — see below)* | `accademia-junxuan` |
+| Accademia — Hanji | *(named by id — see below)* | `accademia-hanji` |
 
 The two Duomo receipts differ **only in that trailing digit**. Getting them the
 wrong way round puts the wrong name on each pass; Opera staff check names
 against ID at the dome, so it matters.
+
+**The Accademia order arrives as one two-page PDF, order-numbered, with no
+per-traveller filename to match on** — GAMB emails a single confirmation
+covering everyone on the order, page 1 for whoever the order was booked under
+and one further page per named ticket-holder after that. There is no filename
+fragment this table could match, so that PDF has to be split into one
+single-page file per person and each one named after its id
+(`accademia-junxuan.pdf`, `accademia-hanji.pdf`) before it goes in
+`tickets-in/` — confirm which page is which by extracting each page's text
+(the passenger name line, not the `Cod.Cliente` account holder) rather than
+assuming page order, the same care the Duomo passes need.
 
 Re-running replaces by id rather than adding duplicates. Labels live in
 `api/_lib/tickets.ts` (`LABELS`) and can be reworded without re-uploading.

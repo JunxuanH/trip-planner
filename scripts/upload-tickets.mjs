@@ -17,7 +17,10 @@ import { put, list, del } from '@vercel/blob';
 const PREFIX = 'italy2026/tickets/';
 
 /** The ids api/_lib/tickets.ts knows how to label. Order matters below. */
-const IDS = ['vatican-voucher', 'borghese-reservation', 'duomo-pass-junxuan', 'duomo-pass-hanji'];
+const IDS = [
+  'vatican-voucher', 'borghese-reservation', 'duomo-pass-junxuan', 'duomo-pass-hanji',
+  'accademia-junxuan', 'accademia-hanji',
+];
 
 /**
  * Filename fragment → ticket id, for the providers' own download names, so the
