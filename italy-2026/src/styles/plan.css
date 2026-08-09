@@ -229,7 +229,9 @@ body { padding-bottom: 4rem; }
 
 .day h3 { font-size: clamp(1.7rem, 4vw, 2.6rem); letter-spacing: -.02em; }
 .day .kicker { font-size: .8rem; letter-spacing: .13em; text-transform: uppercase; color: var(--c); font-weight: 650; margin-top: .3rem; }
-.day .note { font-family: var(--serif); font-style: italic; color: var(--ink-2); margin-top: .7rem; max-width: 60ch; }
+/* pre-line: a plain multi-line note keeps its line breaks; a run of ordinary
+   spaces still collapses, so typed-out text isn't held to typewriter spacing. */
+.day .note { font-family: var(--serif); font-style: italic; color: var(--ink-2); margin-top: .7rem; max-width: 60ch; white-space: pre-line; }
 
 .callout {
   display: flex; gap: .7rem; margin-top: 1rem; padding: .75rem .9rem;
@@ -281,7 +283,23 @@ body { padding-bottom: 4rem; }
 
 .tl-title { font-weight: 600; font-size: .97rem; line-height: 1.4; }
 .tl-title .idx { color: var(--ink-3); font-family: var(--mono); font-size: .72rem; margin-right: .35rem; }
-.tl-detail { font-size: .89rem; color: var(--ink-2); margin-top: .12rem; }
+.tl-detail { font-size: .89rem; color: var(--ink-2); margin-top: .12rem; white-space: pre-line; }
+
+/* A bullet list inside a detail or a day note. Custom markers rather than the
+   browser default: an en-dash reads as this document's own voice rather than
+   a form control, and a sub-bullet gets a lighter, smaller mark so depth is
+   visible without indentation alone carrying the whole signal. */
+.bullets {
+  list-style: none; margin: .35em 0 0; padding-left: 1.15em;
+  white-space: normal; /* the list itself carries structure; no need for the parent's pre-line here */
+}
+.tl-detail > .bullets:first-child, .note > .bullets:first-child { margin-top: 0; }
+.bullets li { position: relative; margin: .2em 0; }
+.bullets li::before {
+  content: "–"; position: absolute; left: -1.05em; color: var(--ink-3);
+}
+.bullets .bullets { margin-top: .2em; }
+.bullets .bullets li::before { content: "◦"; font-size: .85em; }
 .tl-how {
   font-size: .78rem; color: var(--ink-3); margin-top: .2rem;
   display: inline-flex; align-items: center; gap: .3rem;

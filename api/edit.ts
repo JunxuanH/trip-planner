@@ -42,6 +42,11 @@ Each edit is a path and its new value. The paths you may write:
 
 <n> is the day number you were given. <i> is the item's "index" field.
 
+"detail" and "note" may be a short bullet list instead of a sentence: put each
+item on its own line starting with "- ", and indent a line two spaces further
+than the one above it to nest it as a sub-bullet. Use this only when asked for
+a list or checklist — a sentence stays a sentence otherwise.
+
 Rules:
 - Times must stay in order through the day. If moving one stop would put it
   before the one above it, move the others too and say so in your summary.

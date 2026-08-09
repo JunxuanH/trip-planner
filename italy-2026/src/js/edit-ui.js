@@ -13,7 +13,7 @@
  * diff and imagining it.
  */
 
-import { h, $, $$, pathLabel } from './dom.js';
+import { h, $, $$, pathLabel, richNodes } from './dom.js';
 import {
   state, effective, baseValue, setDraft, setDrafts, discardDraft, draftPaths,
   applyDraft, revertApplied, signIn, onChange, proposeEdit, sync,
@@ -24,6 +24,10 @@ let editing = false;
 
 /* ── painting values back into the page ──────────────────────────────────── */
 
+/** `detail` and the day `note` may hold a bullet list; everything else — time,
+ * title, how — stays the one-liner it always was. */
+const isMultiline = (path) => /\.(detail|note)$/.test(path);
+
 /**
  * The page is rendered once, imperatively, by plan.js. Rather than rebuild it
  * on every overlay change — which would tear down fourteen lazily-built maps —
@@ -33,8 +37,13 @@ export function repaint() {
   $$('[data-path]').forEach((el) => {
     const path = el.dataset.path;
     const { value, source, by } = effective(path);
-    // Don't fight the caret: skip the field being typed in right now.
-    if (document.activeElement !== el) el.textContent = value ?? '';
+    // Don't fight the caret: skip the field being typed in right now — this
+    // includes not swapping a multiline field's raw text back to a rendered
+    // <ul> out from under someone mid-sentence.
+    if (document.activeElement !== el) {
+      if (isMultiline(path)) el.replaceChildren(...richNodes(value ?? ''));
+      else el.textContent = value ?? '';
+    }
     el.classList.toggle('is-draft', source === 'draft');
     el.classList.toggle('is-theirs', source === 'applied' && by && by !== state.by);
     el.classList.toggle('is-mine', source === 'applied' && by === state.by);
@@ -44,17 +53,74 @@ export function repaint() {
 
 /* ── inline editing ──────────────────────────────────────────────────────── */
 
+/**
+ * Tidy a field's raw text before it is saved.
+ *
+ * One-liners keep the original behaviour verbatim: every run of whitespace,
+ * including a line break, collapses to one space. A multiline field must
+ * NOT do that — a newline is exactly the thing this feature exists to keep —
+ * so it only tidies each line on its own: interior runs of spaces/tabs
+ * collapse and trailing space is trimmed, but *leading* whitespace survives
+ * untouched, because that indentation is what tells a sub-bullet from a
+ * top-level one. Blank-line runs of three or more collapse to one blank line.
+ */
+function normalize(text, multiline) {
+  if (!multiline) return text.replace(/\s+/g, ' ').trim();
+  return text
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => {
+      const m = /^(\s*)(.*)$/.exec(line);
+      return m[1].replace(/\t/g, '  ') + m[2].replace(/[ \t]+/g, ' ').trimEnd();
+    })
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
+ * `el.textContent` is layout-blind: it concatenates every descendant text
+ * node with nothing between them, so wherever a contentEditable Enter press
+ * split the field into sibling blocks, textContent glues the two lines
+ * together with no separator at all. `el.innerText` is the layout-aware
+ * counterpart made for exactly this — it renders block boundaries as `\n` the
+ * same way copying the visible text would. Tried controlling Enter by hand
+ * first (inserting a literal "\n" via Range surgery, then via
+ * execCommand('insertText') as a fallback) and measured both: the Range
+ * version left the caret one character early so the next keystroke landed
+ * before the newline, and execCommand returned false in this build and
+ * inserted nothing at all. Reading innerText sidesteps the question by not
+ * caring what shape Enter's default behaviour left behind.
+ */
+function readMultiline(el) {
+  return el.innerText;
+}
+
 function bindField(el) {
-  el.addEventListener('focus', () => { el.dataset.wasBefore = el.textContent; });
+  const multiline = isMultiline(el.dataset.path);
+
+  el.addEventListener('focus', () => {
+    // A multiline field displays as rendered bullets; editing happens on the
+    // markdown-lite source underneath, not the <ul> itself, so swap to it now.
+    const raw = multiline ? String(effective(el.dataset.path).value ?? '') : el.textContent;
+    if (multiline) el.textContent = raw;
+    el.dataset.wasBefore = raw;
+  });
   el.addEventListener('blur', () => {
-    const next = el.textContent.replace(/\s+/g, ' ').trim();
+    const next = normalize(multiline ? readMultiline(el) : el.textContent, multiline);
     if (next !== el.dataset.wasBefore) setDraft(el.dataset.path, next);
     else repaint();
   });
-  // Enter commits rather than inserting a line break — these are one-liners,
-  // except the detail, where a paragraph is reasonable.
   el.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+    if (e.key === 'Enter' && multiline && !e.shiftKey && (e.metaKey || e.ctrlKey)) {
+      // The one thing Enter itself does NOT do in a multiline field: commit.
+      // Left uncaught, plain Enter falls through to the browser's own
+      // default line-break behaviour, whatever shape that takes — innerText
+      // above is what makes not caring about that shape safe.
+      e.preventDefault(); el.blur();
+    } else if (e.key === 'Enter' && !multiline && !e.shiftKey) {
+      e.preventDefault(); el.blur();
+    }
     if (e.key === 'Escape') { el.textContent = el.dataset.wasBefore; el.blur(); }
     e.stopPropagation();
   });
