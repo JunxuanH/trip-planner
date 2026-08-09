@@ -162,11 +162,13 @@ comments with no conflict policy at all. Comments post immediately; edits do not
 
 **`api/_lib/schema.ts` is the security boundary.** Every path — from Claude or from a
 hand-made HTTP request — goes through `validatePatch` before it is stored. Only item
-`time`/`title`/`detail`/`how` and `day.N.note` are editable; coordinates, dates,
-hotels and prices are not, because `verify.mjs` invariants depend on them and it
-would never see a browser overlay. The server stamps `at`/`by` itself so authorship
-cannot be forged. `/api/edit` sends **one day** to the model (~1–2k tokens), not the
-whole file, and returns a proposal — it writes nothing.
+`time`/`title`/`detail`/`how`/`skipped` and `day.N.note` are editable; coordinates,
+dates, hotels and prices are not, because `verify.mjs` invariants depend on them and
+it would never see a browser overlay. The server stamps `at`/`by` itself so
+authorship cannot be forged. `/api/edit` sends **one day** to the model (~1–2k
+tokens), not the whole file, and returns a proposal — it writes nothing (and does
+not currently write `skipped` either — deleting a stop is a direct-manipulation-only
+action, same restriction subitems' `deleted` has).
 
 Client side: `src/js/overlay.js` (state, persistence, sync), `edit-ui.js` (inline
 fields, review tray, ask box), `comments.js` (anchors, panel). They decorate what
@@ -193,6 +195,22 @@ function is pure and has no view of the store. Folding one back into
 (`{id, time, title, detail?}`) — preserve the `s_...` id it was created with
 if you can, though every read site tolerates a hand-written entry that
 forgot to (falling back to a position-derived id).
+
+**Deleting a top-level item reuses that same tombstone idea, on a field that
+already existed.** Unlike a subitem, an item is a fixed array slot — there is
+no id to mint or discard, so `deleteItem()`/`restoreItem()` in `overlay.js`
+just set `day.N.items.I.skipped` true/false through the normal draft flow.
+`edit-ui.js`'s `syncItemVisibility()` toggles a `.tl.is-skipped` class off
+that flag (structural, like `syncSubitems()` — it hides time/title/detail/
+subitems/tags together, so it can't be `repaint()`'s per-field sweep). CSS
+does the rest: to a plain viewer the row is just gone; in edit mode it
+collapses to a one-line "Removed — Undo" ghost instead, so the undo stays
+reachable without knowing the path. A skipped item's map pin does not
+move or disappear — `groupStops()` runs once over the static base
+`TRIP.days[].items` at initial render and isn't overlay-reactive, the same
+limitation coordinates/dates/prices have generally; folding the delete back
+into `itinerary.json` (removing the array entry, or leaving `skipped: true`
+if you'd rather keep the history) is what actually drops the pin.
 
 Secrets are set in the Vercel dashboard and **never written to the repo** (it is
 public, and GitHub auto-revokes Anthropic keys pushed to public repos):

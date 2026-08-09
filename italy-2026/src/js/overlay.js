@@ -86,7 +86,7 @@ export function baseValue(path) {
   if (!m) return '';
   const it = TRIP.days[+m[1] - 1]?.items[+m[2]];
   if (!it) return '';
-  return it[m[3]] ?? (m[3] === 'done' ? false : '');
+  return it[m[3]] ?? (m[3] === 'done' || m[3] === 'skipped' ? false : '');
 }
 
 /**
@@ -196,6 +196,30 @@ export async function revertApplied(paths) {
   emit('applied');
   const r = await api('/api/overlay', { method: 'PUT', body: { clear: paths } });
   if (r.ok) { state.applied = r.data.overlay; write(LS.applied, state.applied); emit('applied'); }
+}
+
+/* ── items ───────────────────────────────────────────────────────────────
+ * Unlike a subitem, a timeline item is a fixed array slot from
+ * itinerary.json — there is no id to mint and nothing to discard outright,
+ * so "delete" can't mean "make the path disappear" the way it does above.
+ * `skipped` (ITEM_FLAG_FIELDS, api/_lib/schema.ts) is the tombstone instead:
+ * same mechanism as a subitem's `deleted`, just on a field that already
+ * existed. Hiding and restoring are both plain draft writes, so restoring
+ * before Apply is instant and free, exactly like undoing any other edit —
+ * there is no special-cased undo path here. */
+
+/** Hide a stop from the timeline — time, title, detail, subitems and tags
+ * together, not just one field. Reversible up to Apply via restoreItem();
+ * after Apply, un-skipping is an edit like any other applied one; there is no
+ * live per-field revert yet (see revertApplied above), so it needs a second
+ * round through draft → Apply too, same as fixing a wrong time would. */
+export function deleteItem(dayN, itemIdx) {
+  setDraft(`day.${dayN}.items.${itemIdx}.skipped`, true);
+}
+
+/** Bring a hidden stop back. */
+export function restoreItem(dayN, itemIdx) {
+  setDraft(`day.${dayN}.items.${itemIdx}.skipped`, false);
 }
 
 /* ── subitems ────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ import STREETS from '../geo/streets.json';
 import { groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
 import { mapFor } from './tilemap.js';
 import { IMAGES } from './images.js';
-import { startSync, createSubitem } from './overlay.js';
+import { startSync, createSubitem, deleteItem, restoreItem } from './overlay.js';
 import { mountEditing } from './edit-ui.js';
 import { mountComments, anchorTo } from './comments.js';
 import { mountTickets } from './tickets.js';
@@ -205,12 +205,12 @@ function renderDays() {
         },
       }, '+ Add subitem');
 
-      const row = h('li', {
-        class: 'tl', 'data-i': i, style: { '--k': k },
-        onClick: () => focusStop(d.n, stopIdx, i),
-        onMouseenter: () => ensureMap(d.n)?.select(stopIdx),
-        onMouseleave: () => ensureMap(d.n)?.select(activeStop.get(d.n) ?? -1),
-      },
+      // The row's live content. A plain wrapper, not a grid cell of its own —
+      // display:contents in plan.css lets .tl-time/.tl-main keep landing in
+      // the row's own two-column grid exactly as before; the only reason this
+      // div exists is so a skipped item can hide all of it in one CSS rule
+      // rather than one per field.
+      const body = h('div', { class: 'tl-body' },
         h('div', { class: 'tl-time tnum', 'data-path': `day.${d.n}.items.${i}.time` }, it.time),
         h('div', { class: 'tl-main' },
           // The stop number stays outside the editable span — it is the join to
@@ -231,6 +231,36 @@ function renderDays() {
           addSubBtn,
         ),
       );
+
+      // Always in the DOM, gated to edit mode by CSS — same pattern as
+      // tl-sub-del and the ask-box. Confirmed, unlike a subitem's delete:
+      // this hides time/title/detail/subitems together, a bigger thing to
+      // undo by accident than one aside.
+      const delBtn = h('button', {
+        type: 'button', class: 'tl-del', title: 'Remove stop', 'aria-label': `Remove ${it.title}`,
+        onClick: (e) => {
+          e.stopPropagation();
+          if (confirm(`Remove "${it.title}" from the timeline?`)) deleteItem(d.n, i);
+        },
+      }, '×');
+
+      // Shown instead of `body` while the item is skipped and edit mode is on;
+      // hidden outright (with the rest of the row) otherwise — see
+      // .tl.is-skipped in edit.css. Undo is a plain draft write, so it's
+      // instant, same as fixing any other field.
+      const ghost = h('div', { class: 'tl-ghost' },
+        h('span', {}, 'Removed — ', h('b', {}, it.title)),
+        h('button', {
+          type: 'button', class: 'mini-btn ghost', onClick: (e) => { e.stopPropagation(); restoreItem(d.n, i); },
+        }, 'Undo'),
+      );
+
+      const row = h('li', {
+        class: 'tl', 'data-i': i, 'data-skip-path': `day.${d.n}.items.${i}.skipped`, style: { '--k': k },
+        onClick: () => focusStop(d.n, stopIdx, i),
+        onMouseenter: () => ensureMap(d.n)?.select(stopIdx),
+        onMouseleave: () => ensureMap(d.n)?.select(activeStop.get(d.n) ?? -1),
+      }, body, ghost, delBtn);
       anchorTo(row, `day.${d.n}.items.${i}`, `Day ${d.n} · ${it.title}`);
       tl.append(row);
     });

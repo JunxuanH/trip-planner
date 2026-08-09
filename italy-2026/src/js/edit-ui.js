@@ -94,6 +94,19 @@ function syncSubitems() {
   }
 }
 
+/**
+ * A skipped item hides everything under it at once — time, title, detail,
+ * subitems, tags — so this can't be repaint()'s per-[data-path] sweep either.
+ * Structural like syncSubitems(), for the same reason: plan.css/edit.css do
+ * the actual hiding off this one class, keyed off the row's own
+ * data-skip-path so this file never has to know the row's day/item index.
+ */
+function syncItemVisibility() {
+  $$('.tl[data-skip-path]').forEach((row) => {
+    row.classList.toggle('is-skipped', Boolean(effective(row.dataset.skipPath).value));
+  });
+}
+
 /* ── inline editing ──────────────────────────────────────────────────────── */
 
 /**
@@ -191,6 +204,10 @@ function renderTray() {
   tray.textContent = '';
   if (!paths.length) return;
 
+  // A flag (skipped, or a subitem's deleted) is never usefully "false"/"true"
+  // to a person reviewing the tray — say what it does instead.
+  const fmt = (v) => (typeof v === 'boolean' ? (v ? 'removed' : 'kept') : String(v));
+
   const rows = h('div', { class: 'tray-rows' }, ...paths.map((path) => {
     const from = state.applied[path] ? state.applied[path].value : baseValue(path);
     const to = state.draft[path].value;
@@ -198,8 +215,8 @@ function renderTray() {
     return h('div', { class: 'tray-row' + (reason ? ' is-rejected' : '') },
       h('div', { class: 'tray-where' }, pathLabel(path)),
       h('div', { class: 'tray-diff' },
-        h('del', {}, String(from) || '(empty)'),
-        h('ins', {}, String(to) || '(cleared)')),
+        h('del', {}, fmt(from) || '(empty)'),
+        h('ins', {}, fmt(to) || '(cleared)')),
       reason ? h('div', { class: 'tray-reason' }, 'Rejected: ', reason) : null,
       h('div', { class: 'tray-row-acts' },
         h('button', { type: 'button', class: 'mini-btn', onClick: () => applyDraft([path]) }, 'Apply'),
@@ -405,10 +422,13 @@ export function mountEditing() {
       link.classList.toggle('is-on', state.link === 'down');
       return;
     }
-    if (what === 'draft' || what === 'applied' || what === 'all') { syncSubitems(); repaint(); renderTray(); }
+    if (what === 'draft' || what === 'applied' || what === 'all') {
+      syncSubitems(); syncItemVisibility(); repaint(); renderTray();
+    }
   });
 
   syncSubitems();
+  syncItemVisibility();
   repaint();
   renderTray();
   if (state.token) sync();

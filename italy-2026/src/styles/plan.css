@@ -281,6 +281,14 @@ body { padding-bottom: 4rem; }
 @media (max-width: 520px) { .tl-main::before { left: -.8rem; } }
 .tl.is-active .tl-main::before { background: var(--k, var(--c)); box-shadow: 0 0 0 3px color-mix(in oklab, var(--k, var(--c)) 22%, transparent); }
 
+/* .tl-body carries no layout of its own — display:contents hands its two
+   children straight to .tl's own grid, exactly where they sat before this
+   wrapper existed. It exists purely as one thing for .tl.is-skipped to hide
+   in edit.css, instead of one rule per field. */
+.tl-body { display: contents; }
+.tl-del { display: none; } /* shown only in edit.css, under body.editing */
+.tl-ghost { display: none; } /* shown only in edit.css, under body.editing + is-skipped */
+
 .tl-title { font-weight: 600; font-size: .97rem; line-height: 1.4; }
 .tl-title .idx { color: var(--ink-3); font-family: var(--mono); font-size: .72rem; margin-right: .35rem; }
 .tl-detail { font-size: .89rem; color: var(--ink-2); margin-top: .12rem; white-space: pre-line; }
