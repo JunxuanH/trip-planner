@@ -100,10 +100,20 @@ function syncSubitems() {
  * Structural like syncSubitems(), for the same reason: plan.css/edit.css do
  * the actual hiding off this one class, keyed off the row's own
  * data-skip-path so this file never has to know the row's day/item index.
+ *
+ * Also keeps the ghost's title current off the live value while a row stays
+ * skipped — plan.js seeds it with the base title as a first-paint default,
+ * but a title edited before or during the removal shouldn't show stale.
  */
 function syncItemVisibility() {
   $$('.tl[data-skip-path]').forEach((row) => {
-    row.classList.toggle('is-skipped', Boolean(effective(row.dataset.skipPath).value));
+    const skipped = Boolean(effective(row.dataset.skipPath).value);
+    row.classList.toggle('is-skipped', skipped);
+    if (skipped) {
+      const titlePath = row.dataset.skipPath.replace(/\.skipped$/, '.title');
+      const b = $('.tl-ghost b', row);
+      if (b) b.textContent = effective(titlePath).value || '';
+    }
   });
 }
 
