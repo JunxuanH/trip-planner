@@ -145,6 +145,30 @@ travelling, and one of them does not hold the repo. Root `package.json`,
 `tsconfig.json` and `vercel.json` belong to that deployment only; `italy-2026/` has
 its own and is unaffected.
 
+**`src/js/gate.js` walls off `plan.html` itself behind the same passphrase, not
+just editing.** This is deliberately *not* real access control — Pages is a static
+host with nothing in front of it to check a login before serving bytes, so the
+itinerary is still sitting in the page's own JS (`TRIP`, bundled at build time)
+for anyone who inspects it, gate or no gate. What it does is stop a casual
+visitor, a shared link, or a search engine from seeing content at a glance, as an
+interim step before real server-side gating (serving the page from behind the
+Vercel API instead of Pages) lands. `mountGate()` runs first, before any renderer,
+and toggles a `body.gated` class that hides `<header>`/`<nav>`/`<main>` behind a
+`#gate` passphrase form — the same `/api/session` call `signIn()` already makes for
+editing, just triggered earlier and for a different reason. Unlocking sets a
+**persistent** `localStorage` flag (`italy26-unlocked`) rather than reusing the
+12-hour edit token: the token is meant to expire and be re-checked server-side,
+which is exactly wrong for a screen whose only job is "has this device ever typed
+the passphrase correctly, once" — the offline-on-a-plane promise the rest of this
+page makes has to hold for the gate too, so after the first unlock (which needs
+the network, like any passphrase check) every later visit, even offline, skips
+it. Anyone who already had `state.by` or a live token before this shipped is
+grandfathered in rather than walled off again. `presentation.html` and
+`shopping.html` are **not** gated — the deck is a separate, fully offline
+document with zero `/api` calls by design (a network-dependent lock screen mid-
+presentation is exactly the failure mode that page exists to avoid), and the
+shopping page was out of scope for this pass.
+
 **Three layers, rendered as `base ⊕ applied ⊕ draft`.** `itinerary.json` is still the
 source of truth and is never mutated in the browser:
 

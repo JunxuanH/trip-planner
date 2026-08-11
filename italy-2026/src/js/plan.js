@@ -10,6 +10,7 @@ import { startSync, createSubitem, deleteItem, restoreItem } from './overlay.js'
 import { mountEditing } from './edit-ui.js';
 import { mountComments, anchorTo } from './comments.js';
 import { mountTickets } from './tickets.js';
+import { mountGate } from './gate.js';
 import { richNodes, renderSubRow } from './dom.js';
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
@@ -558,6 +559,12 @@ function initReveal() {
 }
 
 /* ── go ─────────────────────────────────────────────────────────────────── */
+
+// Decided first, though nothing below actually blocks on it — the whole
+// script runs before the browser's first paint, so a body.gated class set
+// here hides everything the renderers build just as well as one set last.
+// Gate-first just reads truer to what's happening.
+mountGate();
 
 renderMast();
 renderRail();
