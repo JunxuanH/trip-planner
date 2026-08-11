@@ -35,6 +35,8 @@ const LABELS: Record<string, { label: string; day: number }> = {
   'borghese-reservation': { label: 'Galleria Borghese — Aug 26, 1:00pm', day: 3 },
   'duomo-pass-junxuan': { label: 'Brunelleschi Pass — Junxuan, dome 4:30pm Aug 27', day: 4 },
   'duomo-pass-hanji': { label: 'Brunelleschi Pass — Hanji, dome 4:30pm Aug 27', day: 4 },
+  'accademia-junxuan': { label: 'Accademia — Junxuan, entry 2:30pm Aug 27', day: 4 },
+  'accademia-hanji': { label: 'Accademia — Hanji, entry 2:30pm Aug 27', day: 4 },
 };
 
 function idOf(pathname: string): string {
