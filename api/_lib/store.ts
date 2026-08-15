@@ -16,6 +16,7 @@ import type { Overlay, Comment } from './schema.js';
 
 const KEY_OVERLAY = 'italy2026:overlay';
 const KEY_COMMENTS = 'italy2026:comments';
+const KEY_ITINERARY = 'italy2026:itinerary';
 
 /**
  * The Vercel/Upstash integration injects `KV_REST_API_URL` and
@@ -97,6 +98,22 @@ export async function appendComments(incoming: CommentDoc): Promise<CommentDoc> 
 }
 
 export const appendComment = (c: Comment) => appendComments({ [c.anchor]: [c] });
+
+/* ── itinerary ───────────────────────────────────────────────────────────── *
+ * The real data/itinerary.json content — not imported from git here (this
+ * deployment builds from the same repo, so anything importable is by
+ * definition committed and public). Seeded by the local-only
+ * scripts/upload-itinerary.mjs; api/itinerary.ts only ever reads it. Stored
+ * as an opaque blob — this layer doesn't need to know its shape, and typing
+ * it here would just be a second copy of schema.ts's own shape to drift. */
+
+export async function readItinerary(): Promise<unknown> {
+  return await redis().get(KEY_ITINERARY);
+}
+
+export async function writeItinerary(doc: unknown): Promise<void> {
+  await redis().set(KEY_ITINERARY, doc);
+}
 
 export async function setResolved(
   anchor: string,

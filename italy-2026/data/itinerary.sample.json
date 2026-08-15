@@ -1,0 +1,68 @@
+{
+  "_readme": "This is a placeholder, committed so the repo stays self-documenting about the schema. It is NOT read by any build script and NOT validated by verify.mjs — the real, git-ignored data/itinerary.json is what npm run build, the API, and scripts/upload-itinerary.mjs all actually use. See CLAUDE.md, 'Closing the repo-source gap'.",
+  "meta": {
+    "title": "Sample Trip",
+    "subtitle": "City A · City B · City C",
+    "travelers": 2,
+    "start": "2000-01-01",
+    "end": "2000-01-08",
+    "nights": 7,
+    "window": "Sat Jan 1 – Sat Jan 8, 2000",
+    "arrival": "Airport code, day/time, airline",
+    "departure": "Airport code, day/time",
+    "revised": "2000-01-01",
+    "routeLine": "City A (2) → City B (3) → City C (2)",
+    "transportLine": "How you get between cities",
+    "chainStory": "Hotel A → Hotel B → Hotel C",
+    "routeChain": ["City A", "City B", "City C"]
+  },
+  "cities": {
+    "cityA": { "name": "City A", "short": "CITYA", "accent": "#C25A3A", "center": [0, 0], "region": "Region A" }
+  },
+  "days": [
+    {
+      "n": 1,
+      "date": "2000-01-01",
+      "dow": "Sat",
+      "city": "cityA",
+      "title": "Arrival day",
+      "kicker": "One line under the day title",
+      "hotel": "Hotel A",
+      "note": "",
+      "items": [
+        { "time": "10:00am", "title": "Sample stop", "detail": "What happens here.", "how": "How you get there.", "coord": [0, 0], "kind": "sight" }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "city": "City A", "cityKey": "cityA", "img": "placeholder", "name": "Hotel A", "brand": "Some brand",
+      "checkIn": "2000-01-01", "checkOut": "2000-01-03", "nights": 2, "nightly": 0, "total": 0,
+      "coord": [0, 0], "blurb": "Why this hotel.", "link": "https://example.com"
+    }
+  ],
+  "drivers": [
+    { "date": "2000-01-01", "service": "Private driver", "route": "Airport → Hotel A", "hours": 1, "note": "", "link": "https://example.com" }
+  ],
+  "driversNote": "A line about logistics generally.",
+  "bookings": [
+    { "priority": 1, "urgency": "now", "item": "Sample booking", "detail": "Why it's urgent.", "link": "https://example.com" }
+  ],
+  "bookingsRuledOut": [
+    { "item": "Something considered and dropped", "reason": "Why." }
+  ],
+  "budget": [
+    { "category": "Lodging", "amount": 0, "note": "estimate basis" }
+  ],
+  "photographers": [
+    { "location": "City A", "days": "Day 1", "platform": "Some platform", "spots": "Where", "xhs": "handle", "price": "$0", "link": "https://example.com", "xhsLink": "https://example.com" }
+  ],
+  "photographersNote": "A line about booking photographers.",
+  "shopping": {
+    "note": "A paragraph about where and what to shop for.",
+    "vat": { "headline": "VAT refund basics", "detail": "How the refund works." }
+  },
+  "portals": [
+    { "name": "Example portal", "url": "https://example.com" }
+  ]
+}

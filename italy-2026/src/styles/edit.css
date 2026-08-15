@@ -211,6 +211,38 @@ body.editing .tl:hover .tl-del, body.editing .tl-del:focus-visible { opacity: 1;
 }
 .link-state.is-on { display: block; }
 
+/* ── the gate ────────────────────────────────────────────────────────────
+ * The whole document, not just editing, is behind this now — see boot() in
+ * plan.js. header/nav/main render into real content only after a fetched
+ * itinerary lands, but they exist as empty elements from first paint; this
+ * keeps that empty shell off-screen instead of flashing bare chrome behind
+ * the gate card. `.is-ready` is added right before renderAll() runs. */
+body:not(.is-ready) header,
+body:not(.is-ready) nav,
+body:not(.is-ready) main { display: none; }
+
+.gate {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center;
+  padding: 1.5rem;
+  background: var(--paper-2);
+}
+.gate-card {
+  width: min(22rem, 100%);
+  text-align: center;
+}
+.gate-mark { font-size: 2rem; margin-bottom: .6rem; }
+.gate-card h1 { font: 600 1.3rem/1.2 var(--serif); margin: 0 0 .5rem; color: var(--ink); }
+.gate-card p { font: .85rem/1.5 var(--sans); color: var(--ink-3); margin: 0 0 1rem; }
+.gate-card input {
+  display: block; width: 100%;
+  font: .88rem/1.4 var(--sans);
+  padding: .55rem .65rem; margin-bottom: .5rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--paper); color: var(--ink);
+}
+.gate-acts { display: flex; justify-content: center; margin-top: .4rem; }
+
 /* ── sign-in ─────────────────────────────────────────────────────────────── */
 
 .dlg {
@@ -369,6 +401,6 @@ body.editing .tl:hover .tl-del, body.editing .tl-del:focus-visible { opacity: 1;
 
 @media print {
   .tray, .cm-panel, .cm-mark, .ask, .link-state, #edit-toggle, #login-btn, #tickets-btn,
-  .tl-sub-add, .tl-sub-del, .tl-del, .tl-ghost { display: none !important; }
+  .tl-sub-add, .tl-sub-del, .tl-del, .tl-ghost, .gate { display: none !important; }
   [data-path] { outline: 0 !important; box-shadow: none !important; background: none !important; }
 }

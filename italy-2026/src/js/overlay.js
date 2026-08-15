@@ -16,7 +16,14 @@
  * sync loop reconciles when the network comes back.
  */
 
-import TRIP from '../../data/itinerary.json';
+/* No static import of itinerary.json here (or in plan.js, its only caller —
+   deck.js and shopping.js each keep their own separate import and stay fully
+   offline). Vercel builds the API from this same repo, so anything importable
+   there is by definition committed and public — the itinerary is instead
+   fetched live from /api/itinerary after sign-in and handed in via setTrip(),
+   see fetchItinerary() below and plan.js's boot(). */
+let TRIP = null;
+export function setTrip(t) { TRIP = t; }
 
 /* The Vercel deployment holding the endpoints. GitHub Pages serves this
    document; it cannot run server code, so sync and Claude live elsewhere.
@@ -72,10 +79,10 @@ export function emit(what = 'all') { subs.forEach((fn) => fn(what)); }
 /** The value itinerary.json was built with. */
 export function baseValue(path) {
   let m = /^day\.(\d+)\.note$/.exec(path);
-  if (m) return TRIP.days[+m[1] - 1]?.note ?? '';
+  if (m) return TRIP?.days?.[+m[1] - 1]?.note ?? '';
   m = /^day\.(\d+)\.items\.(\d+)\.subitems\.([a-z0-9_]+)\.([a-z]+)$/.exec(path);
   if (m) {
-    const it = TRIP.days[+m[1] - 1]?.items[+m[2]];
+    const it = TRIP?.days?.[+m[1] - 1]?.items?.[+m[2]];
     // A hand-folded-back entry without its own id is still addressable, keyed
     // by array position — matches subitemIdsFor()'s fallback server-side.
     const s = it?.subitems?.find((x, i) => (x.id ?? `b_${i}`) === m[3]);
@@ -84,7 +91,7 @@ export function baseValue(path) {
   }
   m = /^day\.(\d+)\.items\.(\d+)\.([a-z]+)$/.exec(path);
   if (!m) return '';
-  const it = TRIP.days[+m[1] - 1]?.items[+m[2]];
+  const it = TRIP?.days?.[+m[1] - 1]?.items?.[+m[2]];
   if (!it) return '';
   return it[m[3]] ?? (m[3] === 'done' || m[3] === 'skipped' ? false : '');
 }
@@ -241,7 +248,7 @@ const minutesOf = (t) => {
  * tombstoned `deleted`. Sorted by time, id as the tiebreak so a never-timed
  * new row is stable rather than jumping around as fields land. */
 export function subitemsFor(dayN, itemIdx) {
-  const base = TRIP.days[dayN - 1]?.items[itemIdx]?.subitems ?? [];
+  const base = TRIP?.days?.[dayN - 1]?.items?.[itemIdx]?.subitems ?? [];
   const ids = new Set(base.map((s, i) => s.id ?? `b_${i}`));
   const prefix = `day.${dayN}.items.${itemIdx}.subitems.`;
   for (const src of [state.applied, state.draft]) {
@@ -285,7 +292,7 @@ export function deleteSubitem(dayN, itemIdx, id) {
   const prefix = `day.${dayN}.items.${itemIdx}.subitems.${id}.`;
   const everApplied =
     Object.keys(state.applied).some((p) => p.startsWith(prefix)) ||
-    (TRIP.days[dayN - 1]?.items[itemIdx]?.subitems ?? []).some((s, i) => (s.id ?? `b_${i}`) === id);
+    (TRIP?.days?.[dayN - 1]?.items?.[itemIdx]?.subitems ?? []).some((s, i) => (s.id ?? `b_${i}`) === id);
   if (everApplied) setDraft(`${prefix}deleted`, true);
   else discardDraft(Object.keys(state.draft).filter((p) => p.startsWith(prefix)));
 }
@@ -462,6 +469,17 @@ function setLink(v) {
   if (state.link === v) return;
   state.link = v;
   emit('link');
+}
+
+/**
+ * The itinerary itself — fetched live, not bundled. This is the one call the
+ * whole page is gated behind: no token, no data, per api()'s auth:true default
+ * short-circuit above. Null on any failure (401, offline, 5xx); plan.js's
+ * boot() tells those apart by whether a token was ever presented.
+ */
+export async function fetchItinerary() {
+  const r = await api('/api/itinerary');
+  return r.ok ? r.data.itinerary : null;
 }
 
 /** Ask Claude for a patch. Returns a proposal — it applies nothing. */
