@@ -145,6 +145,18 @@ travelling, and one of them does not hold the repo. Root `package.json`,
 `tsconfig.json` and `vercel.json` belong to that deployment only; `italy-2026/` has
 its own and is unaffected.
 
+**`plan.html` itself is gated now, not just editing.** Unlike `presentation.html` and
+`shopping.html` (which still bundle `itinerary.json` at build time and stay fully
+offline), `plan.js` no longer imports the itinerary at all — it fetches it live from
+`GET /api/itinerary` after a valid `edit`-scope sign-in and renders nothing until
+that succeeds (`boot()` at the bottom of `plan.js`; `overlay.js`'s `fetchItinerary()`/
+`setTrip()`). This is a deliberate, page-scoped exception to the single-file/offline
+design: this one page now needs one live API call before it can render anything, and
+loses the "opens from `file://`, works on a plane with no signal" property for that
+first load (a cached `sessionStorage` token skips the login screen on a same-session
+reload, but not the fetch). See *The itinerary source: gated, and out of git* below
+for where the data itself now lives.
+
 **Three layers, rendered as `base ⊕ applied ⊕ draft`.** `itinerary.json` is still the
 source of truth and is never mutated in the browser:
 
@@ -243,14 +255,46 @@ provider's own downloaded filename to that id (see the table in
 rather than duplicating it.
 
 Client side, `src/js/tickets.js` caches each opened PDF in IndexedDB so the drawer
-keeps working offline after a first open on wifi — the ticket vault is otherwise the
-only network-dependent part of the plan.
+keeps working offline after a first open on wifi — the ticket vault and the
+itinerary fetch below (`GET /api/itinerary`) are the only network-dependent parts of
+the plan.
 
 `TICKET-VAULT-SETUP.md` is the one-time infra runbook (Google OAuth consent screen,
 the four Vercel env vars, connecting Blob storage, uploading the PDFs) — it's
 console/CLI work, not a code change, and says as much: if you find yourself editing
 `api/` or `italy-2026/src/` to make the vault "work," stop, the feature is already
 built.
+
+### The itinerary source: gated, and out of git
+
+`plan.html` no longer bundles `itinerary.json` — see *`plan.html` itself is gated
+now* above. The real data also stopped being tracked in git entirely, for the same
+reason the ticket PDFs aren't: this repo is public.
+
+- **`italy-2026/data/itinerary.json` is local-only**, gitignored. It stays exactly
+  where it always was on disk, and `npm run verify`/`build:html`/`build:xlsx` all
+  keep reading it from that same path with no change — only its presence in git
+  changed. `presentation.html`/`shopping.html` are still built from it and still
+  ship the real data inlined, same as before; this gate is `plan.html`-only.
+- **`italy-2026/data/itinerary.sample.json` is the committed placeholder** — same
+  top-level shape, no real dates/hotels/prices, purely so the repo stays
+  self-documenting about the schema. It is not read by any build script and not
+  checked by `verify.mjs`.
+- **The real data lives in Redis** for `api/itinerary.ts` to serve (key
+  `italy2026:itinerary`, `readItinerary()`/`writeItinerary()` in
+  `api/_lib/store.ts`) — `api/` deploys from this same repo, so anything it could
+  `import` from a file would by definition be committed and public, the same
+  reasoning that puts the ticket PDFs in Blob rather than in git.
+- **`node --env-file=.env.local scripts/upload-itinerary.mjs`** is how a local edit
+  reaches the live page: it pushes the current local `itinerary.json` into Redis.
+  Run it after every content change you want live — a `git push` alone no longer
+  does anything for `plan.html`'s content, only for `presentation.html`/
+  `shopping.html`/`dist/` and the code itself.
+- **Residual limit, explicit:** untracking the file did not rewrite git history —
+  every earlier commit that touched `data/itinerary.json`, and every earlier
+  `dist/plan.html` commit (from before this change) with old itinerary content
+  inlined, still has it in the log. A real scrub needs `git filter-repo` or
+  equivalent plus a force-push and everyone re-cloning; that has not been done.
 
 ## Conventions
 
@@ -270,3 +314,7 @@ built.
 - Booking PDFs never go in git. `.gitignore` blocks `tickets-in/` and `*.pdf`; they
   go to Vercel Blob via `scripts/upload-tickets.mjs` instead (see *Auth scopes and
   the ticket vault*).
+- The real `italy-2026/data/itinerary.json` never goes in git either. `.gitignore`
+  blocks it by exact path; it goes to Redis via `scripts/upload-itinerary.mjs`
+  instead (see *The itinerary source: gated, and out of git*). The committed
+  `itinerary.sample.json` alongside it is a placeholder, not the real file.

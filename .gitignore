@@ -14,3 +14,11 @@ Thumbs.db
 # they go to Vercel Blob and nowhere near git.
 tickets-in/
 *.pdf
+
+# The real trip data. This repo is public; the real dates, hotels, prices and
+# bookings go to Redis instead, via scripts/upload-itinerary.mjs — see
+# CLAUDE.md, "Closing the repo-source gap". italy-2026/data/itinerary.sample.json
+# is the committed placeholder that documents the shape. This file stays on
+# disk locally and is what npm run build/verify still read; only its presence
+# in git changes.
+italy-2026/data/itinerary.json

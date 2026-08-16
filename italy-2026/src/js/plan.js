@@ -1,16 +1,23 @@
 /* ── Italy 2026 · the plan document ────────────────────────────────────── */
 
-import TRIP from '../../data/itinerary.json';
 import GEO from '../geo/italy.json';
 import STREETS from '../geo/streets.json';
 import { groupStops, frameAspect, PIN_COLORS, PIN_LABELS } from './mapengine.js';
 import { mapFor } from './tilemap.js';
 import { IMAGES } from './images.js';
-import { startSync, createSubitem, deleteItem, restoreItem } from './overlay.js';
+import {
+  state, startSync, createSubitem, deleteItem, restoreItem, setTrip, fetchItinerary, signIn,
+} from './overlay.js';
 import { mountEditing } from './edit-ui.js';
 import { mountComments, anchorTo } from './comments.js';
 import { mountTickets } from './tickets.js';
 import { richNodes, renderSubRow } from './dom.js';
+
+/* No static import of itinerary.json — this page fetches it live, after
+   sign-in, and never bundles it. See boot() at the bottom and overlay.js's
+   fetchItinerary()/setTrip(). Every render function below still reads a plain
+   module-level TRIP; only where that binding comes from has changed. */
+let TRIP = null;
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -559,25 +566,113 @@ function initReveal() {
 
 /* ── go ─────────────────────────────────────────────────────────────────── */
 
-renderMast();
-renderRail();
-renderDays();
-renderHotels();
-renderDrivers();
-renderBookings();
-renderBudget();
-renderPhotographers();
-renderPortals();
-initTheme();
-initSpy();
-initReveal();
+function renderAll() {
+  renderMast();
+  renderRail();
+  renderDays();
+  renderHotels();
+  renderDrivers();
+  renderBookings();
+  renderBudget();
+  renderPhotographers();
+  renderPortals();
+  initTheme();
+  initSpy();
+  initReveal();
 
-// Editing is mounted last: it decorates what the renderers above produced
-// rather than owning any of it, so the document still renders in full if the
-// network — or the whole Vercel side — is gone.
-mountComments();
-mountTickets();
-mountEditing();
-startSync();
+  // Editing is mounted last: it decorates what the renderers above produced
+  // rather than owning any of it, so the document still renders in full if the
+  // network — or the whole Vercel side — is gone (once past the gate below;
+  // the gate itself is the one thing this page still needs Vercel for).
+  mountComments();
+  mountTickets();
+  mountEditing();
+  startSync();
 
-$('#revised').textContent = fmt(TRIP.meta.revised, { day: 'numeric', month: 'long', year: 'numeric' });
+  $('#revised').textContent = fmt(TRIP.meta.revised, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* ── the gate ───────────────────────────────────────────────────────────── *
+ * The whole document is now behind this, not just editing — no cached or
+ * fetched itinerary, no render. Three states, one card, swapped in place
+ * rather than three separate elements: loading (first paint, or a cached
+ * token being redeemed), login (no token, or it was rejected), and offline
+ * (a token exists but the API couldn't be reached — worth a retry, not a
+ * password re-entry, which is why it's a different state from login). */
+
+function gateCard() {
+  let card = $('#gate-card');
+  if (card) return card;
+  const gate = h('div', { class: 'gate', id: 'gate' }, h('div', { class: 'gate-card', id: 'gate-card' }));
+  document.body.prepend(gate);
+  return $('#gate-card');
+}
+
+function showLoading() {
+  gateCard().replaceChildren(
+    h('div', { class: 'gate-mark' }, '🇮🇹'),
+    h('p', {}, 'Loading the plan…'),
+  );
+}
+
+function showOffline(retry) {
+  gateCard().replaceChildren(
+    h('div', { class: 'gate-mark' }, '🇮🇹'),
+    h('h1', {}, 'Italy 2026'),
+    h('p', {}, "Can't reach the plan right now — check your connection and try again."),
+    h('div', { class: 'gate-acts' },
+      h('button', { type: 'button', class: 'mini-btn solid', onClick: retry }, 'Retry')),
+  );
+}
+
+function showLogin(onReady) {
+  const pass = h('input', { type: 'password', placeholder: 'Passphrase', autocomplete: 'current-password' });
+  const who = h('input', { type: 'text', placeholder: 'Initials', maxlength: '2', value: state.by || '' });
+  const err = h('div', { class: 'dlg-err' });
+  const btn = h('button', { type: 'submit', class: 'mini-btn solid' }, 'Continue');
+  const form = h('form', {
+    onSubmit: async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      err.textContent = '';
+      const r = await signIn(pass.value, who.value);
+      btn.disabled = false;
+      if (!r.ok) { err.textContent = r.data.error || 'Could not sign in.'; return; }
+      onReady();
+    },
+  },
+    h('div', { class: 'gate-mark' }, '🇮🇹'),
+    h('h1', {}, 'Italy 2026'),
+    h('p', {}, 'Sign in to see the plan.'),
+    who, pass, err,
+    h('div', { class: 'gate-acts' }, btn),
+  );
+  gateCard().replaceChildren(form);
+  who.focus();
+}
+
+async function boot() {
+  showLoading();
+
+  async function attempt() {
+    if (!state.token) { showLogin(attempt); return; }
+    const trip = await fetchItinerary();
+    if (trip) {
+      TRIP = trip;
+      setTrip(trip);
+      $('#gate')?.remove();
+      document.body.classList.add('is-ready');
+      renderAll();
+      return;
+    }
+    // fetchItinerary() failed. api()'s own 401 handling already signed out a
+    // rejected/expired token, so by the time we're here "no token" and "token
+    // was bad" are the same case — only a network/5xx failure leaves a token
+    // in place, and that's the one worth a retry instead of a password box.
+    if (state.token) showOffline(attempt); else showLogin(attempt);
+  }
+
+  await attempt();
+}
+
+boot();
